@@ -324,3 +324,28 @@ address = "0x19b080FE1ffA0553469D20Ca36219F17Fcf03859"
 variant = "StableSwapV1"
 name = "ibEUR/sEUR"
 
+[[pools]]
+address = "0xEB16Ae0052ed37f479f7fe63849198Df1765a733"
+variant = "StableSwapALend"
+name = "aDAI/aSUSD"
+
+[[pools]]
+address = "0x04b727C7e246CA70d496ecF52E6b6280f3c8077D"
+variant = "StableSwapMeta"
+name = "ApeUSD/crvFRAX"
+
+[[pools]]
+address = "0x9D0464996170c6B9e75eED71c68B99dDEDf279e8"
+variant = "StableSwapV2"
+name = "CRV/cvxCRV"
+
+[[pools]]
+address = "0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb"
+variant = "StableSwapMeta"
+name = "USDK/3Crv"
+
+[[pools]]
+address = "0x48fF31bBbD8Ab553Ebe7cBD84e1eA3dBa8f54957"
+variant = "StableSwapV2"
+name = "ANGLE/sdANGLE"
+
