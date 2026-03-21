@@ -11,6 +11,19 @@
 
 use alloy_primitives::{I256, U256};
 
+/// Floor division for signed integers (Vyper `//` and `/` semantics).
+/// Rust I256 `/` truncates toward zero; Vyper rounds toward negative infinity.
+/// Differs when operands have different signs and there's a remainder.
+fn fdiv(a: I256, b: I256) -> I256 {
+    let d = a / b;
+    let r = a % b;
+    if !r.is_zero() && ((a ^ b) < I256::ZERO) {
+        d - I256::try_from(1u64).unwrap()
+    } else {
+        d
+    }
+}
+
 pub const WAD: u128 = 1_000_000_000_000_000_000;
 pub const FEE_DENOMINATOR: u64 = 10_000_000_000;
 pub const A_MULTIPLIER: u64 = 10_000;
@@ -184,27 +197,27 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
     let e18 = s(WAD);
     let n_s = s(2);
 
-    let k0_i = e18.wrapping_mul(n_s).wrapping_mul(x_j_s) / d_s;
+    let k0_i = fdiv(e18.wrapping_mul(n_s).wrapping_mul(x_j_s), d_s);
     let lim_mul_signed = I256::try_from(lim_mul).ok()?;
-    if k0_i < s(10u128.pow(36)) / lim_mul_signed || k0_i > lim_mul_signed {
+    if k0_i < fdiv(s(10u128.pow(36)), lim_mul_signed) || k0_i > lim_mul_signed {
         return None;
     }
 
     let ann_gamma2 = ann_s.wrapping_mul(gamma2);
     let a: I256 = s(10u128.pow(32));
-    let b: I256 = d_s.wrapping_mul(ann_gamma2) / s(400_000_000) / x_j_s
+    let b: I256 = fdiv(fdiv(d_s.wrapping_mul(ann_gamma2), s(400_000_000)), x_j_s)
         - s(3).wrapping_mul(s(10u128.pow(32)))
         - s(2).wrapping_mul(gamma_s).wrapping_mul(s(10u128.pow(14)));
     let c: I256 = s(3).wrapping_mul(s(10u128.pow(32)))
         + s(4).wrapping_mul(gamma_s).wrapping_mul(s(10u128.pow(14)))
-        + gamma2 / s(10u128.pow(4))
-        + (s(4).wrapping_mul(ann_gamma2) / s(400_000_000)).wrapping_mul(x_j_s) / d_s
-        - s(4).wrapping_mul(ann_gamma2) / s(400_000_000);
-    let d_coeff: I256 = -(e18 + gamma_s).wrapping_mul(e18 + gamma_s) / s(10u128.pow(4));
+        + fdiv(gamma2, s(10u128.pow(4)))
+        + fdiv(fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000)).wrapping_mul(x_j_s), d_s)
+        - fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000));
+    let d_coeff: I256 = fdiv(-(e18 + gamma_s).wrapping_mul(e18 + gamma_s), s(10u128.pow(4)));
 
-    let delta0: I256 = s(3).wrapping_mul(a).wrapping_mul(c) / b - b;
+    let delta0: I256 = fdiv(s(3).wrapping_mul(a).wrapping_mul(c), b) - b;
     let delta1: I256 = s(3).wrapping_mul(delta0) + b
-        - (s(27).wrapping_mul(a).wrapping_mul(a) / b).wrapping_mul(d_coeff) / b;
+        - fdiv(fdiv(s(27).wrapping_mul(a).wrapping_mul(a), b).wrapping_mul(d_coeff), b);
 
     let threshold = delta0.abs().min(delta1.abs()).min(a);
     let threshold_u = U256::try_from(threshold.abs()).unwrap_or(U256::ZERO);
@@ -240,15 +253,17 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
         s(1)
     };
 
-    let a = a / divider;
-    let b = b / divider;
-    let c = c / divider;
-    let d_coeff = d_coeff / divider;
-    let delta0 = s(3).wrapping_mul(a).wrapping_mul(c) / b - b;
+    // unsafe_div in Vyper = EVM SDIV = truncation, but v2.0.0 used safe / = floor
+    // Use fdiv for consistency with both versions
+    let a = fdiv(a, divider);
+    let b = fdiv(b, divider);
+    let c = fdiv(c, divider);
+    let d_coeff = fdiv(d_coeff, divider);
+    let delta0 = fdiv(s(3).wrapping_mul(a).wrapping_mul(c), b) - b;
     let delta1 = s(3).wrapping_mul(delta0) + b
-        - (s(27).wrapping_mul(a.wrapping_mul(a)) / b).wrapping_mul(d_coeff) / b;
+        - fdiv(fdiv(s(27).wrapping_mul(a.wrapping_mul(a)), b).wrapping_mul(d_coeff), b);
     let sqrt_arg = delta1.wrapping_mul(delta1)
-        + (s(4).wrapping_mul(delta0.wrapping_mul(delta0)) / b).wrapping_mul(delta0);
+        + fdiv(s(4).wrapping_mul(delta0.wrapping_mul(delta0)), b).wrapping_mul(delta0);
 
     if sqrt_arg <= I256::ZERO {
         let y = newton_y_2_ng(ann, gamma, x, d, i, lim_mul)?;
@@ -276,10 +291,12 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
         .wrapping_div(e18)
         .wrapping_mul(second_cbrt)
         .wrapping_div(e18);
-    let root: I256 = (e18.wrapping_mul(c1)
-        - e18.wrapping_mul(b)
-        - (e18.wrapping_mul(b) / c1).wrapping_mul(delta0))
-        / (s(3).wrapping_mul(a));
+    let root: I256 = fdiv(
+        e18.wrapping_mul(c1)
+            - e18.wrapping_mul(b)
+            - fdiv(e18.wrapping_mul(b), c1).wrapping_mul(delta0),
+        s(3).wrapping_mul(a),
+    );
     let y_out = U256::try_from(
         d_s.wrapping_mul(d_s)
             .wrapping_div(x_j_s)
