@@ -166,6 +166,39 @@ pub fn get_amount_in(
     Some(dx)
 }
 
+/// Spot price dy/dx including fee, returned as (numerator, denominator).
+/// Numerical: compute get_amount_out with a small dx for marginal price.
+pub fn spot_price(
+    balances: &[U256; 3],
+    precisions: &[U256; 3],
+    price_scale: &[U256; 2],
+    d: U256,
+    ann: U256,
+    gamma: U256,
+    mid_fee: U256,
+    out_fee: U256,
+    fee_gamma: U256,
+    i: usize,
+    j: usize,
+) -> Option<(U256, U256)> {
+    let dx = U256::from(1_000_000_000_000_000u64); // 10^15 = 0.001 tokens for 18-dec
+    let dy = get_amount_out(
+        balances,
+        precisions,
+        price_scale,
+        d,
+        ann,
+        gamma,
+        mid_fee,
+        out_fee,
+        fee_gamma,
+        i,
+        j,
+        dx,
+    )?;
+    Some((dy, dx))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

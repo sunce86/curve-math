@@ -5,7 +5,7 @@
 
 use alloy_primitives::U256;
 
-use crate::core::stableswap_alend::{dynamic_fee, get_d, get_y, FEE_DENOMINATOR};
+use crate::core::stableswap_alend::{dynamic_fee, get_d, get_y, A_PRECISION, FEE_DENOMINATOR};
 
 pub fn get_amount_out(
     balances: &[U256],
@@ -101,6 +101,48 @@ pub fn get_amount_in(
     }
     let dx = (x_new - xp[i]) / precision_mul[i] + U256::from(1);
     Some(dx)
+}
+
+/// Spot price dy/dx including fee, returned as (numerator, denominator).
+/// Analytical: from implicit differentiation of StableSwap invariant.
+/// Uses dynamic fee at current pool state (zero trade size).
+pub fn spot_price(
+    balances: &[U256],
+    precision_mul: &[U256],
+    amp: U256,
+    fee: U256,
+    offpeg_fee_multiplier: U256,
+    i: usize,
+    j: usize,
+) -> Option<(U256, U256)> {
+    let fee_denom = U256::from(FEE_DENOMINATOR);
+    let n = U256::from(balances.len());
+    let ann_eff = amp.checked_mul(n)? / U256::from(A_PRECISION);
+    let xp: Vec<U256> = balances
+        .iter()
+        .zip(precision_mul.iter())
+        .map(|(b, p)| *b * *p)
+        .collect();
+    let d = get_d(&xp, amp)?;
+    // D_P = D^(N+1) / (N^N * prod(xp)), computed iteratively
+    let mut d_p = d;
+    for x_k in &xp {
+        d_p = d_p.checked_mul(d)?.checked_div(x_k.checked_mul(n)?)?;
+    }
+    // raw_price(i->j) = (ann_eff * xp[i] - d_p) / (ann_eff * xp[j] - d_p)
+    let num_xp = ann_eff.checked_mul(xp[i])?.checked_sub(d_p)?;
+    let den_xp = ann_eff.checked_mul(xp[j])?.checked_sub(d_p)?;
+    if num_xp.is_zero() || den_xp.is_zero() {
+        return None;
+    }
+    // Convert to native units: multiply by precision_mul[i] / precision_mul[j]
+    // (inverse of rates because xp = balance * precision_mul, not balance * rate / PRECISION)
+    // Dynamic fee at current pool state
+    let effective_fee = dynamic_fee(xp[i], xp[j], fee, offpeg_fee_multiplier);
+    // Include fee: multiply numerator by (FEE_DENOM - fee)
+    let numerator = num_xp * precision_mul[i] * (fee_denom - effective_fee);
+    let denominator = den_xp * precision_mul[j] * fee_denom;
+    Some((numerator, denominator))
 }
 
 #[cfg(test)]
