@@ -1,8 +1,7 @@
 # curve-math
 
-[![tests](https://img.shields.io/github/actions/workflow/status/sunce86/curve-math/unit-tests.yml?label=tests&logo=rust&logoColor=white)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
-[![fuzz ethereum](https://img.shields.io/github/actions/workflow/status/sunce86/curve-math/fuzz-ethereum.yml?label=fuzz%20ethereum&logo=ethereum&logoColor=white)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)
-[![pools](https://img.shields.io/badge/verified%20pools-12-brightgreen)](registry/1.toml)
+[![Unit Tests](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
+[![Fuzz Ethereum](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)
 
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 
@@ -19,7 +18,7 @@ All 10 Curve pool variants:
 | `StableSwapNG` | StableSwap | Newton | StableSwap-NG (plain + meta) | [CurveStableSwapNG.vy](https://github.com/curvefi/stableswap-ng/blob/main/contracts/main/CurveStableSwapNG.vy) |
 | `StableSwapMeta` | StableSwap | Newton | GUSD, HUSD, factory meta | [SwapTemplateMeta.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/meta/SwapTemplateMeta.vy) |
 | `TwoCryptoV1` | CryptoSwap | Newton | CRV/ETH (legacy) | [CurveCryptoSwap2ETH.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/two/CurveCryptoSwap2ETH.vy) |
-| `TwoCryptoNG` | CryptoSwap | Cardano cubic | crvUSD/FXN (twocrypto-ng) | [CurveTwocryptoOptimized.vy](https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/CurveTwocryptoOptimized.vy) |
+| `TwoCryptoNG` | CryptoSwap | Cardano cubic | crvUSD/FXN (twocrypto-ng) | [Twocrypto.vy](https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/Twocrypto.vy) |
 | `TriCryptoV1` | CryptoSwap | Newton | tricrypto2 (USDT/WBTC/WETH) | [CurveCryptoMath3.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/tricrypto/CurveCryptoMath3.vy) |
 | `TriCryptoNG` | CryptoSwap | Hybrid cubic+Newton | tricrypto-ng (USDC/WBTC/WETH) | [CurveTricryptoOptimized.vy](https://github.com/curvefi/tricrypto-ng/blob/main/contracts/main/CurveTricryptoOptimized.vy) |
 

@@ -1,8 +1,8 @@
 //! TwoCryptoNG — Next-gen 2-coin CryptoSwap.
 //!
 //! Uses Cardano cubic solver (get_y) instead of Newton.
-//! Vyper: https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/CurveTwocryptoOptimized.vy
-//!      + https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/CurveCryptoMathOptimized2.vy
+//! Vyper: https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/Twocrypto.vy
+//!      + https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/TwocryptoMath.vy
 //!
 //! NOTE: The NG Vyper `_fee` uses a different formula than V1's `reduction_coefficient`:
 //!   NG GitHub:  f = fee_gamma * k / (fee_gamma * k / WAD + WAD - k)
