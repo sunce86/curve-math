@@ -379,3 +379,63 @@ address = "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"
 variant = "StableSwapMeta"
 name = "LINKUSD/3Crv"
 
+[[pools]]
+address = "0x87650D7bbfC3A9F10587d7778206671719d9910D"
+variant = "StableSwapMeta"
+name = "OUSD/3Crv"
+
+[[pools]]
+address = "0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0"
+variant = "StableSwapV2"
+name = "LINK/sLINK"
+
+[[pools]]
+address = "0x3Fb78e61784C9c637D560eDE23Ad57CA1294c14a"
+variant = "StableSwapV2"
+name = "EURN/EURT"
+
+[[pools]]
+address = "0xaE34574AC03A15cd58A92DC79De7B1A0800F1CE3"
+variant = "StableSwapV2"
+name = "FRAX/USDP"
+
+[[pools]]
+address = "0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c"
+variant = "StableSwapMeta"
+name = "DUSD/3Crv"
+
+[[pools]]
+address = "0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c"
+variant = "StableSwapMeta"
+name = "USDV/3Crv"
+
+[[pools]]
+address = "0x9c2C8910F113181783c249d8F6Aa41b51Cde0f0c"
+variant = "StableSwapV2"
+name = "ibCHF/sCHF"
+
+[[pools]]
+address = "0x1977870a4c18a728C19Dd4eB6542451DF06e0A4b"
+variant = "StableSwapV2"
+name = "ApeUSD/FRAX"
+
+[[pools]]
+address = "0xe6b5CC1B4b47305c58392CE3D359B10282FC36Ea"
+variant = "StableSwapMeta"
+name = "USDD/3Crv"
+
+[[pools]]
+address = "0xe3c190c57b5959Ae62EfE3B6797058B76bA2f5eF"
+variant = "StableSwapMeta"
+name = "sUSD/crvFRAX"
+
+[[pools]]
+address = "0xAA5A67c256e27A5d80712c51971408db3370927D"
+variant = "StableSwapMeta"
+name = "DOLA/3Crv"
+
+[[pools]]
+address = "0xdE495223F7cD7EE0cDe1AddbD6836046bBdf3ad3"
+variant = "StableSwapMeta"
+name = "USDS/3Crv"
+
