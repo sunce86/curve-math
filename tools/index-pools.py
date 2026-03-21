@@ -242,6 +242,9 @@ def main():
             write_registry(registry_path, registry)
         return
 
+    # Save original pool list for diff
+    original_pools = list(registry["pools"])
+
     # Verify
     verified = 0
     failed = 0
@@ -267,9 +270,23 @@ def main():
 
     if args.dry_run:
         print("(dry run — no files written)")
-    else:
+    elif verified == 0:
+        print("No new pools to add.")
+        # Update timestamp only
+        registry["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         write_registry(registry_path, registry)
-        print(f"Written to {registry_path}")
+    else:
+        # Write new pools to pending file (not main registry)
+        # CI will fuzz only these, then merge if passed
+        pending_path = Path(f"registry/{args.chain_id}_pending.toml")
+        pending_registry = {"pools": [p for p in registry["pools"] if p not in original_pools]}
+        write_registry(pending_path, pending_registry)
+        print(f"Pending pools written to {pending_path}")
+
+        # Also update main registry (will be committed together)
+        registry["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        write_registry(registry_path, registry)
+        print(f"Registry updated: {registry_path}")
 
         # Update verified pool count in README badge
         pool_count = len(registry["pools"])

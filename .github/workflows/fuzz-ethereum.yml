@@ -3,10 +3,10 @@ name: Fuzz Ethereum
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
-    paths:
+    paths-ignore:
       - 'registry/**'
+      - 'tools/**'
+      - '*.md'
 
 env:
   CARGO_TERM_COLOR: always

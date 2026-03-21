@@ -22,7 +22,7 @@ jobs:
       - name: Install Python deps
         run: pip install web3 toml
 
-      - name: Run pool indexer
+      - name: Discover new pools
         env:
           RPC_URL_1: ${{ secrets.RPC_URL_1 }}
         run: |
@@ -31,6 +31,16 @@ jobs:
             exit 0
           fi
           python tools/index-pools.py --chain-id 1 --min-tvl 1000000 --max-new 10
+
+      - name: Fuzz new pools only
+        if: hashFiles('registry/1_pending.toml') != ''
+        env:
+          RPC_URL_1: ${{ secrets.RPC_URL_1 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          cargo test --features swap --test fuzz_registry -- fuzz_1_pending --ignored --nocapture
+          # If fuzz passes, remove pending file (pools already in main registry)
+          rm -f registry/1_pending.toml
 
       - name: Read PR summary
         id: summary

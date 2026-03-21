@@ -372,7 +372,8 @@ async fn on_chain_get_dy(
 
 // ── Shared fuzz runner ───────────────────────────────────────────────────────
 
-async fn fuzz_chain(chain_id: u64) {
+async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
+    let chain_id: u64 = std::env::var("FUZZ_CHAIN_ID").unwrap_or_else(|_| "1".into()).parse().unwrap();
     let env_key = format!("RPC_URL_{chain_id}");
     let rpc_url = std::env::var(&env_key)
         .or_else(|_| std::env::var("RPC_URL"))
@@ -381,12 +382,7 @@ async fn fuzz_chain(chain_id: u64) {
     let bn = provider.get_block_number().await.expect("block");
     let block = alloy::eips::BlockId::number(bn);
 
-    let path = format!("registry/{chain_id}.toml");
-    let toml_str = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("{path} not found"));
-    let registry: Registry = toml::from_str(&toml_str).unwrap_or_else(|_| panic!("invalid {path}"));
-
-    let pools = &registry.pools;
-    println!("[chain {chain_id}] {} pools, block {bn}", pools.len());
+    println!("[{label}] {} pools, block {bn}", pools.len());
 
     let n = fuzz_iterations();
     let mut total_passed = 0u64;
@@ -455,14 +451,39 @@ async fn fuzz_chain(chain_id: u64) {
         pools_ok += 1;
     }
 
-    println!("[chain {chain_id}] {pools_ok} pools, {total_passed} passed, {total_skipped} skipped\n");
-    assert!(total_passed > 0, "no tests passed for chain {chain_id}");
+    println!("[{label}] {pools_ok} pools, {total_passed} passed, {total_skipped} skipped\n");
+    assert!(total_passed > 0, "no tests passed for {label}");
+}
+
+fn load_registry(path: &str) -> Vec<PoolEntry> {
+    let toml_str = std::fs::read_to_string(path).unwrap_or_else(|_| panic!("{path} not found"));
+    let registry: Registry = toml::from_str(&toml_str).unwrap_or_else(|_| panic!("invalid {path}"));
+    registry.pools
 }
 
 // ── Per-chain tests ─────────────────────────────────────────────────────────
 
+/// Full fuzz: all pools in registry. Triggered by code changes.
 #[tokio::test]
 #[ignore = "requires RPC_URL_1 or RPC_URL"]
 async fn fuzz_1() {
-    fuzz_chain(1).await;
+    let pools = load_registry("registry/1.toml");
+    fuzz_pools("chain 1", &pools).await;
+}
+
+/// Pending fuzz: only new pools. Triggered by indexer PR.
+#[tokio::test]
+#[ignore = "requires RPC_URL_1 or RPC_URL"]
+async fn fuzz_1_pending() {
+    let path = "registry/1_pending.toml";
+    if !std::path::Path::new(path).exists() {
+        println!("No pending pools at {path}");
+        return;
+    }
+    let pools = load_registry(path);
+    if pools.is_empty() {
+        println!("No pending pools");
+        return;
+    }
+    fuzz_pools("chain 1 pending", &pools).await;
 }
