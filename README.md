@@ -2,7 +2,7 @@
 
 [![Unit Tests](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
 [![Fuzz Ethereum](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)
-![verified pools](https://img.shields.io/badge/verified%20pools-45-brightgreen)
+![verified pools](https://img.shields.io/badge/verified%20pools-49-brightgreen)
 
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 

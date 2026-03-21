@@ -148,7 +148,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
     detail_calls = []
     for addr in tvl_passed:
         pc = pool_contracts[addr]
-        for ci in range(2):  # most twocrypto pools are 2-coin
+        for ci in range(4):  # up to 4 coins
             detail_calls.append((pc, "coins", [ci]))
             detail_calls.append((pc, "balances", [ci]))
     detail_results = _batch_call(w3, detail_calls, block)
@@ -157,8 +157,8 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
     coin_addrs = {}
     for pi, addr in enumerate(tvl_passed):
         coins_for_pool = []
-        for ci in range(2):
-            base = pi * 4 + ci * 2
+        for ci in range(4):
+            base = pi * 8 + ci * 2
             coin_addr = detail_results[base]
             if coin_addr and coin_addr != "0x" + "0" * 40:
                 coins_for_pool.append((coin_addr, detail_results[base + 1]))
@@ -239,7 +239,6 @@ def verify_pool_quick(w3, pool_entry, block) -> tuple[bool, str]:
     """
     addr = Web3.to_checksum_address(pool_entry["address"])
     variant = pool_entry["variant"]
-    decimals = pool_entry["decimals"]
     pool = w3.eth.contract(address=addr, abi=POOL_ABI)
 
     # Read balance[0] for a reasonable swap amount (0.1% of balance)
