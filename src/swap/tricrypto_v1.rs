@@ -54,7 +54,7 @@ pub fn get_amount_out(
         dy = dy * wad / price_scale[j - 1];
     }
     // Vyper: dy /= precisions[j]
-    dy = dy / precisions[j];
+    dy /= precisions[j];
 
     // Vyper: dy -= fee_calc(xp) * dy / 10**10
     let fee = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma)?;
@@ -68,9 +68,173 @@ pub fn get_amount_out(
     Some(result)
 }
 
+pub fn get_amount_in(
+    balances: &[U256; 3],
+    precisions: &[U256; 3],
+    price_scale: &[U256; 2],
+    d: U256,
+    ann: U256,
+    gamma: U256,
+    mid_fee: U256,
+    out_fee: U256,
+    fee_gamma: U256,
+    i: usize,
+    j: usize,
+    desired_output: U256,
+) -> Option<U256> {
+    if desired_output.is_zero() {
+        return None;
+    }
+
+    let wad = U256::from(WAD);
+    let fee_denom = U256::from(FEE_DENOMINATOR);
+
+    let xp_orig: [U256; 3] = [
+        balances[0] * precisions[0],
+        balances[1] * price_scale[0] * precisions[1] / wad,
+        balances[2] * price_scale[1] * precisions[2] / wad,
+    ];
+
+    // First pass: estimate fee from pre-swap state
+    let fee_est = crypto_fee(&xp_orig, mid_fee, out_fee, fee_gamma)?;
+    let complement_est = fee_denom - fee_est;
+    let dy_native = (desired_output * fee_denom + complement_est - U256::from(1)) / complement_est;
+
+    // Reverse denorm: dy /= precisions[j], and if j > 0: dy = dy * WAD / price_scale[j-1]
+    let mut dy_internal = dy_native * precisions[j];
+    if j > 0 {
+        dy_internal = (dy_internal * price_scale[j - 1] + wad - U256::from(1)) / wad;
+    }
+    dy_internal += U256::from(1); // +1 for -1 offset
+    if xp_orig[j] <= dy_internal {
+        return None;
+    }
+    let y = xp_orig[j] - dy_internal;
+    let mut xp_mod = xp_orig;
+    xp_mod[j] = y;
+    let x_new = newton_y_3(ann, gamma, xp_mod, d, i)?;
+
+    // Second pass: recompute fee with actual xp_after
+    let mut xp_after = xp_orig;
+    xp_after[i] = x_new;
+    xp_after[j] = y;
+    let fee_actual = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma)?;
+    let complement_actual = fee_denom - fee_actual;
+    let dy_native =
+        (desired_output * fee_denom + complement_actual - U256::from(1)) / complement_actual;
+    let mut dy_internal = dy_native * precisions[j];
+    if j > 0 {
+        dy_internal = (dy_internal * price_scale[j - 1] + wad - U256::from(1)) / wad;
+    }
+    dy_internal += U256::from(1);
+    if xp_orig[j] <= dy_internal {
+        return None;
+    }
+    let y = xp_orig[j] - dy_internal;
+    let mut xp_mod = xp_orig;
+    xp_mod[j] = y;
+    let x_new = newton_y_3(ann, gamma, xp_mod, d, i)?;
+
+    if x_new <= xp_orig[i] {
+        return None;
+    }
+    let mut dx = x_new - xp_orig[i];
+    if i > 0 {
+        dx = dx * wad / price_scale[i - 1];
+    }
+    dx = dx / precisions[i] + U256::from(1);
+    loop {
+        let check = get_amount_out(
+            balances,
+            precisions,
+            price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            i,
+            j,
+            dx,
+        );
+        match check {
+            Some(dy_check) if dy_check >= desired_output => break,
+            _ => dx += U256::from(1),
+        }
+    }
+    Some(dx)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn roundtrip() {
+        let wad = U256::from(1_000_000_000_000_000_000u128);
+        // All 18-dec, 1:1:1 pricing for simplicity
+        let balances = [
+            U256::from(5000u64) * wad,
+            U256::from(5000u64) * wad,
+            U256::from(5000u64) * wad,
+        ];
+        let precisions = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
+        let price_scale = [wad, wad];
+        let d = U256::from(15000u64) * wad;
+        let ann = U256::from(1707629u64) * U256::from(10_000u64);
+        let gamma = U256::from(11_809_167_828_997u64);
+        let mid_fee = U256::from(3_000_000u64);
+        let out_fee = U256::from(30_000_000u64);
+        let fee_gamma = U256::from(230_000_000_000_000u64);
+        let dx = U256::from(1u64) * wad;
+        let dy = get_amount_out(
+            &balances,
+            &precisions,
+            &price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            dx,
+        )
+        .expect("out");
+        let dx_recovered = get_amount_in(
+            &balances,
+            &precisions,
+            &price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            dy,
+        )
+        .expect("in");
+        let dy_check = get_amount_out(
+            &balances,
+            &precisions,
+            &price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            dx_recovered,
+        )
+        .expect("check");
+        assert!(dy_check >= dy);
+    }
 
     alloy::sol! {
         #[sol(rpc)]

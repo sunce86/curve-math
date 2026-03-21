@@ -40,9 +40,72 @@ pub fn get_amount_out(
     Some(result)
 }
 
+pub fn get_amount_in(
+    balances: &[U256],
+    rates: &[U256],
+    amp: U256,
+    fee: U256,
+    i: usize,
+    j: usize,
+    desired_output: U256,
+) -> Option<U256> {
+    if desired_output.is_zero() {
+        return None;
+    }
+    let precision = U256::from(PRECISION);
+    let fee_denom = U256::from(FEE_DENOMINATOR);
+    let xp: Vec<U256> = balances
+        .iter()
+        .zip(rates.iter())
+        .map(|(b, r)| *b * *r / precision)
+        .collect();
+    let d = get_d(&xp, amp)?;
+    // Reverse fee (round up to ensure sufficient input)
+    let fee_complement = fee_denom - fee;
+    let dy = (desired_output * fee_denom + fee_complement - U256::from(1)) / fee_complement;
+    // Reverse denorm: dy_internal = dy * rates[j] / PRECISION
+    let dy_internal = dy * rates[j] / precision;
+    if xp[j] <= dy_internal {
+        return None;
+    }
+    // NO -1 offset
+    let y_new = xp[j] - dy_internal;
+    // Solve for x_new using swapped indices
+    let x_new = get_y(j, i, y_new, &xp, d, amp)?;
+    if x_new <= xp[i] {
+        return None;
+    }
+    // Denormalize input
+    let dx = (x_new - xp[i]) * precision / rates[i] + U256::from(1);
+    Some(dx)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn roundtrip() {
+        let rate18 = U256::from(1_000_000_000_000_000_000u128);
+        let balances = [
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+        ];
+        let rates = [rate18, rate18, rate18, rate18];
+        let amp = U256::from(100u64);
+        let fee = U256::from(4_000_000u64);
+        let dx = U256::from(1_000_000_000_000_000_000_000u128);
+        let dy = get_amount_out(&balances, &rates, amp, fee, 0, 1, dx).expect("out");
+        let dx_recovered = get_amount_in(&balances, &rates, amp, fee, 0, 1, dy).expect("in");
+        assert!(dx_recovered >= dx);
+        assert!(dx_recovered <= dx + U256::from(2));
+        // Verify forward pass produces at least desired output
+        let dy_check =
+            get_amount_out(&balances, &rates, amp, fee, 0, 1, dx_recovered).expect("check");
+        assert!(dy_check >= dy);
+    }
 
     alloy::sol! {
         #[sol(rpc)]

@@ -46,6 +46,44 @@ pub fn get_amount_out(
     Some(result)
 }
 
+pub fn get_amount_in(
+    balances: &[U256],
+    rates: &[U256],
+    amp: U256,
+    fee: U256,
+    i: usize,
+    j: usize,
+    desired_output: U256,
+) -> Option<U256> {
+    if desired_output.is_zero() {
+        return None;
+    }
+    let precision = U256::from(PRECISION);
+    let fee_denom = U256::from(FEE_DENOMINATOR);
+    let xp: Vec<U256> = balances
+        .iter()
+        .zip(rates.iter())
+        .map(|(b, r)| *b * *r / precision)
+        .collect();
+    let d = get_d(&xp, amp)?;
+    // Reverse denorm: dy_after_fee_internal = desired_output * rates[j] / PRECISION
+    let dy_after_fee_internal = desired_output * rates[j] / precision;
+    // Reverse fee (fee was applied in internal space)
+    let complement = fee_denom - fee;
+    let dy_internal = (dy_after_fee_internal * fee_denom + complement - U256::from(1)) / complement;
+    if xp[j] <= dy_internal + U256::from(1) {
+        return None;
+    }
+    // -1 offset
+    let y_new = xp[j] - dy_internal - U256::from(1);
+    let x_new = get_y(j, i, y_new, &xp, d, amp)?;
+    if x_new <= xp[i] {
+        return None;
+    }
+    let dx = (x_new - xp[i]) * precision / rates[i] + U256::from(1);
+    Some(dx)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,6 +109,42 @@ mod tests {
         let amount_in = U256::from(1_000_000_000_000_000_000_000u128);
         assert!(out < amount_in);
         assert!(out > amount_in * U256::from(999) / U256::from(1000));
+    }
+
+    #[test]
+    fn roundtrip() {
+        let b = U256::from(1_000_000_000_000_000_000_000_000u128);
+        let balances = [b, b];
+        let rates = [U256::from(RATE_18), U256::from(RATE_18)];
+        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let dx = U256::from(1_000_000_000_000_000_000_000u128);
+        let dy = get_amount_out(&balances, &rates, amp, fee, 0, 1, dx).expect("out");
+        let dx_recovered = get_amount_in(&balances, &rates, amp, fee, 0, 1, dy).expect("in");
+        assert!(dx_recovered >= dx);
+        assert!(dx_recovered <= dx + U256::from(2));
+        let dy_check =
+            get_amount_out(&balances, &rates, amp, fee, 0, 1, dx_recovered).expect("check");
+        assert!(dy_check >= dy);
+    }
+
+    #[test]
+    fn roundtrip_different_decimals() {
+        let balances = [
+            U256::from(1_000_000_000_000_000_000_000_000u128),
+            U256::from(1_000_000_000_000u128),
+        ];
+        let rates = [U256::from(RATE_18), U256::from(RATE_6)];
+        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let dx = U256::from(1_000_000_000u128); // 1k USDC
+        let dy = get_amount_out(&balances, &rates, amp, fee, 1, 0, dx).expect("out");
+        let dx_recovered = get_amount_in(&balances, &rates, amp, fee, 1, 0, dy).expect("in");
+        assert!(dx_recovered >= dx);
+        assert!(dx_recovered <= dx + U256::from(2));
+        let dy_check =
+            get_amount_out(&balances, &rates, amp, fee, 1, 0, dx_recovered).expect("check");
+        assert!(dy_check >= dy);
     }
 
     #[test]

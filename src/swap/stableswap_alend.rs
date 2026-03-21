@@ -50,10 +50,86 @@ pub fn get_amount_out(
     Some(result)
 }
 
+pub fn get_amount_in(
+    balances: &[U256],
+    precision_mul: &[U256],
+    amp: U256,
+    fee: U256,
+    offpeg_fee_multiplier: U256,
+    i: usize,
+    j: usize,
+    desired_output: U256,
+) -> Option<U256> {
+    if desired_output.is_zero() {
+        return None;
+    }
+    let fee_denom = U256::from(FEE_DENOMINATOR);
+    let xp: Vec<U256> = balances
+        .iter()
+        .zip(precision_mul.iter())
+        .map(|(b, p)| *b * *p)
+        .collect();
+    let d = get_d(&xp, amp)?;
+
+    // First pass: use base fee as estimate (round up)
+    let fee_complement = fee_denom - fee;
+    let dy = (desired_output * fee_denom + fee_complement - U256::from(1)) / fee_complement;
+    let dy_internal = dy * precision_mul[j];
+    if xp[j] <= dy_internal {
+        return None;
+    }
+    let y_new = xp[j] - dy_internal;
+    let x_new = get_y(j, i, y_new, &xp, d, amp)?;
+
+    // Second pass: recompute with actual dynamic fee
+    let actual_fee = dynamic_fee(
+        (xp[i] + x_new) / U256::from(2),
+        (xp[j] + y_new) / U256::from(2),
+        fee,
+        offpeg_fee_multiplier,
+    );
+    let actual_complement = fee_denom - actual_fee;
+    let dy = (desired_output * fee_denom + actual_complement - U256::from(1)) / actual_complement;
+    let dy_internal = dy * precision_mul[j];
+    if xp[j] <= dy_internal {
+        return None;
+    }
+    let y_new = xp[j] - dy_internal;
+    let x_new = get_y(j, i, y_new, &xp, d, amp)?;
+    if x_new <= xp[i] {
+        return None;
+    }
+    let dx = (x_new - xp[i]) / precision_mul[i] + U256::from(1);
+    Some(dx)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::core::stableswap_alend::A_PRECISION;
+
+    #[test]
+    fn roundtrip() {
+        // All 18-dec tokens (precision_mul = 1)
+        let balances = [
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+            U256::from(10_000_000_000_000_000_000_000_000u128),
+        ];
+        let prec_mul = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
+        let amp = U256::from(100u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let offpeg = U256::from(20_000_000_000u64);
+        let dx = U256::from(1_000_000_000_000_000_000_000u128);
+        let dy = get_amount_out(&balances, &prec_mul, amp, fee, offpeg, 0, 1, dx).expect("out");
+        let dx_recovered =
+            get_amount_in(&balances, &prec_mul, amp, fee, offpeg, 0, 1, dy).expect("in");
+        assert!(dx_recovered >= dx);
+        assert!(dx_recovered <= dx + U256::from(2));
+        let dy_check = get_amount_out(&balances, &prec_mul, amp, fee, offpeg, 0, 1, dx_recovered)
+            .expect("check");
+        assert!(dy_check >= dy);
+    }
 
     alloy::sol! {
         #[sol(rpc)]
