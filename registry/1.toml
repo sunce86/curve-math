@@ -55,8 +55,8 @@ address = "0x167478921b907422F8E88B43C4Af2B8BEa278d3A"
 variant = "StableSwapNG"
 name = "sDAI/sUSDe"
 coins = 2
-decimals = [18, 18]
-oracle_rates = true  # rates must be read from pool.stored_rates(), not computed from decimals
+decimals = [ 18, 18,]
+oracle_rates = true
 
 [[pools]]
 address = "0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f"
@@ -91,7 +91,7 @@ address = "0x6e5492F8ea2370844EE098A56DD88e1717e4A9C2"
 variant = "TwoCryptoStable"
 name = "crvUSD/WETH (MATH v0.1.0)"
 coins = 2
-decimals = [18, 18]
+decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xD51a44d3FaE010294C616388b506AcdA1bfAAE46"
@@ -113,4 +113,46 @@ variant = "StableSwapNG"
 name = "apxUSD/USDC"
 coins = 2
 decimals = [ 18, 6,]
+
+[[pools]]
+address = "0xBf5047039F2980C21eB5692c790BAd8A9533b900"
+variant = "StableSwapNG"
+name = "pmUSD/frxUSD"
+coins = 2
+decimals = [ 18, 18,]
+
+[[pools]]
+address = "0xEcb0F0d68C19BdAaDAEbE24f6752A4Db34e2c2cb"
+variant = "StableSwapNG"
+name = "pmUSD/crvUSD"
+coins = 2
+decimals = [ 18, 18,]
+
+[[pools]]
+address = "0x2C7C98A3b1582D83c43987202aEFf638312478aE"
+variant = "StableSwapNG"
+name = "USDS/stUSDS"
+coins = 2
+decimals = [ 18, 18,]
+
+[[pools]]
+address = "0x9A9e2e70919c75D80aAaA1D483c46CdBb8ac4d1b"
+variant = "StableSwapNG"
+name = "frxUSD/msUSD"
+coins = 2
+decimals = [ 18, 18,]
+
+[[pools]]
+address = "0x7E19F0253A564e026C63eeAA9338d6DBddeF3b09"
+variant = "StableSwapNG"
+name = "NUSD/USDC"
+coins = 2
+decimals = [ 18, 6,]
+
+[[pools]]
+address = "0x64273624eb57c5cA961d366CBF3968e760Bf0452"
+variant = "StableSwapNG"
+name = "DOLA/wstUSR"
+coins = 2
+decimals = [ 18, 18,]
 

@@ -86,6 +86,24 @@ def write_registry(path: Path, registry: dict):
         f.write(toml.dumps(registry))
 
 
+def _batch_call(w3, calls, block):
+    """Execute multiple eth_call in parallel using threading."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    results = [None] * len(calls)
+    def do_call(idx, contract, fn_name, args):
+        try:
+            fn = getattr(contract.functions, fn_name)(*args)
+            return idx, fn.call(block_identifier=block)
+        except Exception:
+            return idx, None
+    with ThreadPoolExecutor(max_workers=20) as pool:
+        futures = [pool.submit(do_call, i, c, f, a) for i, (c, f, a) in enumerate(calls)]
+        for future in as_completed(futures):
+            idx, val = future.result()
+            results[idx] = val
+    return results
+
+
 def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
     """Discover new pools from a factory contract."""
     factory = w3.eth.contract(
@@ -93,73 +111,92 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
         abi=FACTORY_ABI,
     )
     count = factory.functions.pool_count().call(block_identifier=block)
-    print(f"  {factory_cfg['label']}: {count} pools")
+    max_check = min(max_new * 20, count)
+    print(f"  {factory_cfg['label']}: {count} pools (checking newest {max_check})")
+
+    # Step 1: batch fetch pool addresses (newest first)
+    indices = list(range(count - 1, max(count - 1 - max_check, -1), -1))
+    addr_calls = [(factory, "pool_list", [i]) for i in indices]
+    pool_addrs = _batch_call(w3, addr_calls, block)
+
+    # Filter out existing
+    new_addrs = []
+    for addr in pool_addrs:
+        if addr and addr.lower() not in existing_addrs:
+            new_addrs.append(addr)
+    if not new_addrs:
+        return []
+
+    # Step 2: batch fetch balance[0] for TVL filter
+    pool_contracts = {a: w3.eth.contract(address=a, abi=POOL_ABI) for a in new_addrs}
+    bal_calls = [(pool_contracts[a], "balances", [0]) for a in new_addrs]
+    bal_results = _batch_call(w3, bal_calls, block)
+
+    # Filter by rough TVL
+    tvl_passed = []
+    for addr, bal0 in zip(new_addrs, bal_results):
+        if bal0 and (bal0 // 10**18) * 3 >= min_tvl:
+            tvl_passed.append(addr)
+    if not tvl_passed:
+        return []
+
+    # Step 3: batch fetch coin details for TVL-passing pools (limit to max_new)
+    tvl_passed = tvl_passed[:max_new]
+    detail_calls = []
+    for addr in tvl_passed:
+        pc = pool_contracts[addr]
+        for ci in range(2):  # most twocrypto pools are 2-coin
+            detail_calls.append((pc, "coins", [ci]))
+            detail_calls.append((pc, "balances", [ci]))
+    detail_results = _batch_call(w3, detail_calls, block)
+
+    # Step 4: batch fetch decimals/symbols for coins
+    coin_addrs = {}
+    for pi, addr in enumerate(tvl_passed):
+        coins_for_pool = []
+        for ci in range(2):
+            base = pi * 4 + ci * 2
+            coin_addr = detail_results[base]
+            if coin_addr and coin_addr != "0x" + "0" * 40:
+                coins_for_pool.append((coin_addr, detail_results[base + 1]))
+        coin_addrs[addr] = coins_for_pool
+
+    # Batch decimals/symbols
+    token_calls = []
+    token_map = []  # (pool_addr, coin_idx)
+    for addr, coins in coin_addrs.items():
+        for ci, (coin_addr, _) in enumerate(coins):
+            tc = w3.eth.contract(address=coin_addr, abi=TOKEN_ABI)
+            token_calls.append((tc, "decimals", []))
+            token_calls.append((tc, "symbol", []))
+            token_map.append((addr, ci))
+    token_results = _batch_call(w3, token_calls, block)
+
+    # Assemble candidates
+    token_info = {}
+    for ti, (pool_addr, ci) in enumerate(token_map):
+        dec = token_results[ti * 2] or 18
+        sym = token_results[ti * 2 + 1] or "???"
+        if pool_addr not in token_info:
+            token_info[pool_addr] = []
+        token_info[pool_addr].append((dec, sym))
 
     candidates = []
-    checked = 0
-    max_check = max_new * 20  # check at most 20x max_new pools (from newest to oldest)
-    for i in range(count - 1, -1, -1):  # iterate newest first
-        if len(candidates) >= max_new or checked >= max_check:
-            break
-        checked += 1
-
-        pool_addr = factory.functions.pool_list(i).call(block_identifier=block)
-        addr_lower = pool_addr.lower()
-        if addr_lower in existing_addrs:
+    for addr in tvl_passed:
+        coins = coin_addrs.get(addr, [])
+        info = token_info.get(addr, [])
+        if not coins or not info:
             continue
-
-        # Quick TVL check: balance[0] only
-        pool = w3.eth.contract(address=pool_addr, abi=POOL_ABI)
-        try:
-            bal0 = pool.functions.balances(0).call(block_identifier=block)
-        except Exception:
-            continue
-
-        # Rough filter: assume 18 decimals, multiply by 3 for n_coins estimate
-        rough_tvl = (bal0 // 10**18) * 3
-        if rough_tvl < min_tvl:
-            continue
-
-        # Read coin details
-        coins = []
-        decimals = []
-        symbols = []
-        balances = []
-        for ci in range(4):
-            try:
-                coin_addr = pool.functions.coins(ci).call(block_identifier=block)
-                if coin_addr == "0x" + "0" * 40:
-                    break
-                token = w3.eth.contract(address=coin_addr, abi=TOKEN_ABI)
-                try:
-                    dec = token.functions.decimals().call(block_identifier=block)
-                except Exception:
-                    dec = 18
-                try:
-                    sym = token.functions.symbol().call(block_identifier=block)
-                except Exception:
-                    sym = "???"
-                bal = pool.functions.balances(ci).call(block_identifier=block)
-                coins.append(coin_addr)
-                decimals.append(dec)
-                symbols.append(sym)
-                balances.append(bal)
-            except Exception:
-                break
-
-        if not coins:
-            continue
-
-        # Accurate TVL
-        tvl = sum(b // 10**d for b, d in zip(balances, decimals))
+        decimals = [d for d, _ in info]
+        symbols = [s for _, s in info]
+        balances = [b for _, b in coins]
+        tvl = sum(b // 10**d for b, d in zip(balances, decimals) if b)
         if tvl < min_tvl:
             continue
-
         name = "/".join(symbols)
-        print(f"    {pool_addr} {name} ({len(coins)}-coin, ~${tvl:,})")
-
+        print(f"    {addr} {name} ({len(coins)}-coin, ~${tvl:,})")
         candidates.append({
-            "address": pool_addr,
+            "address": addr,
             "variant": factory_cfg["variant"],
             "name": name,
             "coins": len(coins),
