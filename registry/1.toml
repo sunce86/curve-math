@@ -284,3 +284,18 @@ address = "0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6"
 variant = "StableSwapMeta"
 name = "mUSD/3Crv"
 
+[[pools]]
+address = "0x5a6A4D54456819380173272A5E8E9B9904BdF41B"
+variant = "StableSwapMeta"
+name = "MIM/3Crv"
+
+[[pools]]
+address = "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA"
+variant = "StableSwapMeta"
+name = "LUSD/3Crv"
+
+[[pools]]
+address = "0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B"
+variant = "StableSwapMeta"
+name = "FRAX/3Crv"
+

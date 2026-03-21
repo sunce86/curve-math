@@ -322,17 +322,29 @@ async fn build_pool(
             let raw_a = c.A().block(block).call().await.ok()?;
             let fee = c.fee().block(block).call().await.ok()?;
             // Read virtual_price for base LP token rate
-            let base_pool_addr = c.base_pool().block(block).call().await.ok()?;
+            // Newer meta pools have base_pool(), older ones don't — fallback to 3pool
+            let three_pool = Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
+            let base_pool_addr = c.base_pool().block(block).call().await.unwrap_or(three_pool);
             let base_pool = IBasePool::new(base_pool_addr, provider);
-            let cached_vp = c.base_virtual_price().block(block).call().await.ok()?;
-            let cache_updated = c.base_cache_updated().block(block).call().await.ok()?;
-            let bn = match block { alloy::eips::BlockId::Number(n) => n.as_number().unwrap_or(0), _ => 0 };
-            let block_data = provider.get_block_by_number(bn.into()).await.ok()??;
-            let block_ts = U256::from(block_data.header.timestamp);
-            let vp = if block_ts - cache_updated > U256::from(600u64) {
-                base_pool.get_virtual_price().block(block).call().await.ok()?
-            } else {
-                cached_vp
+            // Try cached vp with staleness check, fallback to direct get_virtual_price
+            let vp = match (
+                c.base_virtual_price().block(block).call().await,
+                c.base_cache_updated().block(block).call().await,
+            ) {
+                (Ok(cached_vp), Ok(cache_updated)) => {
+                    let bn_num = match block { alloy::eips::BlockId::Number(n) => n.as_number().unwrap_or(0), _ => 0 };
+                    let block_data = provider.get_block_by_number(bn_num.into()).await.ok()??;
+                    let block_ts = U256::from(block_data.header.timestamp);
+                    if block_ts - cache_updated > U256::from(600u64) {
+                        base_pool.get_virtual_price().block(block).call().await.ok()?
+                    } else {
+                        cached_vp
+                    }
+                }
+                _ => {
+                    // Legacy meta pool — read virtual_price directly from base pool
+                    base_pool.get_virtual_price().block(block).call().await.ok()?
+                }
             };
             let mut rates: Vec<U256> = decimals.iter().map(|d| rate_for_decimals(*d)).collect();
             // Override last rate with virtual_price
