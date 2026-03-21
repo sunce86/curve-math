@@ -156,6 +156,95 @@ alloy::sol! {
     }
 }
 
+alloy::sol! {
+    #[sol(rpc)]
+    interface IMulticall3 {
+        struct Call3 {
+            address target;
+            bool allowFailure;
+            bytes callData;
+        }
+        struct Result {
+            bool success;
+            bytes returnData;
+        }
+        function aggregate3(Call3[] calldata calls) external payable returns (Result[] returnData);
+    }
+}
+
+const MULTICALL3: Address = Address::new([
+    0xca, 0x11, 0xbd, 0xe0, 0x59, 0x77, 0xb3, 0x63, 0x11, 0x67,
+    0x02, 0x88, 0x62, 0xbE, 0x2a, 0x17, 0x39, 0x76, 0xCA, 0x11,
+]);
+const BATCH_SIZE: usize = 100;
+
+/// Batch `get_dy` calls via Multicall3 to reduce RPC request count.
+/// Returns one `Option<U256>` per input case (None = on-chain revert or batch error).
+async fn batch_get_dy(
+    entry: &PoolEntry,
+    provider: &BoxProvider,
+    block: alloy::eips::BlockId,
+    cases: &[(usize, usize, U256)],
+) -> Vec<Option<U256>> {
+    use alloy::sol_types::SolCall;
+
+    let addr = Address::from_str(&entry.address).unwrap();
+    let mc = IMulticall3::new(MULTICALL3, provider);
+
+    let is_crypto = matches!(
+        entry.variant.as_str(),
+        "TwoCryptoV1" | "TwoCryptoNG" | "TwoCryptoStable" | "TriCryptoV1" | "TriCryptoNG"
+    );
+
+    let mut results = Vec::with_capacity(cases.len());
+
+    for chunk in cases.chunks(BATCH_SIZE) {
+        let calls: Vec<IMulticall3::Call3> = chunk
+            .iter()
+            .map(|(i, j, dx)| {
+                let calldata = if is_crypto {
+                    ICrypto2::get_dyCall {
+                        i: U256::from(*i),
+                        j: U256::from(*j),
+                        dx: *dx,
+                    }
+                    .abi_encode()
+                } else {
+                    IStable::get_dyCall {
+                        i: *i as i128,
+                        j: *j as i128,
+                        dx: *dx,
+                    }
+                    .abi_encode()
+                };
+                IMulticall3::Call3 {
+                    target: addr,
+                    allowFailure: true,
+                    callData: calldata.into(),
+                }
+            })
+            .collect();
+
+        match mc.aggregate3(calls).block(block).call().await {
+            Ok(batch_results) => {
+                for r in &batch_results {
+                    if r.success && r.returnData.len() == 32 {
+                        results.push(Some(U256::from_be_slice(&r.returnData)));
+                    } else {
+                        results.push(None);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("    multicall3 batch failed: {e}");
+                results.extend(std::iter::repeat(None).take(chunk.len()));
+            }
+        }
+    }
+
+    results
+}
+
 // ── PRNG + amount generation ────────────────────────────────────────────────
 
 fn splitmix64(seed: &mut u64) -> u64 {
@@ -529,26 +618,32 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
             Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => balances.to_vec(),
         };
 
+        let mut test_cases: Vec<(usize, usize, U256)> = Vec::new();
         for (idx, &(i, j)) in pairs.iter().enumerate() {
             for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
-                let on_chain = on_chain_get_dy(entry, &provider, block, i, j, dx).await;
-                match on_chain {
-                    Some(expected) => {
-                        let ours = pool.get_amount_out(i, j, dx);
-                        match ours {
-                            Some(result) => {
-                                assert_eq!(
-                                    result, expected,
-                                    "{} ({}) {i}→{j} mismatch at dx={dx}",
-                                    entry.name, entry.variant
-                                );
-                                passed += 1;
-                            }
-                            None => skipped += 1,
+                test_cases.push((i, j, dx));
+            }
+        }
+
+        let on_chain_results = batch_get_dy(entry, &provider, block, &test_cases).await;
+
+        for ((i, j, dx), on_chain) in test_cases.iter().zip(on_chain_results.iter()) {
+            match on_chain {
+                Some(expected) => {
+                    let ours = pool.get_amount_out(*i, *j, *dx);
+                    match ours {
+                        Some(result) => {
+                            assert_eq!(
+                                result, *expected,
+                                "{} ({}) {i}→{j} mismatch at dx={dx}",
+                                entry.name, entry.variant
+                            );
+                            passed += 1;
                         }
+                        None => skipped += 1,
                     }
-                    None => skipped += 1,
                 }
+                None => skipped += 1,
             }
         }
 
