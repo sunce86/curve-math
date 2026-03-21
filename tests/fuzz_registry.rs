@@ -228,8 +228,10 @@ async fn batch_get_dy(
         match mc.aggregate3(calls).block(block).call().await {
             Ok(batch_results) => {
                 for r in &batch_results {
-                    if r.success && r.returnData.len() == 32 {
-                        results.push(Some(U256::from_be_slice(&r.returnData)));
+                    if r.success && r.returnData.len() >= 32 {
+                        // Take first 32 bytes — some older Vyper contracts
+                        // return padded data (e.g. 4096 bytes).
+                        results.push(Some(U256::from_be_slice(&r.returnData[..32])));
                     } else {
                         results.push(None);
                     }
@@ -524,38 +526,6 @@ async fn build_pool(
             } else {
                 Some((Pool::TriCryptoNG { balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
             }
-        }
-        _ => None,
-    }
-}
-
-// ── On-chain get_dy caller ──────────────────────────────────────────────────
-
-async fn on_chain_get_dy(
-    entry: &PoolEntry,
-    provider: &BoxProvider,
-    block: alloy::eips::BlockId,
-    i: usize,
-    j: usize,
-    dx: U256,
-) -> Option<U256> {
-    let addr = Address::from_str(&entry.address).ok()?;
-    match entry.variant.as_str() {
-        "StableSwapV0" => {
-            let c = IStableOld::new(addr, provider);
-            c.get_dy(i as i128, j as i128, dx).block(block).call().await.ok()
-        }
-        "StableSwapV1" | "StableSwapV2" | "StableSwapALend" | "StableSwapNG" | "StableSwapMeta" => {
-            let c = IStable::new(addr, provider);
-            c.get_dy(i as i128, j as i128, dx).block(block).call().await.ok()
-        }
-        "TwoCryptoV1" | "TwoCryptoNG" | "TwoCryptoStable" => {
-            let c = ICrypto2::new(addr, provider);
-            c.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await.ok()
-        }
-        "TriCryptoV1" | "TriCryptoNG" => {
-            let c = ICrypto3::new(addr, provider);
-            c.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await.ok()
         }
         _ => None,
     }
