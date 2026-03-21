@@ -309,3 +309,18 @@ address = "0xbcb91E689114B9Cc865AD7871845C95241Df4105"
 variant = "StableSwapMeta"
 name = "PWRD/3Crv"
 
+[[pools]]
+address = "0xB30dA2376F63De30b42dC055C93fa474F31330A5"
+variant = "StableSwapMeta"
+name = "alUSD/crvFRAX"
+
+[[pools]]
+address = "0xB37D6c07482Bc11cd28a1f11f1a6ad7b66Dec933"
+variant = "StableSwapV1"
+name = "ibEUR/EURA"
+
+[[pools]]
+address = "0x19b080FE1ffA0553469D20Ca36219F17Fcf03859"
+variant = "StableSwapV1"
+name = "ibEUR/sEUR"
+

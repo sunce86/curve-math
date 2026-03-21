@@ -322,9 +322,22 @@ async fn build_pool(
             let raw_a = c.A().block(block).call().await.ok()?;
             let fee = c.fee().block(block).call().await.ok()?;
             // Read virtual_price for base LP token rate
-            // Newer meta pools have base_pool(), older ones don't — fallback to 3pool
-            let three_pool = Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
-            let base_pool_addr = c.base_pool().block(block).call().await.unwrap_or(three_pool);
+            // Newer meta pools have base_pool(), older ones don't.
+            // Fallback: read coin[1] (LP token) → call minter() → that's the base pool
+            let base_pool_addr = match c.base_pool().block(block).call().await {
+                Ok(addr) => addr,
+                Err(_) => {
+                    // Legacy meta pool — find base pool via LP token's minter()
+                    let lp_token = ICoinInfo::new(addr, provider)
+                        .coins(U256::from(1)).block(block).call().await.ok()?;
+                    alloy::sol! {
+                        #[sol(rpc)]
+                        interface ILPToken { function minter() external view returns (address); }
+                    }
+                    ILPToken::new(lp_token, provider)
+                        .minter().block(block).call().await.ok()?
+                }
+            };
             let base_pool = IBasePool::new(base_pool_addr, provider);
             // Try cached vp with staleness check, fallback to direct get_virtual_price
             let vp = match (
