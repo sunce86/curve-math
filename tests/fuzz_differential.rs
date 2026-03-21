@@ -110,22 +110,26 @@ async fn fuzz_stableswap_v0() {
     let balances = [b0, b1, b2, b3];
 
     let n = fuzz_iterations();
-    let max_dx = balances[0];
-    let amounts = generate_amounts(n, max_dx, bn);
+    let n_coins = 4usize;
+    let mut pairs: Vec<(usize, usize)> = Vec::new();
+    for i in 0..n_coins { for j in 0..n_coins { if i != j { pairs.push((i, j)); } } }
+    let per_pair = (n / pairs.len()).max(1);
 
     let mut passed = 0u64;
     let mut skipped = 0u64;
-    for dx in &amounts {
-        let on_chain = curve.get_dy(0i128, 1i128, *dx).block(block).call().await;
-        match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, *dx) {
-                Some(result) => { assert_eq!(result, expected, "V0 mismatch at dx={dx}"); passed += 1; }
-                None => skipped += 1,
-            },
-            Err(_) => skipped += 1,
+    for (idx, &(i, j)) in pairs.iter().enumerate() {
+        for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
+            let on_chain = curve.get_dy(i as i128, j as i128, dx).block(block).call().await;
+            match on_chain {
+                Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, i, j, dx) {
+                    Some(result) => { assert_eq!(result, expected, "V0 {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                    None => skipped += 1,
+                },
+                Err(_) => skipped += 1,
+            }
         }
     }
-    println!("fuzz_stableswap_v0: {passed} passed, {skipped} skipped (block {bn})");
+    println!("fuzz_stableswap_v0: {passed} passed, {skipped} skipped, {n_coins}-coin all pairs (block {bn})");
     assert!(passed > 0, "no tests passed");
 }
 
@@ -164,22 +168,26 @@ async fn fuzz_stableswap_v1() {
     let balances = [b0, b1, b2];
 
     let n = fuzz_iterations();
-    let max_dx = balances[0];
-    let amounts = generate_amounts(n, max_dx, bn);
+    let n_coins = 3usize;
+    let mut pairs: Vec<(usize, usize)> = Vec::new();
+    for i in 0..n_coins { for j in 0..n_coins { if i != j { pairs.push((i, j)); } } }
+    let per_pair = (n / pairs.len()).max(1);
 
     let mut passed = 0u64;
     let mut skipped = 0u64;
-    for dx in &amounts {
-        let on_chain = curve.get_dy(0i128, 1i128, *dx).block(block).call().await;
-        match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, *dx) {
-                Some(result) => { assert_eq!(result, expected, "V1 mismatch at dx={dx}"); passed += 1; }
-                None => skipped += 1,
-            },
-            Err(_) => skipped += 1,
+    for (idx, &(i, j)) in pairs.iter().enumerate() {
+        for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
+            let on_chain = curve.get_dy(i as i128, j as i128, dx).block(block).call().await;
+            match on_chain {
+                Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, i, j, dx) {
+                    Some(result) => { assert_eq!(result, expected, "V1 {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                    None => skipped += 1,
+                },
+                Err(_) => skipped += 1,
+            }
         }
     }
-    println!("fuzz_stableswap_v1: {passed} passed, {skipped} skipped (block {bn})");
+    println!("fuzz_stableswap_v1: {passed} passed, {skipped} skipped, {n_coins}-coin all pairs (block {bn})");
     assert!(passed > 0, "no tests passed");
 }
 
@@ -283,22 +291,26 @@ async fn fuzz_stableswap_alend() {
     let amp = raw_a * U256::from(curve_math::core::stableswap_alend::A_PRECISION as u64);
 
     let n = fuzz_iterations();
-    let max_dx = balances[0];
-    let amounts = generate_amounts(n, max_dx, bn);
+    let n_coins = 3usize;
+    let mut pairs: Vec<(usize, usize)> = Vec::new();
+    for i in 0..n_coins { for j in 0..n_coins { if i != j { pairs.push((i, j)); } } }
+    let per_pair = (n / pairs.len()).max(1);
 
     let mut passed = 0u64;
     let mut skipped = 0u64;
-    for dx in &amounts {
-        let on_chain = curve.get_dy(0i128, 1i128, *dx).block(block).call().await;
-        match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precision_mul, amp, fee, offpeg, 0, 1, *dx) {
-                Some(result) => { assert_eq!(result, expected, "ALend mismatch at dx={dx}"); passed += 1; }
-                None => skipped += 1,
-            },
-            Err(_) => skipped += 1,
+    for (idx, &(i, j)) in pairs.iter().enumerate() {
+        for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
+            let on_chain = curve.get_dy(i as i128, j as i128, dx).block(block).call().await;
+            match on_chain {
+                Ok(expected) => match get_amount_out(&balances, &precision_mul, amp, fee, offpeg, i, j, dx) {
+                    Some(result) => { assert_eq!(result, expected, "ALend {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                    None => skipped += 1,
+                },
+                Err(_) => skipped += 1,
+            }
         }
     }
-    println!("fuzz_stableswap_alend: {passed} passed, {skipped} skipped (block {bn})");
+    println!("fuzz_stableswap_alend: {passed} passed, {skipped} skipped, {n_coins}-coin all pairs (block {bn})");
     assert!(passed > 0, "no tests passed");
 }
 
@@ -339,22 +351,31 @@ async fn fuzz_stableswap_ng() {
     let amp = raw_a * U256::from(A_PRECISION as u64);
 
     let n = fuzz_iterations();
-    let max_dx = balances[0];
-    let amounts = generate_amounts(n, max_dx, bn);
-
+    let half = n / 2;
     let mut passed = 0u64;
     let mut skipped = 0u64;
-    for dx in &amounts {
-        let on_chain = curve.get_dy(0i128, 1i128, *dx).block(block).call().await;
+
+    for dx in generate_amounts(half, balances[0], bn) {
+        let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 0, 1, *dx) {
-                Some(result) => { assert_eq!(result, expected, "NG mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 0, 1, dx) {
+                Some(result) => { assert_eq!(result, expected, "NG 0→1 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
-    println!("fuzz_stableswap_ng: {passed} passed, {skipped} skipped (block {bn})");
+    for dx in generate_amounts(n - half, balances[1], bn + 1) {
+        let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
+        match on_chain {
+            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 1, 0, dx) {
+                Some(result) => { assert_eq!(result, expected, "NG 1→0 mismatch at dx={dx}"); passed += 1; }
+                None => skipped += 1,
+            },
+            Err(_) => skipped += 1,
+        }
+    }
+    println!("fuzz_stableswap_ng: {passed} passed, {skipped} skipped, both directions (block {bn})");
     assert!(passed > 0, "no tests passed");
 }
 
@@ -414,22 +435,33 @@ async fn fuzz_stableswap_meta() {
     let amp = raw_a * U256::from(A_PRECISION as u64);
 
     let n = fuzz_iterations();
-    let max_dx = balances[0];
-    let amounts = generate_amounts(n, max_dx, bn);
-
+    let half = n / 2;
     let mut passed = 0u64;
     let mut skipped = 0u64;
-    for dx in &amounts {
-        let on_chain = curve.get_dy(0i128, 1i128, *dx).block(block).call().await;
+
+    // GUSD → 3CRV
+    for dx in generate_amounts(half, balances[0], bn) {
+        let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, *dx) {
-                Some(result) => { assert_eq!(result, expected, "Meta mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
+                Some(result) => { assert_eq!(result, expected, "Meta 0→1 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
-    println!("fuzz_stableswap_meta: {passed} passed, {skipped} skipped (block {bn})");
+    // 3CRV → GUSD
+    for dx in generate_amounts(n - half, balances[1], bn + 1) {
+        let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
+        match on_chain {
+            Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 1, 0, dx) {
+                Some(result) => { assert_eq!(result, expected, "Meta 1→0 mismatch at dx={dx}"); passed += 1; }
+                None => skipped += 1,
+            },
+            Err(_) => skipped += 1,
+        }
+    }
+    println!("fuzz_stableswap_meta: {passed} passed, {skipped} skipped, both directions (block {bn})");
     assert!(passed > 0, "no tests passed");
 }
 

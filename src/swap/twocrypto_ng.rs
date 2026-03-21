@@ -132,27 +132,29 @@ pub fn get_amount_in(
     } else {
         (x_new - xp_orig[i]) / precisions[0]
     } + U256::from(1);
-    loop {
-        let check = get_amount_out(
-            balances,
-            precisions,
-            price_scale,
-            d,
-            ann,
-            gamma,
-            mid_fee,
-            out_fee,
-            fee_gamma,
-            i,
-            j,
-            dx,
-        );
-        match check {
-            Some(dy_check) if dy_check >= desired_output => break,
-            _ => dx += U256::from(1),
+    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, i, j, amt);
+    match forward(dx) {
+        Some(dy_check) if dy_check >= desired_output => return Some(dx),
+        _ => {}
+    }
+    let mut lo = dx;
+    let mut hi = dx;
+    for _ in 0..64 {
+        hi = hi + hi / U256::from(10u64) + U256::from(1u64);
+        if let Some(dy_check) = forward(hi) {
+            if dy_check >= desired_output { break; }
         }
     }
-    Some(dx)
+    for _ in 0..256 {
+        if lo >= hi { break; }
+        let mid = (lo + hi) / U256::from(2u64);
+        if mid == lo { break; }
+        match forward(mid) {
+            Some(dy_check) if dy_check >= desired_output => hi = mid,
+            _ => lo = mid + U256::from(1u64),
+        }
+    }
+    Some(hi)
 }
 
 /// Spot price dy/dx including fee, returned as (numerator, denominator).
