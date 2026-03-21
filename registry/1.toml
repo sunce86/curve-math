@@ -728,3 +728,63 @@ address = "0x56be5d27878bf847189F5a6a29ED1350177c7420"
 variant = "TriCryptoNG"
 name = "CJPY/WETH/TXJP"
 
+[[pools]]
+address = "0x080A4941aad94dDC19C2fEd604D55109119b5774"
+variant = "StableSwapNG"
+name = "ELX/stELX"
+
+[[pools]]
+address = "0x4b5E827F4C0a1042272a11857a355dA1F4Ceebae"
+variant = "StableSwapNG"
+name = "sUSD/sUSDe"
+
+[[pools]]
+address = "0x3CEf1AFC0E8324b57293a6E7cE663781bbEFBB79"
+variant = "StableSwapNG"
+name = "sUSDe/sUSDS"
+
+[[pools]]
+address = "0xBBaf8B2837CBbc7146F5bC978D6F84db0BE1CAcc"
+variant = "StableSwapNG"
+name = "FRAX/frxUSD"
+
+[[pools]]
+address = "0x1f5766eAe6527EF00EF82c00A8e11b95A473865f"
+variant = "TwoCryptoNG"
+name = "CRV/PROS"
+
+[[pools]]
+address = "0x39355d9dDD84C6801c311Ac743a0EB55288BFDe1"
+variant = "TwoCryptoNG"
+name = "SPECTRA/OETH"
+
+[[pools]]
+address = "0x161287C32Ce149997637D28f1A9d7682eAD16ed8"
+variant = "TwoCryptoNG"
+name = "ELON/SPANK"
+
+[[pools]]
+address = "0x20F858D88124857274994516eEaC7720fe39B8ea"
+variant = "TwoCryptoNG"
+name = "VSP/WETH"
+
+[[pools]]
+address = "0x62bfEA5673c6336d265865e5eA1d32F67c523C33"
+variant = "TriCryptoNG"
+name = "POOH/WETH/crvUSD"
+
+[[pools]]
+address = "0x8a4f252812dFF2A8636E4F7EB249d8FC2E3bd77f"
+variant = "TriCryptoNG"
+name = "GHO/cbBTC/WETH"
+
+[[pools]]
+address = "0x84CeCB5525c6B1C20070E742da870062E84Da178"
+variant = "TriCryptoNG"
+name = "QOM/O/CAW"
+
+[[pools]]
+address = "0x4eBdF703948ddCEA3B11f675B4D1Fba9d2414A14"
+variant = "TriCryptoNG"
+name = "crvUSD/WETH/CRV"
+
