@@ -334,8 +334,13 @@ async fn build_pool(
                         #[sol(rpc)]
                         interface ILPToken { function minter() external view returns (address); }
                     }
-                    ILPToken::new(lp_token, provider)
-                        .minter().block(block).call().await.ok()?
+                    match ILPToken::new(lp_token, provider).minter().block(block).call().await {
+                        Ok(a) => a,
+                        Err(_) => {
+                            // CurveTokenV2 (3Crv) has no minter() — fallback to 3pool
+                            Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap()
+                        }
+                    }
                 }
             };
             let base_pool = IBasePool::new(base_pool_addr, provider);

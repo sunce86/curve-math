@@ -349,3 +349,18 @@ address = "0x48fF31bBbD8Ab553Ebe7cBD84e1eA3dBa8f54957"
 variant = "StableSwapV2"
 name = "ANGLE/sdANGLE"
 
+[[pools]]
+address = "0x6870F9b4DD5d34C7FC53D0d85D9dBd1aAB339BF7"
+variant = "StableSwapMeta"
+name = "DEI/3Crv"
+
+[[pools]]
+address = "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c"
+variant = "StableSwapMeta"
+name = "alUSD/3Crv"
+
+[[pools]]
+address = "0x06cb22615BA53E60D67Bf6C341a0fD5E718E1655"
+variant = "StableSwapMeta"
+name = "FEI/3Crv"
+
