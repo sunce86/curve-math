@@ -56,6 +56,9 @@ POOL_ABI = json.loads('[{"name":"coins","outputs":[{"type":"address"}],"inputs":
 
 TOKEN_ABI = json.loads('[{"name":"decimals","outputs":[{"type":"uint8"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"symbol","outputs":[{"type":"string"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 
+MATH_GETTER_ABI = json.loads('[{"name":"MATH","outputs":[{"type":"address"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+VERSION_ABI = json.loads('[{"name":"version","outputs":[{"type":"string"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+
 
 def get_rpc_url(chain_id: int) -> str:
     key = f"RPC_URL_{chain_id}"
@@ -181,6 +184,22 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
             token_info[pool_addr] = []
         token_info[pool_addr].append((dec, sym))
 
+    # Step 5: For TwoCryptoNG, detect MATH version to distinguish TwoCryptoNG vs TwoCryptoStable
+    math_versions = {}
+    if factory_cfg["variant"] == "TwoCryptoNG":
+        math_calls = [(w3.eth.contract(address=a, abi=MATH_GETTER_ABI), "MATH", []) for a in tvl_passed]
+        math_addrs = _batch_call(w3, math_calls, block)
+        ver_calls = []
+        ver_map = []
+        for pool_addr, math_addr in zip(tvl_passed, math_addrs):
+            if math_addr:
+                ver_calls.append((w3.eth.contract(address=math_addr, abi=VERSION_ABI), "version", []))
+                ver_map.append(pool_addr)
+        if ver_calls:
+            ver_results = _batch_call(w3, ver_calls, block)
+            for pool_addr, ver in zip(ver_map, ver_results):
+                math_versions[pool_addr] = ver or "unknown"
+
     candidates = []
     for addr in tvl_passed:
         coins = coin_addrs.get(addr, [])
@@ -193,11 +212,19 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
         tvl = sum(b // 10**d for b, d in zip(balances, decimals) if b)
         if tvl < min_tvl:
             continue
+
+        variant = factory_cfg["variant"]
+        # Detect TwoCryptoStable: MATH v0.1.0 = StableSwap math
+        if variant == "TwoCryptoNG":
+            math_ver = math_versions.get(addr, "v2.0.0")
+            if math_ver == "v0.1.0":
+                variant = "TwoCryptoStable"
+
         name = "/".join(symbols)
-        print(f"    {addr} {name} ({len(coins)}-coin, ~${tvl:,})")
+        print(f"    {addr} {name} ({len(coins)}-coin, ~${tvl:,}, {variant})")
         candidates.append({
             "address": addr,
-            "variant": factory_cfg["variant"],
+            "variant": variant,
             "name": name,
             "coins": len(coins),
             "decimals": decimals,
