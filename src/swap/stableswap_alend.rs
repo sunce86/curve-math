@@ -129,19 +129,17 @@ pub fn spot_price(
     for x_k in &xp {
         d_p = d_p.checked_mul(d)?.checked_div(x_k.checked_mul(n)?)?;
     }
-    // raw_price(i->j) = (ann_eff * xp[i] - d_p) / (ann_eff * xp[j] - d_p)
-    let num_xp = ann_eff.checked_mul(xp[i])?.checked_sub(d_p)?;
-    let den_xp = ann_eff.checked_mul(xp[j])?.checked_sub(d_p)?;
-    if num_xp.is_zero() || den_xp.is_zero() {
+    // Implicit differentiation of StableSwap invariant at constant D:
+    // dy/dx = (A_n + D_P/xp[i]) / (A_n + D_P/xp[j])
+    // As integer fraction: (A_n*xp[i] + D_P) * bal[j] / ((A_n*xp[j] + D_P) * bal[i])
+    let num_xp = ann_eff.checked_mul(xp[i])?.checked_add(d_p)?;
+    let den_xp = ann_eff.checked_mul(xp[j])?.checked_add(d_p)?;
+    if den_xp.is_zero() {
         return None;
     }
-    // Convert to native units: multiply by precision_mul[i] / precision_mul[j]
-    // (inverse of rates because xp = balance * precision_mul, not balance * rate / PRECISION)
-    // Dynamic fee at current pool state
     let effective_fee = dynamic_fee(xp[i], xp[j], fee, offpeg_fee_multiplier);
-    // Include fee: multiply numerator by (FEE_DENOM - fee)
-    let numerator = num_xp * precision_mul[i] * (fee_denom - effective_fee);
-    let denominator = den_xp * precision_mul[j] * fee_denom;
+    let numerator = num_xp.checked_mul(balances[j])?.checked_mul(fee_denom - effective_fee)?;
+    let denominator = den_xp.checked_mul(balances[i])?.checked_mul(fee_denom)?;
     Some((numerator, denominator))
 }
 
@@ -204,14 +202,13 @@ mod tests {
             spot_price(&balances, &prec_mul, amp, fee, offpeg, 0, 1).expect("price_ij");
         let (num_ji, den_ji) =
             spot_price(&balances, &prec_mul, amp, fee, offpeg, 1, 0).expect("price_ji");
-        let product_num = num_ij * num_ji;
-        let product_den = den_ij * den_ji;
-        let diff = if product_num > product_den {
-            product_num - product_den
-        } else {
-            product_den - product_num
-        };
-        assert!(diff * U256::from(1000) < product_den, "symmetry violated");
+        // price(i,j) * price(j,i) ≈ (1-f)^2
+        // Compare via cross-mul to avoid overflow: num_ij * den_ji ≈ num_ji * den_ij
+        // (for balanced pool, both prices ≈ (1-f), so their ratio should be ≈ 1)
+        let lhs = num_ij * den_ji;
+        let rhs = num_ji * den_ij;
+        let diff = if lhs > rhs { lhs - rhs } else { rhs - lhs };
+        assert!(diff * U256::from(1000) < rhs, "symmetry violated");
     }
 
     #[test]

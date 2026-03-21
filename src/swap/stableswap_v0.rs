@@ -105,16 +105,17 @@ pub fn spot_price(
     for x_k in &xp {
         d_p = d_p.checked_mul(d)?.checked_div(x_k.checked_mul(n)?)?;
     }
-    // raw_price(i→j) = (ann_eff * xp[i] - d_p) / (ann_eff * xp[j] - d_p)
-    let num_xp = ann_eff.checked_mul(xp[i])?.checked_sub(d_p)?;
-    let den_xp = ann_eff.checked_mul(xp[j])?.checked_sub(d_p)?;
-    if num_xp.is_zero() || den_xp.is_zero() {
+    // Implicit differentiation of StableSwap invariant at constant D:
+    // dy/dx = (A_n + D_P/xp[i]) / (A_n + D_P/xp[j])
+    // As integer fraction: (A_n*xp[i] + D_P) * bal[j] / ((A_n*xp[j] + D_P) * bal[i])
+    // (using identity: xp[j]*rates[i] / (xp[i]*rates[j]) = balances[j]/balances[i])
+    let num_xp = ann_eff.checked_mul(xp[i])?.checked_add(d_p)?;
+    let den_xp = ann_eff.checked_mul(xp[j])?.checked_add(d_p)?;
+    if den_xp.is_zero() {
         return None;
     }
-    // Convert to native units: multiply by rates[i]/rates[j]
-    // Include fee: multiply numerator by (FEE_DENOM - fee)
-    let numerator = num_xp * rates[i] * (fee_denom - fee);
-    let denominator = den_xp * rates[j] * fee_denom;
+    let numerator = num_xp.checked_mul(balances[j])?.checked_mul(fee_denom - fee)?;
+    let denominator = den_xp.checked_mul(balances[i])?.checked_mul(fee_denom)?;
     Some((numerator, denominator))
 }
 
