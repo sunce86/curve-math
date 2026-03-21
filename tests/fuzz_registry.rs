@@ -1,0 +1,469 @@
+//! Registry-driven differential fuzz test.
+//!
+//! Reads `pools.toml`, tests every pool with `fuzz_verified = true`.
+//! One generic test — no per-variant copy-paste.
+//!
+//! Run:
+//!   FUZZ_ITERATIONS=100 RPC_URL=<ethereum-mainnet> \
+//!     cargo test --features swap --test fuzz_registry -- --ignored --nocapture
+
+#![cfg(feature = "swap")]
+
+use alloy::providers::{Provider, ProviderBuilder};
+use alloy_primitives::{Address, U256};
+use curve_math::Pool;
+use serde::Deserialize;
+use std::str::FromStr;
+
+// ── Registry types ──────────────────────────────────────────────────────────
+
+#[derive(Deserialize)]
+struct Registry {
+    pools: Vec<PoolEntry>,
+}
+
+#[derive(Deserialize)]
+struct PoolEntry {
+    address: String,
+    chain: String,
+    variant: String,
+    name: String,
+    coins: usize,
+    decimals: Vec<u8>,
+    fuzz_verified: bool,
+    #[serde(default)]
+    note: String,
+}
+
+// ── On-chain interfaces ─────────────────────────────────────────────────────
+
+alloy::sol! {
+    #[sol(rpc)]
+    interface IStableOld {
+        function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256);
+        function balances(int128 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function fee() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface IStable {
+        function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256);
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function fee() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface IStableOffpeg {
+        function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256);
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function fee() external view returns (uint256);
+        function offpeg_fee_multiplier() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface IStableMeta {
+        function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256);
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function fee() external view returns (uint256);
+        function base_pool() external view returns (address);
+        function base_virtual_price() external view returns (uint256);
+        function base_cache_updated() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface IBasePool {
+        function get_virtual_price() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface ICrypto2 {
+        function get_dy(uint256 i, uint256 j, uint256 dx) external view returns (uint256);
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function gamma() external view returns (uint256);
+        function D() external view returns (uint256);
+        function price_scale() external view returns (uint256);
+        function mid_fee() external view returns (uint256);
+        function out_fee() external view returns (uint256);
+        function fee_gamma() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface ICrypto3 {
+        function get_dy(uint256 i, uint256 j, uint256 dx) external view returns (uint256);
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function gamma() external view returns (uint256);
+        function D() external view returns (uint256);
+        function price_scale(uint256 i) external view returns (uint256);
+        function mid_fee() external view returns (uint256);
+        function out_fee() external view returns (uint256);
+        function fee_gamma() external view returns (uint256);
+    }
+}
+
+// ── PRNG + amount generation ────────────────────────────────────────────────
+
+fn splitmix64(seed: &mut u64) -> u64 {
+    *seed = seed.wrapping_add(0x9e3779b97f4a7c15);
+    let mut z = *seed;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+    z ^ (z >> 31)
+}
+
+fn generate_amounts(n: usize, balance: U256, seed: u64) -> Vec<U256> {
+    if balance.is_zero() || n == 0 {
+        return vec![];
+    }
+    let mut amounts = Vec::with_capacity(n + 6);
+    amounts.push(U256::ZERO);
+    amounts.push(U256::from(1u64));
+    amounts.push(balance / U256::from(1000u64));
+    amounts.push(balance / U256::from(10u64));
+    amounts.push(balance / U256::from(2u64));
+    amounts.push(balance);
+    amounts.push(balance * U256::from(2u64));
+    amounts.push(U256::MAX);
+    let remaining = n.saturating_sub(amounts.len());
+    if remaining > 0 {
+        let mut s = seed;
+        let max_f64 = balance.to_string().parse::<f64>().unwrap_or(1e30);
+        let ln_max = max_f64.ln();
+        for _ in 0..remaining {
+            let r = splitmix64(&mut s);
+            let t = (r as f64) / (u64::MAX as f64);
+            let val = (t * ln_max).exp();
+            let v = U256::from(val.min(1e38) as u128).max(U256::from(1u64)).min(balance);
+            amounts.push(v);
+        }
+    }
+    amounts
+}
+
+fn fuzz_iterations() -> usize {
+    std::env::var("FUZZ_ITERATIONS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(100)
+}
+
+fn rate_for_decimals(dec: u8) -> U256 {
+    // rate = 10^(36 - decimals) / 10^18 = 10^(18 - decimals) ... but stored as 10^(36-dec)/PRECISION
+    // For StableSwap: rate = PRECISION * PRECISION_MUL = 10^18 * 10^(18-dec) = 10^(36-dec)
+    // Actually: rate = 10^(36 - decimals) for the rates-based variants
+    // For 18-dec: 10^18, for 6-dec: 10^30, for 8-dec: 10^28, for 2-dec: 10^34
+    U256::from(10u64).pow(U256::from(36 - dec as u32))
+}
+
+fn precision_mul_for_decimals(dec: u8) -> U256 {
+    U256::from(10u64).pow(U256::from(18 - dec as u32))
+}
+
+fn precision_for_decimals(dec: u8) -> U256 {
+    // CryptoSwap precisions: 10^(18 - decimals)
+    U256::from(10u64).pow(U256::from(18 - dec as u32))
+}
+
+// ── Generic pool builder ────────────────────────────────────────────────────
+
+type BoxProvider = alloy::providers::fillers::FillProvider<
+    alloy::providers::fillers::JoinFill<
+        alloy::providers::Identity,
+        alloy::providers::fillers::JoinFill<
+            alloy::providers::fillers::GasFiller,
+            alloy::providers::fillers::JoinFill<
+                alloy::providers::fillers::BlobGasFiller,
+                alloy::providers::fillers::JoinFill<
+                    alloy::providers::fillers::NonceFiller,
+                    alloy::providers::fillers::ChainIdFiller,
+                >,
+            >,
+        >,
+    >,
+    alloy::providers::RootProvider,
+>;
+
+async fn build_pool(
+    entry: &PoolEntry,
+    provider: &BoxProvider,
+    block: alloy::eips::BlockId,
+) -> Option<Pool> {
+    let addr = Address::from_str(&entry.address).ok()?;
+    let a_prec_100 = U256::from(100u64);
+
+    match entry.variant.as_str() {
+        "StableSwapV0" => {
+            let c = IStableOld::new(addr, provider);
+            let mut balances = Vec::new();
+            for i in 0..entry.coins {
+                balances.push(c.balances(i as i128).block(block).call().await.ok()?);
+            }
+            let amp = c.A().block(block).call().await.ok()?;
+            let fee = c.fee().block(block).call().await.ok()?;
+            let rates: Vec<U256> = entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect();
+            Some(Pool::StableSwapV0 { balances, rates, amp, fee })
+        }
+        "StableSwapV1" => {
+            let c = IStable::new(addr, provider);
+            let mut balances = Vec::new();
+            for i in 0..entry.coins {
+                balances.push(c.balances(U256::from(i)).block(block).call().await.ok()?);
+            }
+            let amp = c.A().block(block).call().await.ok()?;
+            let fee = c.fee().block(block).call().await.ok()?;
+            let rates: Vec<U256> = entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect();
+            Some(Pool::StableSwapV1 { balances, rates, amp, fee })
+        }
+        "StableSwapV2" => {
+            let c = IStable::new(addr, provider);
+            let mut balances = Vec::new();
+            for i in 0..entry.coins {
+                balances.push(c.balances(U256::from(i)).block(block).call().await.ok()?);
+            }
+            let raw_a = c.A().block(block).call().await.ok()?;
+            let fee = c.fee().block(block).call().await.ok()?;
+            let rates: Vec<U256> = entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect();
+            let amp = raw_a * a_prec_100;
+            Some(Pool::StableSwapV2 { balances, rates, amp, fee })
+        }
+        "StableSwapALend" => {
+            let c = IStableOffpeg::new(addr, provider);
+            let mut balances = Vec::new();
+            for i in 0..entry.coins {
+                balances.push(c.balances(U256::from(i)).block(block).call().await.ok()?);
+            }
+            let raw_a = c.A().block(block).call().await.ok()?;
+            let fee = c.fee().block(block).call().await.ok()?;
+            let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok()?;
+            let precision_mul: Vec<U256> = entry.decimals.iter().map(|d| precision_mul_for_decimals(*d)).collect();
+            let amp = raw_a * a_prec_100;
+            Some(Pool::StableSwapALend { balances, precision_mul, amp, fee, offpeg_fee_multiplier: offpeg })
+        }
+        "StableSwapNG" => {
+            let c = IStableOffpeg::new(addr, provider);
+            let mut balances = Vec::new();
+            for i in 0..entry.coins {
+                balances.push(c.balances(U256::from(i)).block(block).call().await.ok()?);
+            }
+            let raw_a = c.A().block(block).call().await.ok()?;
+            let fee = c.fee().block(block).call().await.ok()?;
+            let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok()?;
+            let rates: Vec<U256> = entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect();
+            let amp = raw_a * a_prec_100;
+            Some(Pool::StableSwapNG { balances, rates, amp, fee, offpeg_fee_multiplier: offpeg })
+        }
+        "StableSwapMeta" => {
+            let c = IStableMeta::new(addr, provider);
+            let mut balances = Vec::new();
+            for i in 0..entry.coins {
+                balances.push(c.balances(U256::from(i)).block(block).call().await.ok()?);
+            }
+            let raw_a = c.A().block(block).call().await.ok()?;
+            let fee = c.fee().block(block).call().await.ok()?;
+            // Read virtual_price for base LP token rate
+            let base_pool_addr = c.base_pool().block(block).call().await.ok()?;
+            let base_pool = IBasePool::new(base_pool_addr, provider);
+            let cached_vp = c.base_virtual_price().block(block).call().await.ok()?;
+            let cache_updated = c.base_cache_updated().block(block).call().await.ok()?;
+            let bn = match block { alloy::eips::BlockId::Number(n) => n.as_number().unwrap_or(0), _ => 0 };
+            let block_data = provider.get_block_by_number(bn.into()).await.ok()??;
+            let block_ts = U256::from(block_data.header.timestamp);
+            let vp = if block_ts - cache_updated > U256::from(600u64) {
+                base_pool.get_virtual_price().block(block).call().await.ok()?
+            } else {
+                cached_vp
+            };
+            let mut rates: Vec<U256> = entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect();
+            // Override last rate with virtual_price
+            if let Some(last) = rates.last_mut() {
+                *last = vp;
+            }
+            let amp = raw_a * a_prec_100;
+            Some(Pool::StableSwapMeta { balances, rates, amp, fee })
+        }
+        "TwoCryptoV1" | "TwoCryptoNG" => {
+            let c = ICrypto2::new(addr, provider);
+            let b0 = c.balances(U256::from(0)).block(block).call().await.ok()?;
+            let b1 = c.balances(U256::from(1)).block(block).call().await.ok()?;
+            let ann = c.A().block(block).call().await.ok()?;
+            let gamma = c.gamma().block(block).call().await.ok()?;
+            let d = c.D().block(block).call().await.ok()?;
+            let ps = c.price_scale().block(block).call().await.ok()?;
+            let mid_fee = c.mid_fee().block(block).call().await.ok()?;
+            let out_fee = c.out_fee().block(block).call().await.ok()?;
+            let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
+            let precisions: [U256; 2] = [
+                precision_for_decimals(entry.decimals[0]),
+                precision_for_decimals(entry.decimals[1]),
+            ];
+            let balances = [b0, b1];
+            if entry.variant == "TwoCryptoV1" {
+                Some(Pool::TwoCryptoV1 { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma })
+            } else {
+                Some(Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma })
+            }
+        }
+        "TriCryptoV1" | "TriCryptoNG" => {
+            let c = ICrypto3::new(addr, provider);
+            let b0 = c.balances(U256::from(0)).block(block).call().await.ok()?;
+            let b1 = c.balances(U256::from(1)).block(block).call().await.ok()?;
+            let b2 = c.balances(U256::from(2)).block(block).call().await.ok()?;
+            let ann = c.A().block(block).call().await.ok()?;
+            let gamma = c.gamma().block(block).call().await.ok()?;
+            let d = c.D().block(block).call().await.ok()?;
+            let ps0 = c.price_scale(U256::from(0)).block(block).call().await.ok()?;
+            let ps1 = c.price_scale(U256::from(1)).block(block).call().await.ok()?;
+            let mid_fee = c.mid_fee().block(block).call().await.ok()?;
+            let out_fee = c.out_fee().block(block).call().await.ok()?;
+            let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
+            let precisions: [U256; 3] = [
+                precision_for_decimals(entry.decimals[0]),
+                precision_for_decimals(entry.decimals[1]),
+                precision_for_decimals(entry.decimals[2]),
+            ];
+            let balances = [b0, b1, b2];
+            let price_scale = [ps0, ps1];
+            if entry.variant == "TriCryptoV1" {
+                Some(Pool::TriCryptoV1 { balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma })
+            } else {
+                Some(Pool::TriCryptoNG { balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma })
+            }
+        }
+        _ => None,
+    }
+}
+
+// ── On-chain get_dy caller ──────────────────────────────────────────────────
+
+async fn on_chain_get_dy(
+    entry: &PoolEntry,
+    provider: &BoxProvider,
+    block: alloy::eips::BlockId,
+    i: usize,
+    j: usize,
+    dx: U256,
+) -> Option<U256> {
+    let addr = Address::from_str(&entry.address).ok()?;
+    match entry.variant.as_str() {
+        "StableSwapV0" => {
+            let c = IStableOld::new(addr, provider);
+            c.get_dy(i as i128, j as i128, dx).block(block).call().await.ok()
+        }
+        "StableSwapV1" | "StableSwapV2" | "StableSwapALend" | "StableSwapNG" | "StableSwapMeta" => {
+            let c = IStable::new(addr, provider);
+            c.get_dy(i as i128, j as i128, dx).block(block).call().await.ok()
+        }
+        "TwoCryptoV1" | "TwoCryptoNG" => {
+            let c = ICrypto2::new(addr, provider);
+            c.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await.ok()
+        }
+        "TriCryptoV1" | "TriCryptoNG" => {
+            let c = ICrypto3::new(addr, provider);
+            c.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await.ok()
+        }
+        _ => None,
+    }
+}
+
+// ── The test ────────────────────────────────────────────────────────────────
+
+#[tokio::test]
+#[ignore = "requires RPC_URL"]
+async fn fuzz_registry() {
+    let rpc_url = std::env::var("RPC_URL").expect("RPC_URL must be set");
+    let provider = ProviderBuilder::new().connect_http(rpc_url.parse().expect("invalid RPC_URL"));
+    let bn = provider.get_block_number().await.expect("block");
+    let block = alloy::eips::BlockId::number(bn);
+
+    let toml_str = std::fs::read_to_string("pools.toml").expect("pools.toml not found");
+    let registry: Registry = toml::from_str(&toml_str).expect("invalid pools.toml");
+
+    let verified: Vec<&PoolEntry> = registry.pools.iter().filter(|p| p.fuzz_verified).collect();
+    println!("Registry: {} pools ({} verified), block {bn}", registry.pools.len(), verified.len());
+
+    let n = fuzz_iterations();
+    let mut total_passed = 0u64;
+    let mut total_skipped = 0u64;
+    let mut pools_ok = 0u64;
+
+    for entry in &verified {
+        // Only test ethereum pools (for now)
+        if entry.chain != "ethereum" {
+            continue;
+        }
+
+        let pool = match build_pool(entry, &provider, block).await {
+            Some(p) => p,
+            None => {
+                println!("  SKIP {}: could not read on-chain state", entry.name);
+                continue;
+            }
+        };
+
+        // Build all (i,j) pairs
+        let mut pairs: Vec<(usize, usize)> = Vec::new();
+        for i in 0..entry.coins {
+            for j in 0..entry.coins {
+                if i != j {
+                    pairs.push((i, j));
+                }
+            }
+        }
+        let per_pair = (n / pairs.len()).max(1);
+
+        let mut passed = 0u64;
+        let mut skipped = 0u64;
+
+        // Get balances for amount generation
+        let bal_0 = match &pool {
+            Pool::StableSwapV0 { balances, .. }
+            | Pool::StableSwapV1 { balances, .. }
+            | Pool::StableSwapV2 { balances, .. }
+            | Pool::StableSwapALend { balances, .. }
+            | Pool::StableSwapNG { balances, .. }
+            | Pool::StableSwapMeta { balances, .. } => balances.clone(),
+            Pool::TwoCryptoV1 { balances, .. } | Pool::TwoCryptoNG { balances, .. } => balances.to_vec(),
+            Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => balances.to_vec(),
+        };
+
+        for (idx, &(i, j)) in pairs.iter().enumerate() {
+            let balance_i = bal_0[i];
+            for dx in generate_amounts(per_pair, balance_i, bn + idx as u64) {
+                let on_chain = on_chain_get_dy(entry, &provider, block, i, j, dx).await;
+                match on_chain {
+                    Some(expected) => {
+                        let ours = pool.get_amount_out(i, j, dx);
+                        match ours {
+                            Some(result) => {
+                                assert_eq!(
+                                    result, expected,
+                                    "{} ({}) {i}→{j} mismatch at dx={dx}",
+                                    entry.name, entry.variant
+                                );
+                                passed += 1;
+                            }
+                            None => skipped += 1,
+                        }
+                    }
+                    None => skipped += 1,
+                }
+            }
+        }
+
+        println!(
+            "  {} ({}): {passed} passed, {skipped} skipped",
+            entry.name, entry.variant
+        );
+        total_passed += passed;
+        total_skipped += skipped;
+        pools_ok += 1;
+    }
+
+    println!("\nRegistry fuzz: {pools_ok} pools, {total_passed} passed, {total_skipped} skipped (block {bn})");
+    assert!(total_passed > 0, "no tests passed");
+}

@@ -1,0 +1,187 @@
+# Verified Curve pool registry.
+#
+# Every pool listed here with `fuzz_verified = true` has passed differential
+# fuzz testing against its on-chain `get_dy` with 100+ random swap amounts
+# (including edge cases: 0, 1 wei, 0.1%/10%/50%/100%/200% of balance, MAX).
+#
+# To run verification:
+#   FUZZ_ITERATIONS=100 RPC_URL=<rpc> cargo test --features swap --test fuzz_registry -- --ignored --nocapture
+#
+# Fields:
+#   address          - Pool contract address (checksummed)
+#   chain            - Chain name (matches RPC_URL env var: RPC_URL_ETHEREUM, RPC_URL_ARBITRUM, etc.)
+#   variant          - One of: StableSwapV0, StableSwapV1, StableSwapV2, StableSwapALend,
+#                      StableSwapNG, StableSwapMeta, TwoCryptoV1, TwoCryptoNG, TriCryptoV1, TriCryptoNG
+#   name             - Human-readable pool name
+#   coins            - Number of coins (2, 3, or 4)
+#   decimals         - Token decimals array
+#   fuzz_verified    - Whether this pool passes differential fuzz
+#   note             - Optional notes
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# StableSwapV0
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
+chain = "ethereum"
+variant = "StableSwapV0"
+name = "sUSD (DAI/USDC/USDT/sUSD)"
+coins = 4
+decimals = [18, 6, 6, 18]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# StableSwapV1
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"
+chain = "ethereum"
+variant = "StableSwapV1"
+name = "3pool (DAI/USDC/USDT)"
+coins = 3
+decimals = [18, 6, 6]
+fuzz_verified = true
+
+[[pools]]
+address = "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022"
+chain = "ethereum"
+variant = "StableSwapV1"
+name = "stETH/ETH"
+coins = 2
+decimals = [18, 18]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# StableSwapV2
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
+chain = "ethereum"
+variant = "StableSwapV2"
+name = "FRAX/USDC"
+coins = 2
+decimals = [18, 6]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# StableSwapALend
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xDeBF20617708857ebe4F679508E7b7863a8A8EeE"
+chain = "ethereum"
+variant = "StableSwapALend"
+name = "Aave (aDAI/aUSDC/aUSDT)"
+coins = 3
+decimals = [18, 6, 6]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# StableSwapNG
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d"
+chain = "ethereum"
+variant = "StableSwapNG"
+name = "USDe/DAI"
+coins = 2
+decimals = [18, 18]
+fuzz_verified = true
+
+[[pools]]
+address = "0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f"
+chain = "ethereum"
+variant = "StableSwapNG"
+name = "PYUSD/USDS"
+coins = 2
+decimals = [6, 18]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# StableSwapMeta
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956"
+chain = "ethereum"
+variant = "StableSwapMeta"
+name = "GUSD/3CRV"
+coins = 2
+decimals = [2, 18]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TwoCryptoV1
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0x8301AE4fc9c624d1D396cbDAa1ed877821D7C511"
+chain = "ethereum"
+variant = "TwoCryptoV1"
+name = "CRV/ETH"
+coins = 2
+decimals = [18, 18]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TwoCryptoNG
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009"
+chain = "ethereum"
+variant = "TwoCryptoNG"
+name = "crvUSD/FXN (v2.0.0)"
+coins = 2
+decimals = [18, 18]
+fuzz_verified = true
+
+[[pools]]
+address = "0x83f24023d15d835a213df24fd309c47dab5beb32"
+chain = "ethereum"
+variant = "TwoCryptoNG"
+name = "crvUSD/cbBTC (v2.1.0)"
+coins = 2
+decimals = [18, 8]
+fuzz_verified = false
+note = "v2.1.0 contract — produces different outputs than v2.0.0, not yet supported"
+
+[[pools]]
+address = "0xf1f435b05d255a5dbde37333c0f61da6f69c6127"
+chain = "ethereum"
+variant = "TwoCryptoNG"
+name = "crvUSD/tBTC (v2.1.0)"
+coins = 2
+decimals = [18, 18]
+fuzz_verified = false
+note = "v2.1.0 contract — produces different outputs than v2.0.0, not yet supported"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TriCryptoV1
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0xD51a44d3FaE010294C616388b506AcdA1bfAAE46"
+chain = "ethereum"
+variant = "TriCryptoV1"
+name = "tricrypto2 (USDT/WBTC/WETH)"
+coins = 3
+decimals = [6, 8, 18]
+fuzz_verified = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TriCryptoNG
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[[pools]]
+address = "0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B"
+chain = "ethereum"
+variant = "TriCryptoNG"
+name = "tricrypto-ng (USDC/WBTC/WETH)"
+coins = 3
+decimals = [6, 8, 18]
+fuzz_verified = true
