@@ -1,7 +1,9 @@
 # curve-math
 
-[![Unit Tests](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
-[![Fuzz Ethereum](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)
+[![tests](https://img.shields.io/github/actions/workflow/status/sunce86/curve-math/unit-tests.yml?label=tests&logo=rust&logoColor=white)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
+[![fuzz ethereum](https://img.shields.io/github/actions/workflow/status/sunce86/curve-math/fuzz-ethereum.yml?label=fuzz%20ethereum&logo=ethereum&logoColor=white)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![pools](https://img.shields.io/badge/verified%20pools-12-brightgreen)](registry/1.toml)
 
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 
