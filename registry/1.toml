@@ -364,3 +364,18 @@ address = "0x06cb22615BA53E60D67Bf6C341a0fD5E718E1655"
 variant = "StableSwapMeta"
 name = "FEI/3Crv"
 
+[[pools]]
+address = "0x1033812EFeC8716BBaE0c19e5678698D25E26eDf"
+variant = "StableSwapMeta"
+name = "XSTUSD/3Crv"
+
+[[pools]]
+address = "0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a"
+variant = "StableSwapMeta"
+name = "BUSD/3Crv"
+
+[[pools]]
+address = "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"
+variant = "StableSwapMeta"
+name = "LINKUSD/3Crv"
+
