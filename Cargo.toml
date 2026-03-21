@@ -1,0 +1,17 @@
+[package]
+name = "curve-math"
+version = "0.1.0"
+edition = "2021"
+description = "Pure Rust port of Curve Finance AMM math (StableSwap + CryptoSwap)"
+license = "MIT"
+
+[dependencies]
+alloy-primitives = "1.5"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros"] }
+alloy = { version = "1.7", features = ["provider-http", "contract", "sol-types"] }
+
+[features]
+default = []
+swap = []
