@@ -653,3 +653,78 @@ address = "0x26D85588B9eD20abA4Fa8Fb9b3C8977C4aAd133C"
 variant = "TwoCryptoStable"
 name = "frxUSD/KRWQ"
 
+[[pools]]
+address = "0x2c7A1b4950Fe369e79fB3471284d4a4E66fbEA76"
+variant = "StableSwapNG"
+name = "sdeUSD/deUSD"
+
+[[pools]]
+address = "0xD25f2cC6819FBD34641712122397eFbaf9b6A6e2"
+variant = "StableSwapNG"
+name = "ebUSD/USDC"
+
+[[pools]]
+address = "0x54e4fC3BCF24610a190d68130432562Df2cb6d9a"
+variant = "StableSwapNG"
+name = "WFRAX/FXS"
+
+[[pools]]
+address = "0xb6E4821c6fCABe32f5F452dfD3Ef20Ce2A3a48E2"
+variant = "StableSwapNG"
+name = "fxSAVE/scrvUSD"
+
+[[pools]]
+address = "0xf74c91b36C26543A0Aa820bEf407A577e5498BF0"
+variant = "StableSwapNG"
+name = "reUSD/USDC"
+
+[[pools]]
+address = "0xa9d2f92B7dedF7Da162BfADc321407E28815Fd4A"
+variant = "StableSwapNG"
+name = "USDX/USDC"
+
+[[pools]]
+address = "0xb0ef04ACE97d350E24Efa5139d2590D26a61A8Dc"
+variant = "StableSwapNG"
+name = "reUSD/fxUSD"
+
+[[pools]]
+address = "0x48d670D189B4b48757992D36897bCa6E3f889040"
+variant = "StableSwapNG"
+name = "reUSD/sDOLA"
+
+[[pools]]
+address = "0x00836Fe54625BE242BcFA286207795405ca4fD10"
+variant = "StableSwapNG"
+name = "sUSDS/USDT"
+
+[[pools]]
+address = "0xdcc3eC9aF62DFcb63033243E90481eB18Baeb897"
+variant = "StableSwapNG"
+name = "OUSD/USDT"
+
+[[pools]]
+address = "0x7E13876B92F1a62C599C231f783f682E96B91761"
+variant = "StableSwapNG"
+name = "LINK/stLINK"
+
+[[pools]]
+address = "0x6d18E1a7faeB1F0467A77C0d293872ab685426dc"
+variant = "StableSwapNG"
+name = "OUSD/USDC"
+
+[[pools]]
+address = "0xed785Af60bEd688baa8990cD5c4166221599A441"
+variant = "StableSwapNG"
+name = "reUSD/sfrxUSD"
+
+[[pools]]
+address = "0xc522A6606BBA746d7960404F22a3DB936B6F4F50"
+variant = "StableSwapNG"
+name = "reUSD/scrvUSD"
+
+[[pools]]
+address = "0x56be5d27878bf847189F5a6a29ED1350177c7420"
+variant = "TriCryptoNG"
+name = "CJPY/WETH/TXJP"
+
