@@ -1,6 +1,7 @@
 # curve-math
 
-[![CI](https://github.com/sunce86/curve-math/actions/workflows/ci.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/ci.yml)
+[![Unit Tests](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
+[![Fuzz Ethereum](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)
 
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 
