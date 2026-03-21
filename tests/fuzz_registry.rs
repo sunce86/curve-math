@@ -1,11 +1,15 @@
 //! Registry-driven differential fuzz test.
 //!
-//! Reads `pools.toml`, tests every pool with `fuzz_verified = true`.
-//! One generic test — no per-variant copy-paste.
+//! Reads `registry/<chain>.toml`, tests every pool with `fuzz_verified = true`.
+//! One generic test per chain — no per-variant copy-paste.
 //!
-//! Run:
-//!   FUZZ_ITERATIONS=100 RPC_URL=<ethereum-mainnet> \
+//! Run all chains:
+//!   FUZZ_ITERATIONS=100 RPC_URL_ETHEREUM=<rpc> \
 //!     cargo test --features swap --test fuzz_registry -- --ignored --nocapture
+//!
+//! Run single chain:
+//!   FUZZ_ITERATIONS=100 RPC_URL_ETHEREUM=<rpc> \
+//!     cargo test --features swap --test fuzz_registry -- fuzz_ethereum --ignored --nocapture
 
 #![cfg(feature = "swap")]
 
@@ -25,12 +29,12 @@ struct Registry {
 #[derive(Deserialize)]
 struct PoolEntry {
     address: String,
-    chain: String,
     variant: String,
     name: String,
     coins: usize,
     decimals: Vec<u8>,
     fuzz_verified: bool,
+    #[allow(dead_code)]
     #[serde(default)]
     note: String,
 }
@@ -370,21 +374,23 @@ async fn on_chain_get_dy(
     }
 }
 
-// ── The test ────────────────────────────────────────────────────────────────
+// ── Shared fuzz runner ───────────────────────────────────────────────────────
 
-#[tokio::test]
-#[ignore = "requires RPC_URL"]
-async fn fuzz_registry() {
-    let rpc_url = std::env::var("RPC_URL").expect("RPC_URL must be set");
+async fn fuzz_chain(chain_id: u64) {
+    let env_key = format!("RPC_URL_{chain_id}");
+    let rpc_url = std::env::var(&env_key)
+        .or_else(|_| std::env::var("RPC_URL"))
+        .unwrap_or_else(|_| panic!("{env_key} or RPC_URL must be set"));
     let provider = ProviderBuilder::new().connect_http(rpc_url.parse().expect("invalid RPC_URL"));
     let bn = provider.get_block_number().await.expect("block");
     let block = alloy::eips::BlockId::number(bn);
 
-    let toml_str = std::fs::read_to_string("pools.toml").expect("pools.toml not found");
-    let registry: Registry = toml::from_str(&toml_str).expect("invalid pools.toml");
+    let path = format!("registry/{chain_id}.toml");
+    let toml_str = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("{path} not found"));
+    let registry: Registry = toml::from_str(&toml_str).unwrap_or_else(|_| panic!("invalid {path}"));
 
     let verified: Vec<&PoolEntry> = registry.pools.iter().filter(|p| p.fuzz_verified).collect();
-    println!("Registry: {} pools ({} verified), block {bn}", registry.pools.len(), verified.len());
+    println!("[chain {chain_id}] {}/{} pools verified, block {bn}", verified.len(), registry.pools.len());
 
     let n = fuzz_iterations();
     let mut total_passed = 0u64;
@@ -392,11 +398,6 @@ async fn fuzz_registry() {
     let mut pools_ok = 0u64;
 
     for entry in &verified {
-        // Only test ethereum pools (for now)
-        if entry.chain != "ethereum" {
-            continue;
-        }
-
         let pool = match build_pool(entry, &provider, block).await {
             Some(p) => p,
             None => {
@@ -405,7 +406,6 @@ async fn fuzz_registry() {
             }
         };
 
-        // Build all (i,j) pairs
         let mut pairs: Vec<(usize, usize)> = Vec::new();
         for i in 0..entry.coins {
             for j in 0..entry.coins {
@@ -419,8 +419,7 @@ async fn fuzz_registry() {
         let mut passed = 0u64;
         let mut skipped = 0u64;
 
-        // Get balances for amount generation
-        let bal_0 = match &pool {
+        let balances = match &pool {
             Pool::StableSwapV0 { balances, .. }
             | Pool::StableSwapV1 { balances, .. }
             | Pool::StableSwapV2 { balances, .. }
@@ -432,8 +431,7 @@ async fn fuzz_registry() {
         };
 
         for (idx, &(i, j)) in pairs.iter().enumerate() {
-            let balance_i = bal_0[i];
-            for dx in generate_amounts(per_pair, balance_i, bn + idx as u64) {
+            for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
                 let on_chain = on_chain_get_dy(entry, &provider, block, i, j, dx).await;
                 match on_chain {
                     Some(expected) => {
@@ -455,15 +453,20 @@ async fn fuzz_registry() {
             }
         }
 
-        println!(
-            "  {} ({}): {passed} passed, {skipped} skipped",
-            entry.name, entry.variant
-        );
+        println!("  {} ({}): {passed} passed, {skipped} skipped", entry.name, entry.variant);
         total_passed += passed;
         total_skipped += skipped;
         pools_ok += 1;
     }
 
-    println!("\nRegistry fuzz: {pools_ok} pools, {total_passed} passed, {total_skipped} skipped (block {bn})");
-    assert!(total_passed > 0, "no tests passed");
+    println!("[chain {chain_id}] {pools_ok} pools, {total_passed} passed, {total_skipped} skipped\n");
+    assert!(total_passed > 0, "no tests passed for chain {chain_id}");
+}
+
+// ── Per-chain tests ─────────────────────────────────────────────────────────
+
+#[tokio::test]
+#[ignore = "requires RPC_URL_1 or RPC_URL"]
+async fn fuzz_1() {
+    fuzz_chain(1).await;
 }

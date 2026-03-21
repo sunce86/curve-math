@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --features swap
+
+  registry-fuzz:
+    name: Registry Fuzz (Ethereum)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run registry fuzz
+        env:
+          RPC_URL_1: ${{ secrets.RPC_URL_1 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          if [ -z "$RPC_URL_1" ]; then
+            echo "::warning::RPC_URL_1 not set, skipping fuzz"
+            exit 0
+          fi
+          cargo test --features swap --test fuzz_registry -- fuzz_1 --ignored --nocapture

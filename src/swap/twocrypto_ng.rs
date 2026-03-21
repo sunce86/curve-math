@@ -127,7 +127,7 @@ pub fn get_amount_in(
     if x_new <= xp_orig[i] {
         return None;
     }
-    let mut dx = if i > 0 {
+    let dx = if i > 0 {
         (x_new - xp_orig[i]) * wad / price_scale_local
     } else {
         (x_new - xp_orig[i]) / precisions[0]

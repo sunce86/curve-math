@@ -1,5 +1,7 @@
 # curve-math
 
+[![CI](https://github.com/sunce86/curve-math/actions/workflows/ci.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/ci.yml)
+
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 
 ## Coverage
@@ -50,15 +52,27 @@ For **legacy pools** (deployed before factories):
   - Pool subtracts 1 from dy before denormalize? &rarr; `StableSwapV1` (3pool, ren, sbtc, hbtc)
   - Otherwise &rarr; `StableSwapV0` (sUSD, Compound, USDT, y, BUSD)
 
+## Verified Pool Registry
+
+The [`registry/`](registry/) directory contains TOML files listing pools that have been **fuzz-verified** against their on-chain contracts. Each pool entry includes the address, variant, token decimals, and verification status.
+
+A pool is marked `fuzz_verified = true` only if it passes 100+ random differential swaps with `assert_eq` against on-chain `get_dy`.
+
+Files are named by chain ID: [`registry/1.toml`](registry/1.toml) (Ethereum), `registry/42161.toml` (Arbitrum), etc.
+
 ## Structure
 
 ```
 src/
-  core/       # Pure math — Newton solvers, Cardano cubic, fee functions
-  swap/       # get_amount_out/in, spot_price per variant (feature-gated)
-  pool.rs     # Pool enum — unified API over all variants (feature-gated)
+  core/           # Pure math — Newton solvers, Cardano cubic, fee functions
+  swap/           # get_amount_out/in, spot_price per variant (feature-gated)
+  pool.rs         # Pool enum — unified API over all variants (feature-gated)
+registry/
+  1.toml          # Verified pools on Ethereum mainnet (chain ID 1)
 tests/
-  fuzz_differential.rs  # On-chain differential fuzz tests (feature-gated)
+  fuzz_registry.rs      # Generic registry-driven fuzz test (one test, all pools)
+  fuzz_differential.rs  # Per-variant fuzz tests
+  fuzz_properties.rs    # Property-based tests (roundtrip, spot_price consistency)
 ```
 
 - **`core`** (always available): Stateless math functions ported line-by-line from Vyper. No pool state, no normalization. Each variant file is self-contained — no cross-file dependencies. Every file links to the exact Vyper source it was verified against.
@@ -110,18 +124,19 @@ let y = get_y(0, 1, x_new, &xp, d, amp)?;
 ## Testing
 
 ```bash
-# Unit tests (no network required)
-cargo test                                           # core only
-cargo test --features swap                           # + swap layer
+# Unit + property tests (no network required, <1s)
+cargo test --features swap
 
-# On-chain differential fuzz (requires Ethereum mainnet RPC)
-RPC_URL=<ethereum-mainnet> \
-  cargo test --features swap --test fuzz_differential -- --ignored
+# Registry fuzz — verify ALL pools on a chain (requires RPC)
+FUZZ_ITERATIONS=100 RPC_URL_1=<ethereum-rpc> \
+  cargo test --features swap --test fuzz_registry -- fuzz_1 --ignored --nocapture
 
-# Single variant, custom iteration count
-FUZZ_ITERATIONS=500 RPC_URL=<ethereum-mainnet> \
+# Per-variant fuzz (for debugging a specific variant)
+FUZZ_ITERATIONS=500 RPC_URL_1=<ethereum-rpc> \
   cargo test --features swap --test fuzz_differential -- fuzz_stableswap_v2 --ignored
 ```
+
+CI runs unit tests on every push. Registry fuzz runs on merge to master (requires `RPC_URL_1` secret).
 
 ## Dependencies
 
