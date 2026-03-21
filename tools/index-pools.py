@@ -393,8 +393,8 @@ def update_readme_badge(count: int, last_updated: str, total: int = 0):
 
     import re
     # Update Ethereum row in chain status table
-    # Format: | Ethereum | [![Fuzz](...)] | 55 / 1227 | 2026-03-21 |
-    pool_str = f"{count} / {total}" if total else str(count)
+    pct = (count * 100 // total) if total else 0
+    pool_str = f"![](https://geps.dev/progress/{pct}?successColor=6366f1) {count} / {total}" if total else str(count)
     content = re.sub(
         r'\| Ethereum \|.*\|.*\|.*\|',
         f'| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | {pool_str} | {last_updated} |',
