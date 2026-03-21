@@ -86,13 +86,13 @@ def write_registry(path: Path, registry: dict):
         f.write(toml.dumps(registry))
 
 
-def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
+def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
     """Discover new pools from a factory contract."""
     factory = w3.eth.contract(
         address=Web3.to_checksum_address(factory_cfg["address"]),
         abi=FACTORY_ABI,
     )
-    count = factory.functions.pool_count().call()
+    count = factory.functions.pool_count().call(block_identifier=block)
     print(f"  {factory_cfg['label']}: {count} pools")
 
     candidates = []
@@ -103,7 +103,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
             break
         checked += 1
 
-        pool_addr = factory.functions.pool_list(i).call()
+        pool_addr = factory.functions.pool_list(i).call(block_identifier=block)
         addr_lower = pool_addr.lower()
         if addr_lower in existing_addrs:
             continue
@@ -111,7 +111,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
         # Quick TVL check: balance[0] only
         pool = w3.eth.contract(address=pool_addr, abi=POOL_ABI)
         try:
-            bal0 = pool.functions.balances(0).call()
+            bal0 = pool.functions.balances(0).call(block_identifier=block)
         except Exception:
             continue
 
@@ -127,19 +127,19 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
         balances = []
         for ci in range(4):
             try:
-                coin_addr = pool.functions.coins(ci).call()
+                coin_addr = pool.functions.coins(ci).call(block_identifier=block)
                 if coin_addr == "0x" + "0" * 40:
                     break
                 token = w3.eth.contract(address=coin_addr, abi=TOKEN_ABI)
                 try:
-                    dec = token.functions.decimals().call()
+                    dec = token.functions.decimals().call(block_identifier=block)
                 except Exception:
                     dec = 18
                 try:
-                    sym = token.functions.symbol().call()
+                    sym = token.functions.symbol().call(block_identifier=block)
                 except Exception:
                     sym = "???"
-                bal = pool.functions.balances(ci).call()
+                bal = pool.functions.balances(ci).call(block_identifier=block)
                 coins.append(coin_addr)
                 decimals.append(dec)
                 symbols.append(sym)
@@ -169,7 +169,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
     return candidates
 
 
-def verify_pool_quick(w3, pool_entry) -> tuple[bool, str]:
+def verify_pool_quick(w3, pool_entry, block) -> tuple[bool, str]:
     """Quick sanity check: 1 swap, compare on-chain get_dy with our get_amount_out.
 
     Full fuzz verification happens later in CI when the PR is created.
@@ -181,7 +181,7 @@ def verify_pool_quick(w3, pool_entry) -> tuple[bool, str]:
     pool = w3.eth.contract(address=addr, abi=POOL_ABI)
 
     # Read balance[0] for a reasonable swap amount (0.1% of balance)
-    bal0 = pool.functions.balances(0).call()
+    bal0 = pool.functions.balances(0).call(block_identifier=block)
     dx = max(bal0 // 1000, 1)
 
     # Get on-chain result
@@ -189,11 +189,11 @@ def verify_pool_quick(w3, pool_entry) -> tuple[bool, str]:
         if variant.startswith("StableSwap"):
             STABLE_ABI = json.loads('[{"name":"get_dy","outputs":[{"type":"uint256"}],"inputs":[{"type":"int128"},{"type":"int128"},{"type":"uint256"}],"stateMutability":"view","type":"function"}]')
             c = w3.eth.contract(address=addr, abi=STABLE_ABI)
-            on_chain = c.functions.get_dy(0, 1, dx).call()
+            on_chain = c.functions.get_dy(0, 1, dx).call(block_identifier=block)
         else:
             CRYPTO_ABI = json.loads('[{"name":"get_dy","outputs":[{"type":"uint256"}],"inputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"}]')
             c = w3.eth.contract(address=addr, abi=CRYPTO_ABI)
-            on_chain = c.functions.get_dy(0, 1, dx).call()
+            on_chain = c.functions.get_dy(0, 1, dx).call(block_identifier=block)
     except Exception as e:
         return False, f"on-chain get_dy failed: {e}"
 
@@ -216,8 +216,9 @@ def main():
 
     rpc_url = get_rpc_url(args.chain_id)
     w3 = Web3(Web3.HTTPProvider(rpc_url))
-    block = w3.eth.block_number
-    print(f"Chain {args.chain_id}: block {block}")
+    latest = w3.eth.block_number
+    block = latest - 5  # use a settled block to avoid inconsistent state
+    print(f"Chain {args.chain_id}: block {block} (latest {latest})")
 
     registry_path = Path(f"registry/{args.chain_id}.toml")
     registry = read_registry(registry_path)
@@ -230,7 +231,7 @@ def main():
         remaining = args.max_new - len(all_candidates)
         if remaining <= 0:
             break
-        candidates = discover_pools(w3, factory, existing, args.min_tvl, remaining)
+        candidates = discover_pools(w3, factory, existing, args.min_tvl, remaining, block)
         all_candidates.extend(candidates)
 
     print(f"\n{len(all_candidates)} new candidates above ${args.min_tvl:,} TVL")
@@ -252,7 +253,7 @@ def main():
     skipped_names = []
     for entry in all_candidates:
         print(f"  Checking {entry['name']} ({entry['address']})... ", end="", flush=True)
-        ok, msg = verify_pool_quick(w3, entry)
+        ok, msg = verify_pool_quick(w3, entry, block)
         if ok:
             # Pool passes sanity check — add to registry, full fuzz happens in CI on the PR
             print(f"OK ({msg})")

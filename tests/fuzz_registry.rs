@@ -385,10 +385,11 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
         .or_else(|_| std::env::var("RPC_URL"))
         .unwrap_or_else(|_| panic!("{env_key} or RPC_URL must be set"));
     let provider = ProviderBuilder::new().connect_http(rpc_url.parse().expect("invalid RPC_URL"));
-    let bn = provider.get_block_number().await.expect("block");
+    let latest = provider.get_block_number().await.expect("block");
+    let bn = latest - 5; // use a settled block to avoid inconsistent state
     let block = alloy::eips::BlockId::number(bn);
 
-    println!("[{label}] {} pools, block {bn}", pools.len());
+    println!("[{label}] {} pools, block {bn} (latest {latest})", pools.len());
 
     let n = fuzz_iterations();
     let mut total_passed = 0u64;

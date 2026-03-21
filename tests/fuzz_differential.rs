@@ -94,7 +94,7 @@ async fn fuzz_stableswap_v0() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xA5407eAE9Ba41422680e2e00537571bcC53efBfD").unwrap();
     let curve = ICurvePoolOld::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(0i128).block(block).call().await.unwrap();
@@ -153,7 +153,7 @@ async fn fuzz_stableswap_v1() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
     let curve = ICurvePool3::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -212,7 +212,7 @@ async fn fuzz_stableswap_v2() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2").unwrap();
     let curve = ICurvePoolV2::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -276,7 +276,7 @@ async fn fuzz_stableswap_alend() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xDeBF20617708857ebe4F679508E7b7863a8A8EeE").unwrap();
     let curve = ICurvePoolALend::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -336,7 +336,7 @@ async fn fuzz_stableswap_ng() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d").unwrap();
     let curve = ICurvePoolNG::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -407,7 +407,7 @@ async fn fuzz_stableswap_meta() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956").unwrap();
     let curve = ICurvePoolMeta::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -490,7 +490,7 @@ async fn fuzz_twocrypto_v1() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0x8301AE4fc9c624d1D396cbDAa1ed877821D7C511").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -545,7 +545,7 @@ async fn fuzz_twocrypto_ng() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -615,7 +615,7 @@ async fn fuzz_tricrypto_v1() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xD51a44d3FaE010294C616388b506AcdA1bfAAE46").unwrap();
     let curve = ITriCryptoPool::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -667,7 +667,7 @@ async fn fuzz_tricrypto_ng() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B").unwrap();
     let curve = ITriCryptoPool::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -724,7 +724,7 @@ async fn fuzz_stableswap_ng_pyusd() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f").unwrap();
     let curve = ICurvePoolNG::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -779,7 +779,7 @@ async fn fuzz_twocrypto_ng_cbbtc() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0x83f24023d15d835a213df24fd309c47dab5beb32").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -836,7 +836,7 @@ async fn fuzz_stableswap_v1_steth() {
     let addr = alloy_primitives::Address::from_str("0xdc24316b9ae028f1497c275eb9192a3ea0f67022").unwrap();
     // stETH pool uses balances(uint256) like 3pool
     let curve = ICurvePool3::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
@@ -888,7 +888,7 @@ async fn fuzz_twocrypto_ng_tbtc() {
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xf1f435b05d255a5dbde37333c0f61da6f69c6127").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
-    let bn = provider.get_block_number().await.unwrap();
+    let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
     let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
