@@ -288,18 +288,23 @@ def main():
 
     # Discover
     all_candidates = []
+    total_factory_pools = 0
     for factory in FACTORIES[args.chain_id]:
         remaining = args.max_new - len(all_candidates)
         if remaining <= 0:
             break
         candidates = discover_pools(w3, factory, existing, args.min_tvl, remaining, block)
         all_candidates.extend(candidates)
+        # Count total pools in factory
+        fc = w3.eth.contract(address=Web3.to_checksum_address(factory["address"]), abi=FACTORY_ABI)
+        total_factory_pools += fc.functions.pool_count().call(block_identifier=block)
 
     print(f"\n{len(all_candidates)} new candidates above ${args.min_tvl:,} TVL")
 
     if not all_candidates:
         print("No new pools to add.")
         registry["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        registry["total_factory_pools"] = total_factory_pools
         if not args.dry_run:
             write_registry(registry_path, registry)
         return
@@ -347,12 +352,13 @@ def main():
 
         # Also update main registry (will be committed together)
         registry["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        registry["total_factory_pools"] = total_factory_pools
         write_registry(registry_path, registry)
         print(f"Registry updated: {registry_path}")
 
-        # Update verified pool count in README badge
+        # Update verified pool count in README
         pool_count = len(registry["pools"])
-        update_readme_badge(pool_count, registry["last_updated"])
+        update_readme_badge(pool_count, registry["last_updated"], total_factory_pools)
 
         # Write PR summary for CI
         write_pr_summary(verified, failed, added_names, skipped_names)
@@ -378,38 +384,24 @@ def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list
     print(f"PR summary written to .pr-summary.md")
 
 
-def update_readme_badge(count: int, last_updated: str):
-    """Update the shields.io badges in README.md."""
+def update_readme_badge(count: int, last_updated: str, total: int = 0):
+    """Update the chain status table in README.md."""
     readme = Path("README.md")
     if not readme.exists():
         return
     content = readme.read_text()
 
-    # Update pool count badge
     import re
+    # Update Ethereum row in chain status table
+    # Format: | Ethereum | [![Fuzz](...)] | 55 / 1227 | 2026-03-21 |
+    pool_str = f"{count} / {total}" if total else str(count)
     content = re.sub(
-        r'verified%20pools-\d+-',
-        f'verified%20pools-{count}-',
+        r'\| Ethereum \|.*\|.*\|.*\|',
+        f'| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | {pool_str} | {last_updated} |',
         content,
     )
-    # Update or add last-updated badge
-    updated_badge = f'[![last indexed](https://img.shields.io/badge/last%20indexed-{last_updated}-informational)](registry/)'
-    if "last indexed" in content:
-        content = re.sub(
-            r'\[!\[last indexed\]\(.*?\)\]\(.*?\)',
-            updated_badge,
-            content,
-        )
-    else:
-        # Add after pools badge
-        content = content.replace(
-            ')](registry/1.toml)',
-            f')](registry/1.toml)\n{updated_badge}',
-            1,
-        )
-
     readme.write_text(content)
-    print(f"Updated README badges: {count} pools, last indexed {last_updated}")
+    print(f"Updated README: {pool_str} pools, last indexed {last_updated}")
 
 
 if __name__ == "__main__":

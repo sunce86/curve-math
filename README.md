@@ -6,9 +6,9 @@ Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact o
 
 ## Chain Status
 
-| Chain | Fuzz | Pools | Last indexed |
-|-------|------|-------|-------------|
-| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 55 | 2026-03-21 |
+| Chain | Fuzz | Registered pools | Last indexed |
+|-------|------|-----------------|-------------|
+| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 55 / 1227 | 2026-03-21 |
 
 ## Coverage
 
