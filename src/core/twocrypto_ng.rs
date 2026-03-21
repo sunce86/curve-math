@@ -213,7 +213,11 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
         + fdiv(gamma2, s(10u128.pow(4)))
         + fdiv(fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000)).wrapping_mul(x_j_s), d_s)
         - fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000));
-    let d_coeff: I256 = fdiv(-(e18 + gamma_s).wrapping_mul(e18 + gamma_s), s(10u128.pow(4)));
+    // Vyper: d = -unsafe_div((10^18 + gamma)^2, 10^4)
+    // Negate AFTER truncation-dividing positive values (not floor-dividing negative)
+    let d_coeff: I256 = -((e18 + gamma_s)
+        .wrapping_mul(e18 + gamma_s)
+        .wrapping_div(s(10u128.pow(4))));
 
     let delta0: I256 = fdiv(s(3).wrapping_mul(a).wrapping_mul(c), b) - b;
     let delta1: I256 = s(3).wrapping_mul(delta0) + b
@@ -253,17 +257,24 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
         s(1)
     };
 
-    // unsafe_div in Vyper = EVM SDIV = truncation, but v2.0.0 used safe / = floor
-    // Use fdiv for consistency with both versions
-    let a = fdiv(a, divider);
-    let b = fdiv(b, divider);
-    let c = fdiv(c, divider);
-    let d_coeff = fdiv(d_coeff, divider);
-    let delta0 = fdiv(s(3).wrapping_mul(a).wrapping_mul(c), b) - b;
+    // After divider: Vyper uses unsafe_div (EVM SDIV = truncation toward zero).
+    // wrapping_div matches SDIV semantics for I256.
+    let a = a.wrapping_div(divider);
+    let b = b.wrapping_div(divider);
+    let c = c.wrapping_div(divider);
+    let d_coeff = d_coeff.wrapping_div(divider);
+    let delta0 = s(3).wrapping_mul(a).wrapping_mul(c).wrapping_div(b) - b;
     let delta1 = s(3).wrapping_mul(delta0) + b
-        - fdiv(fdiv(s(27).wrapping_mul(a.wrapping_mul(a)), b).wrapping_mul(d_coeff), b);
+        - s(27)
+            .wrapping_mul(a.wrapping_mul(a))
+            .wrapping_div(b)
+            .wrapping_mul(d_coeff)
+            .wrapping_div(b);
     let sqrt_arg = delta1.wrapping_mul(delta1)
-        + fdiv(s(4).wrapping_mul(delta0.wrapping_mul(delta0)), b).wrapping_mul(delta0);
+        + s(4)
+            .wrapping_mul(delta0.wrapping_mul(delta0))
+            .wrapping_div(b)
+            .wrapping_mul(delta0);
 
     if sqrt_arg <= I256::ZERO {
         let y = newton_y_2_ng(ann, gamma, x, d, i, lim_mul)?;
