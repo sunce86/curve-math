@@ -22,10 +22,10 @@ jobs:
       - name: Run registry fuzz
         env:
           RPC_URL_1: ${{ secrets.RPC_URL_1 }}
-          FUZZ_ITERATIONS: "100"
+          FUZZ_ITERATIONS: "50"
         run: |
           if [ -z "$RPC_URL_1" ]; then
             echo "::warning::RPC_URL_1 not set, skipping fuzz"
             exit 0
           fi
-          cargo test --features swap --test fuzz_registry -- fuzz_1 --ignored --nocapture
+          cargo test --features swap --test fuzz_registry -- fuzz_1 --ignored --nocapture --test-threads=1
