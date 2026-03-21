@@ -46,6 +46,8 @@ alloy::sol! {
     }
 }
 
+const RETRY_DELAY: std::time::Duration = std::time::Duration::from_millis(500);
+
 /// Read coins count and decimals from on-chain pool contract.
 async fn read_pool_coins(
     addr: Address,
@@ -55,11 +57,24 @@ async fn read_pool_coins(
     let c = ICoinInfo::new(addr, provider);
     let mut decimals = Vec::new();
     for i in 0..4u64 {
-        match c.coins(U256::from(i)).block(block).call().await {
+        let coin_result = match c.coins(U256::from(i)).block(block).call().await {
+            Ok(v) => Ok(v),
+            Err(_) => {
+                tokio::time::sleep(RETRY_DELAY).await;
+                c.coins(U256::from(i)).block(block).call().await
+            }
+        };
+        match coin_result {
             Ok(coin_addr) => {
                 if coin_addr == Address::ZERO { break; }
                 let token = IToken::new(coin_addr, provider);
-                let dec = token.decimals().block(block).call().await.unwrap_or(18);
+                let dec = match token.decimals().block(block).call().await {
+                    Ok(d) => d,
+                    Err(_) => {
+                        tokio::time::sleep(RETRY_DELAY).await;
+                        token.decimals().block(block).call().await.unwrap_or(18)
+                    }
+                };
                 decimals.push(dec);
             }
             Err(_) => break,
