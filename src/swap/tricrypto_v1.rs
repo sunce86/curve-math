@@ -269,6 +269,95 @@ mod tests {
         assert!(dy_check >= dy);
     }
 
+    #[test]
+    fn spot_price_consistent_with_swap() {
+        let wad = U256::from(1_000_000_000_000_000_000u128);
+        let balances = [
+            U256::from(5000u64) * wad,
+            U256::from(5000u64) * wad,
+            U256::from(5000u64) * wad,
+        ];
+        let precisions = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
+        let price_scale = [wad, wad];
+        let d = U256::from(15000u64) * wad;
+        let ann = U256::from(1707629u64) * U256::from(10_000u64);
+        let gamma = U256::from(11_809_167_828_997u64);
+        let mid_fee = U256::from(3_000_000u64);
+        let out_fee = U256::from(30_000_000u64);
+        let fee_gamma = U256::from(230_000_000_000_000u64);
+        let dx = U256::from(1_000_000_000_000_000u128);
+        let dy = get_amount_out(
+            &balances,
+            &precisions,
+            &price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            dx,
+        )
+        .expect("out");
+        let (num, den) = spot_price(
+            &balances,
+            &precisions,
+            &price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+        )
+        .expect("price");
+        let lhs = dy * den;
+        let rhs = dx * num;
+        let diff = if lhs > rhs { lhs - rhs } else { rhs - lhs };
+        assert!(
+            diff * U256::from(100) < rhs,
+            "spot price inconsistent with swap"
+        );
+    }
+
+    #[test]
+    fn spot_price_nonzero() {
+        let wad = U256::from(1_000_000_000_000_000_000u128);
+        let balances = [
+            U256::from(5000u64) * wad,
+            U256::from(5000u64) * wad,
+            U256::from(5000u64) * wad,
+        ];
+        let precisions = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
+        let price_scale = [wad, wad];
+        let d = U256::from(15000u64) * wad;
+        let ann = U256::from(1707629u64) * U256::from(10_000u64);
+        let gamma = U256::from(11_809_167_828_997u64);
+        let mid_fee = U256::from(3_000_000u64);
+        let out_fee = U256::from(30_000_000u64);
+        let fee_gamma = U256::from(230_000_000_000_000u64);
+        let (num, den) = spot_price(
+            &balances,
+            &precisions,
+            &price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+        )
+        .expect("price");
+        assert!(!num.is_zero(), "numerator is zero");
+        assert!(!den.is_zero(), "denominator is zero");
+    }
+
     alloy::sol! {
         #[sol(rpc)]
         interface ITriCryptoPool {

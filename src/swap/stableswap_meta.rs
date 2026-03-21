@@ -155,6 +155,74 @@ mod tests {
         assert!(dy_check >= dy);
     }
 
+    #[test]
+    fn spot_price_balanced_near_one() {
+        // Use a balanced metapool with both rates = 1e18 (same-decimal tokens)
+        let rate = U256::from(1_000_000_000_000_000_000u128);
+        let precision = U256::from(1_000_000_000_000_000_000u128);
+        let balances = [
+            U256::from(10_000_000u64) * precision,
+            U256::from(10_000_000u64) * precision,
+        ];
+        let rates = [rate, rate];
+        let amp = U256::from(1500u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let (num, den) = spot_price(&balances, &rates, amp, fee, 0, 1).expect("price");
+        let diff = if num > den { num - den } else { den - num };
+        assert!(diff * U256::from(1000) < den, "spot price not near 1");
+    }
+
+    #[test]
+    fn spot_price_symmetry() {
+        let precision = U256::from(1_000_000_000_000_000_000u128);
+        let rate_gusd = U256::from(10u64).pow(U256::from(34u64));
+        let vp = U256::from(1_020_000_000_000_000_000u128);
+        let balances = [
+            U256::from(100_000_00u64),
+            U256::from(500_000u64) * precision,
+        ];
+        let rates = [rate_gusd, vp];
+        let amp = U256::from(1500u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let fee_denom = U256::from(10_000_000_000u64);
+        let (num_ij, den_ij) = spot_price(&balances, &rates, amp, fee, 0, 1).expect("price_ij");
+        let (num_ji, den_ji) = spot_price(&balances, &rates, amp, fee, 1, 0).expect("price_ji");
+        // Product includes fee twice: price(i,j)*price(j,i) = (1-f)^2
+        let fee_complement = fee_denom - fee;
+        let product_num = num_ij * num_ji * fee_denom * fee_denom;
+        let product_den = den_ij * den_ji * fee_complement * fee_complement;
+        let diff = if product_num > product_den {
+            product_num - product_den
+        } else {
+            product_den - product_num
+        };
+        assert!(diff * U256::from(1000) < product_den, "symmetry violated");
+    }
+
+    #[test]
+    fn spot_price_consistent_with_swap() {
+        // Use same-decimal balanced pool for precision
+        let rate = U256::from(1_000_000_000_000_000_000u128);
+        let precision = U256::from(1_000_000_000_000_000_000u128);
+        let balances = [
+            U256::from(10_000_000u64) * precision,
+            U256::from(10_000_000u64) * precision,
+        ];
+        let rates = [rate, rate];
+        let amp = U256::from(1500u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let dx = U256::from(1_000_000_000_000_000u128);
+        let dy = get_amount_out(&balances, &rates, amp, fee, 0, 1, dx).expect("out");
+        let (num, den) = spot_price(&balances, &rates, amp, fee, 0, 1).expect("price");
+        let lhs = dy * den;
+        let rhs = dx * num;
+        let diff = if lhs > rhs { lhs - rhs } else { rhs - lhs };
+        assert!(
+            diff * U256::from(100) < rhs,
+            "spot price inconsistent with swap"
+        );
+    }
+
     alloy::sol! {
         #[sol(rpc)]
         interface ICurvePool {

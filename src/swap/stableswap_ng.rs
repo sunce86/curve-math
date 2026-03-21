@@ -201,6 +201,61 @@ mod tests {
         assert!(dy_check >= dy);
     }
 
+    #[test]
+    fn spot_price_balanced_near_one() {
+        let b = U256::from(1_000_000_000_000_000_000_000_000u128);
+        let balances = [b, b];
+        let rates = [U256::from(RATE_18), U256::from(RATE_18)];
+        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let offpeg = U256::from(20_000_000_000u64);
+        let (num, den) = spot_price(&balances, &rates, amp, fee, offpeg, 0, 1).expect("price");
+        let diff = if num > den { num - den } else { den - num };
+        assert!(diff * U256::from(1000) < den, "spot price not near 1");
+    }
+
+    #[test]
+    fn spot_price_symmetry() {
+        let b = U256::from(1_000_000_000_000_000_000_000_000u128);
+        let balances = [b, b];
+        let rates = [U256::from(RATE_18), U256::from(RATE_18)];
+        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let offpeg = U256::from(20_000_000_000u64);
+        let (num_ij, den_ij) =
+            spot_price(&balances, &rates, amp, fee, offpeg, 0, 1).expect("price_ij");
+        let (num_ji, den_ji) =
+            spot_price(&balances, &rates, amp, fee, offpeg, 1, 0).expect("price_ji");
+        let product_num = num_ij * num_ji;
+        let product_den = den_ij * den_ji;
+        let diff = if product_num > product_den {
+            product_num - product_den
+        } else {
+            product_den - product_num
+        };
+        assert!(diff * U256::from(1000) < product_den, "symmetry violated");
+    }
+
+    #[test]
+    fn spot_price_consistent_with_swap() {
+        let b = U256::from(1_000_000_000_000_000_000_000_000u128);
+        let balances = [b, b];
+        let rates = [U256::from(RATE_18), U256::from(RATE_18)];
+        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let fee = U256::from(4_000_000u64);
+        let offpeg = U256::from(20_000_000_000u64);
+        let dx = U256::from(1_000_000_000_000_000u128);
+        let dy = get_amount_out(&balances, &rates, amp, fee, offpeg, 0, 1, dx).expect("out");
+        let (num, den) = spot_price(&balances, &rates, amp, fee, offpeg, 0, 1).expect("price");
+        let lhs = dy * den;
+        let rhs = dx * num;
+        let diff = if lhs > rhs { lhs - rhs } else { rhs - lhs };
+        assert!(
+            diff * U256::from(100) < rhs,
+            "spot price inconsistent with swap"
+        );
+    }
+
     alloy::sol! {
         #[sol(rpc)]
         interface ICurvePoolNG {
