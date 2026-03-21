@@ -83,6 +83,87 @@ pub fn get_amount_out(
     Some(result)
 }
 
+pub fn get_amount_in(
+    balances: &[U256; 2],
+    precisions: &[U256; 2],
+    price_scale: U256,
+    d: U256,
+    ann: U256,
+    mid_fee: U256,
+    out_fee: U256,
+    fee_gamma: U256,
+    i: usize,
+    j: usize,
+    desired_output: U256,
+) -> Option<U256> {
+    if desired_output.is_zero() {
+        return None;
+    }
+
+    let wad = U256::from(WAD);
+    let fee_denom = U256::from(FEE_DENOMINATOR);
+    let price_scale_local = price_scale * precisions[1];
+
+    let xp_orig: [U256; 2] = [balances[0] * precisions[0], balances[1] * price_scale_local / wad];
+
+    // Estimate fee from pre-swap state
+    let fee_est = crypto_fee(&xp_orig, mid_fee, out_fee, fee_gamma)?;
+    let complement = fee_denom - fee_est;
+
+    // Reverse fee (ceiling division)
+    let dy_native = (desired_output * fee_denom + complement - U256::from(1)) / complement;
+
+    // Renormalize to internal space + reverse -1 offset
+    let dy_internal = if j > 0 {
+        (dy_native * price_scale_local + wad - U256::from(1)) / wad
+    } else {
+        dy_native * precisions[0]
+    } + U256::from(1);
+
+    if xp_orig[j] <= dy_internal {
+        return None;
+    }
+    let y_new = xp_orig[j] - dy_internal;
+
+    // Solve for x_new using StableSwap get_y (swap i and j)
+    let x_new = get_y(j, i, y_new, &xp_orig, d, ann)?;
+    if x_new <= xp_orig[i] {
+        return None;
+    }
+
+    // Denormalize dx
+    let dx = if i > 0 {
+        (x_new - xp_orig[i]) * wad / price_scale_local
+    } else {
+        (x_new - xp_orig[i]) / precisions[0]
+    } + U256::from(1);
+
+    // Binary search to ensure get_amount_out(dx) >= desired_output
+    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, mid_fee, out_fee, fee_gamma, i, j, amt);
+    match forward(dx) {
+        Some(dy_check) if dy_check >= desired_output => return Some(dx),
+        _ => {}
+    }
+    let mut lo = dx;
+    let mut hi = dx;
+    for _ in 0..64 {
+        hi = hi + hi / U256::from(10u64) + U256::from(1u64);
+        if let Some(dy_check) = forward(hi) {
+            if dy_check >= desired_output { break; }
+        }
+    }
+    for _ in 0..256 {
+        if lo >= hi { break; }
+        let mid = (lo + hi) / U256::from(2u64);
+        if mid == lo { break; }
+        match forward(mid) {
+            Some(dy_check) if dy_check >= desired_output => hi = mid,
+            _ => lo = mid + U256::from(1u64),
+        }
+    }
+    Some(hi)
+}
+
 /// Spot price dy/dx including fee, returned as (numerator, denominator).
 /// Numerical: compute get_amount_out with a small dx for marginal price.
 pub fn spot_price(

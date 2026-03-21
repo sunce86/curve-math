@@ -8,7 +8,7 @@ Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact o
 
 ## Coverage
 
-All 10 Curve pool variants:
+All 11 Curve pool variants:
 
 | Variant | Type | Solver | Example pools | Vyper source |
 |---------|------|--------|---------------|--------------|
@@ -19,9 +19,14 @@ All 10 Curve pool variants:
 | `StableSwapNG` | StableSwap | Newton | StableSwap-NG (plain + meta) | [CurveStableSwapNG.vy](https://github.com/curvefi/stableswap-ng/blob/main/contracts/main/CurveStableSwapNG.vy) |
 | `StableSwapMeta` | StableSwap | Newton | GUSD, HUSD, factory meta | [SwapTemplateMeta.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/meta/SwapTemplateMeta.vy) |
 | `TwoCryptoV1` | CryptoSwap | Newton | CRV/ETH (legacy) | [CurveCryptoSwap2ETH.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/two/CurveCryptoSwap2ETH.vy) |
-| `TwoCryptoNG` | CryptoSwap | Cardano cubic | crvUSD/FXN (twocrypto-ng) | [Twocrypto.vy](https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/Twocrypto.vy) |
+| `TwoCryptoNG` | CryptoSwap | Cardano cubic | crvUSD/FXN (MATH v2.0.0) | [TwocryptoMath.vy](https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/TwocryptoMath.vy) |
+| `TwoCryptoStable` | StableSwap | Newton | crvUSD/WETH (MATH v0.1.0) | [Etherscan](https://etherscan.io/address/0x79839c2D74531A8222C0F555865aAc1834e82e51#code) |
 | `TriCryptoV1` | CryptoSwap | Newton | tricrypto2 (USDT/WBTC/WETH) | [CurveCryptoMath3.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/tricrypto/CurveCryptoMath3.vy) |
 | `TriCryptoNG` | CryptoSwap | Hybrid cubic+Newton | tricrypto-ng (USDC/WBTC/WETH) | [CurveTricryptoOptimized.vy](https://github.com/curvefi/tricrypto-ng/blob/main/contracts/main/CurveTricryptoOptimized.vy) |
+
+> **TwoCryptoNG vs TwoCryptoStable:** Both are deployed from the same TwoCryptoNG factory,
+> but use different MATH contracts. Detect via `pool.MATH().version()`:
+> `"v2.0.0"` → `TwoCryptoNG`, `"v0.1.0"` → `TwoCryptoStable` (StableSwap math, gamma ignored).
 
 ## Verification
 
