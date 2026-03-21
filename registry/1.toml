@@ -2,7 +2,8 @@
 #
 # Every pool in this file has passed differential fuzz testing against its
 # on-chain `get_dy` with 100+ random swap amounts including edge cases.
-# If a pool is here, it is verified. If it's not here, it's not supported.
+# Pools not listed here may still work, but have not been verified for
+# wei-level accuracy against on-chain contracts.
 #
 # To re-verify all pools:
 #   FUZZ_ITERATIONS=100 RPC_URL_1=<rpc> cargo test --features swap --test fuzz_registry -- fuzz_1 --ignored
