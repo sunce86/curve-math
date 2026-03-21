@@ -27,6 +27,20 @@ use alloy_primitives::U256;
 use crate::swap;
 
 /// All known Curve pool variants with their parameters.
+///
+/// # State update frequency for indexer/adapter implementations
+///
+/// Each field falls into one of three categories:
+///
+/// | Category | When to update | Fields |
+/// |----------|---------------|--------|
+/// | **Per-block** | Every block (or on every swap event) | `balances`, `rates` (if oracle), `d`, `price_scale` |
+/// | **Per-event** | On admin events (rare, days/weeks) | `amp` (during A ramping) |
+/// | **Static** | Once at pool creation | `fee`, `offpeg_fee_multiplier`, `precision_mul` |
+///
+/// For `rates`: plain tokens have static rates (`10^(36-decimals)`), but ERC4626/oracle
+/// tokens have dynamic rates that change per-block. Read `stored_rates()` from the pool
+/// contract to get current rates for oracle-enabled pools.
 pub enum Pool {
     /// Oldest StableSwap pools (sUSD, Compound, USDT, y, BUSD).
     /// A_PRECISION=1, no -1 offset, fee after denormalize.
