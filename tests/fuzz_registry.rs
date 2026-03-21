@@ -61,6 +61,7 @@ alloy::sol! {
         function A() external view returns (uint256);
         function fee() external view returns (uint256);
         function offpeg_fee_multiplier() external view returns (uint256);
+        function stored_rates() external view returns (uint256[]);
     }
 
     #[sol(rpc)]
@@ -253,7 +254,12 @@ async fn build_pool(
             let raw_a = c.A().block(block).call().await.ok()?;
             let fee = c.fee().block(block).call().await.ok()?;
             let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok()?;
-            let rates: Vec<U256> = entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect();
+            // Try stored_rates() first (handles ERC4626/oracle tokens)
+            // Falls back to static rates from decimals
+            let rates: Vec<U256> = match c.stored_rates().block(block).call().await {
+                Ok(r) if r.len() == entry.coins => r,
+                _ => entry.decimals.iter().map(|d| rate_for_decimals(*d)).collect(),
+            };
             let amp = raw_a * a_prec_100;
             Some(Pool::StableSwapNG { balances, rates, amp, fee, offpeg_fee_multiplier: offpeg })
         }

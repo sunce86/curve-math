@@ -51,6 +51,14 @@ coins = 2
 decimals = [ 18, 18,]
 
 [[pools]]
+address = "0x167478921b907422F8E88B43C4Af2B8BEa278d3A"
+variant = "StableSwapNG"
+name = "sDAI/sUSDe"
+coins = 2
+decimals = [18, 18]
+oracle_rates = true  # rates must be read from pool.stored_rates(), not computed from decimals
+
+[[pools]]
 address = "0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f"
 variant = "StableSwapNG"
 name = "PYUSD/USDS"
