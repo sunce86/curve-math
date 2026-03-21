@@ -242,22 +242,25 @@ def main():
     # Verify
     verified = 0
     failed = 0
+    added_names = []
+    skipped_names = []
     for entry in all_candidates:
         print(f"  Checking {entry['name']} ({entry['address']})... ", end="", flush=True)
         ok, msg = verify_pool_quick(w3, entry)
         if ok:
             # Pool passes sanity check — add to registry, full fuzz happens in CI on the PR
             print(f"OK ({msg})")
+            registry["pools"].append(entry)
+            added_names.append(f"{entry['name']} ({entry['address']})")
             verified += 1
         else:
-            continue  # don't add to registry
             print(f"SKIP ({msg})")
+            skipped_names.append(f"{entry['name']} ({entry['address']}): {msg}")
             failed += 1
-        registry["pools"].append(entry)
 
     registry["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    print(f"\nSummary: {verified} verified, {failed} failed")
+    print(f"\nSummary: {verified} added, {failed} skipped")
 
     if args.dry_run:
         print("(dry run — no files written)")
@@ -266,8 +269,31 @@ def main():
         print(f"Written to {registry_path}")
 
         # Update verified pool count in README badge
-        verified_count = sum(1 for p in registry["pools"] if p.get("fuzz_verified"))
-        update_readme_badge(verified_count, registry["last_updated"])
+        pool_count = len(registry["pools"])
+        update_readme_badge(pool_count, registry["last_updated"])
+
+        # Write PR summary for CI
+        write_pr_summary(verified, failed, added_names, skipped_names)
+
+
+def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list[str]):
+    """Write PR body summary to .pr-summary.md for CI to pick up."""
+    lines = [f"## Pool Registry Update\n"]
+    if added:
+        lines.append(f"### Added ({verified} pools)\n")
+        for name in added:
+            lines.append(f"- {name}")
+        lines.append("")
+    if skipped:
+        lines.append(f"### Skipped ({failed} pools)\n")
+        for name in skipped:
+            lines.append(f"- {name}")
+        lines.append("")
+    if not added:
+        lines.append("No new pools added.\n")
+    lines.append(f"\n> Full fuzz verification runs automatically on this PR.")
+    Path(".pr-summary.md").write_text("\n".join(lines))
+    print(f"PR summary written to .pr-summary.md")
 
 
 def update_readme_badge(count: int, last_updated: str):
