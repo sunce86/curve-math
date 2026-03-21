@@ -24,16 +24,24 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
     for _ in 0..MAX_ITERATIONS {
         let mut d_p = d;
         for balance in xp {
-            d_p = d_p.checked_mul(d)?.checked_div(balance.checked_mul(n)?)?;
+            d_p = d_p.checked_mul(d)?.checked_div(*balance)?;
         }
+        // NG divides by N^N at the end (pow_mod256), not per-element
+        let mut n_pow_n = U256::from(1u64);
+        for _ in 0..xp.len() {
+            n_pow_n = n_pow_n.checked_mul(n)?;
+        }
+        d_p = d_p.checked_div(n_pow_n)?;
         let d_prev = d;
         let num = ann
             .checked_mul(sum)?
             .checked_div(a_prec)?
             .checked_add(d_p.checked_mul(n)?)?
             .checked_mul(d)?;
-        let den = (ann.checked_div(a_prec)?.checked_sub(U256::from(1))?)
+        let den = ann
+            .checked_sub(a_prec)?
             .checked_mul(d)?
+            .checked_div(a_prec)?
             .checked_add(n.checked_add(U256::from(1))?.checked_mul(d_p)?)?;
         if den.is_zero() {
             return None;

@@ -24,7 +24,9 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
     for _ in 0..MAX_ITERATIONS {
         let mut d_p = d;
         for balance in xp {
-            d_p = d_p.checked_mul(d)?.checked_div(balance.checked_mul(n)?)?;
+            d_p = d_p
+                .checked_mul(d)?
+                .checked_div(balance.checked_mul(n)?.checked_add(U256::from(1))?)?;
         }
         let d_prev = d;
         let num = ann

@@ -52,7 +52,7 @@ pub fn newton_y_2(ann: U256, gamma: U256, x: [U256; 2], d: U256, j: usize) -> Op
         let diff = if y > y_prev { y - y_prev } else { y_prev - y };
         if diff < convergence_limit.max(y / U256::from(10u128.pow(14))) {
             let frac = y * wad / d;
-            if frac < U256::from(10u128.pow(16) - 1) || frac > U256::from(10u128.pow(20) + 1) {
+            if frac < U256::from(10u128.pow(16)) || frac > U256::from(10u128.pow(20)) {
                 return None;
             }
             return Some(y);

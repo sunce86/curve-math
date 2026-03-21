@@ -39,8 +39,10 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
             .checked_add(d_p.checked_mul(n)?)?
             .checked_mul(d)?;
 
-        let denominator = (ann.checked_div(a_precision)?.checked_sub(U256::from(1))?)
+        let denominator = ann
+            .checked_sub(a_precision)?
             .checked_mul(d)?
+            .checked_div(a_precision)?
             .checked_add(n.checked_add(U256::from(1))?.checked_mul(d_p)?)?;
 
         if denominator.is_zero() {

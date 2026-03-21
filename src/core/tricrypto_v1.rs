@@ -21,7 +21,12 @@ pub fn newton_y_3(ann: U256, gamma: U256, x: [U256; 3], d: U256, j: usize) -> Op
         .collect();
     others.sort_unstable_by(|a, b| b.cmp(a));
     let (x_0, x_1) = (others[0], others[1]);
-    let mut y = d * d / (x_0 * U256::from(9u64));
+    // Vyper: y = D/N, then for each other coin (small first): y = y*D/(x*N)
+    let mut y = d / n;
+    // others is sorted descending [large, small], iterate reversed (small first)
+    for &other in others.iter().rev() {
+        y = y * d / (other * n);
+    }
     let k0_i = wad * n * x_0 / d * n * x_1 / d;
     let s_i = x_0 + x_1;
     let convergence_limit = (others.iter().max().copied().unwrap_or(U256::ZERO)
@@ -59,7 +64,7 @@ pub fn newton_y_3(ann: U256, gamma: U256, x: [U256; 3], d: U256, j: usize) -> Op
         let diff = if y > y_prev { y - y_prev } else { y_prev - y };
         if diff < convergence_limit.max(y / U256::from(10u128.pow(14))) {
             let frac = y * wad / d;
-            if frac < U256::from(10u128.pow(16) - 1) || frac > U256::from(10u128.pow(20) + 1) {
+            if frac < U256::from(10u128.pow(16)) || frac > U256::from(10u128.pow(20)) {
                 return None;
             }
             return Some(y);
