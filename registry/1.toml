@@ -8,6 +8,7 @@
 # wei-level accuracy against on-chain contracts.
 
 last_updated = "2026-03-21"
+total_factory_pools = 1227
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -488,4 +489,84 @@ name = "CVX/bveCVX"
 address = "0xf083FBa98dED0f9C970e5a418500bad08D8b9732"
 variant = "StableSwapV2"
 name = "CVX/bentCVX"
+
+[[pools]]
+address = "0x9AfAd25833D0F47b3A3D9204dDF965CB172De0CB"
+variant = "StableSwapNG"
+name = "OUSD/msUSD"
+
+[[pools]]
+address = "0xf75f2b5fc5F375e1aD3130dD0eEC7219Fe821204"
+variant = "StableSwapNG"
+name = "ynRWAx/OUSD"
+
+[[pools]]
+address = "0x2C2A700766886290359ccf39Cb2173a39af1CEf9"
+variant = "StableSwapNG"
+name = "dUSD/sfrxUSD"
+
+[[pools]]
+address = "0x98b540fa89690969D111D045afCa575C91519B1A"
+variant = "StableSwapNG"
+name = "YB/sdYB"
+
+[[pools]]
+address = "0x3204d754a3003cEc155e2D8F44b3b48eD60b7Cc6"
+variant = "StableSwapNG"
+name = "USDnr/fxUSD"
+
+[[pools]]
+address = "0x20d4c49a873EaeFf76EfBD0cF19002F6E19EF52c"
+variant = "StableSwapNG"
+name = "USDaf/frxUSD"
+
+[[pools]]
+address = "0x5C2ab69Eb2BF12A2f4572D178687Bd4660512972"
+variant = "StableSwapNG"
+name = "reUSD/sUSDe"
+
+[[pools]]
+address = "0x65b05F6b0472b1f36a2F6d90A14cD21900851609"
+variant = "StableSwapNG"
+name = "USD3/sUSDS"
+
+[[pools]]
+address = "0x2E2d6C119bdF226C420cB40E3B9fC9689cF5986e"
+variant = "StableSwapNG"
+name = "iUSD/USDC"
+
+[[pools]]
+address = "0xE5c78cbcf6241f1793caF496f6480B45Fa5BDb46"
+variant = "StableSwapNG"
+name = "YND/sdYND"
+
+[[pools]]
+address = "0x7ED17e037B7d88A8270c89B3aFA9C38e5218F12b"
+variant = "StableSwapNG"
+name = "BOLD/LUSD"
+
+[[pools]]
+address = "0xEFc6516323FbD28e80B85A497B65A86243a54B3E"
+variant = "StableSwapNG"
+name = "BOLD/USDC"
+
+[[pools]]
+address = "0x027B40F5917FCd0eac57d7015e120096A5F92ca9"
+variant = "TwoCryptoStable"
+name = "crvUSD/ZCHF"
+
+[[pools]]
+address = "0x0C371349E2F2B4291a81681b26FCd67639C27BDc"
+variant = "TwoCryptoNG"
+name = "PNKSTR/PROS"
+
+[[pools]]
+address = "0xd1419E4d76e74D3B4D8A224f3A34118622FB4DF4"
+variant = "TwoCryptoNG"
+name = "EIGEN/WETH"
+
+[[pools]]
+address = "0x66da369fC5dBBa0774Da70546Bd20F2B242Cd34d"
+variant = "TriCryptoNG"
+name = "DOLA/DBR/INV"
 
