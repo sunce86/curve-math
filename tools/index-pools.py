@@ -217,7 +217,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
         # Detect TwoCryptoStable: MATH v0.1.0 = StableSwap math
         if variant == "TwoCryptoNG":
             math_ver = math_versions.get(addr, "v2.0.0")
-            if math_ver == "v0.1.0":
+            if math_ver in ("v0.1.0", "v2.1.0"):
                 variant = "TwoCryptoStable"
 
         name = "/".join(symbols)
