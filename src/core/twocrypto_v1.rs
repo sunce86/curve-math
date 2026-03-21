@@ -74,10 +74,16 @@ pub fn crypto_fee(xp: &[U256], mid_fee: U256, out_fee: U256, fee_gamma: U256) ->
     if s.is_zero() {
         return None;
     }
+    // Vyper V1 _fee computes K inline: (WAD * N^N) * xp[0] / S * xp[1] / S
+    // NOT per-element k *= N * x_i / S (which differs in integer truncation)
     let n = U256::from(xp.len());
-    let mut k = wad;
+    let mut nn = U256::from(1u64);
+    for _ in 0..xp.len() {
+        nn = nn * n;
+    }
+    let mut k = wad * nn;
     for x_i in xp {
-        k = k * n * (*x_i) / s;
+        k = k * (*x_i) / s;
     }
     let f = if fee_gamma > U256::ZERO {
         fee_gamma * wad / (fee_gamma + wad - k)

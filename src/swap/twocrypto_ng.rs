@@ -39,8 +39,10 @@ pub fn get_amount_out(
     let dy = xp[j] - y - U256::from(1);
     let xp_after: [U256; 2] = if j == 0 { [y, xp[1]] } else { [xp[0], y] };
 
+    // Vyper: two sequential divisions (dy * WAD // price_scale // precisions[j])
+    // NOT single division by (price_scale * precisions[j])
     let dy_native = if j > 0 {
-        dy * wad / price_scale_local
+        dy * wad / price_scale / precisions[j]
     } else {
         dy / precisions[0]
     };

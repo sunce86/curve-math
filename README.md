@@ -6,20 +6,30 @@ Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact o
 
 All 10 Curve pool variants:
 
-| Variant | Type | Solver | Example pools |
-|---------|------|--------|---------------|
-| `StableSwapV0` | StableSwap | Newton | sUSD, Compound, USDT, y, BUSD |
-| `StableSwapV1` | StableSwap | Newton | 3pool, ren, sbtc, hbtc |
-| `StableSwapV2` | StableSwap | Newton | FRAX/USDC, stETH, factory plain |
-| `StableSwapALend` | StableSwap | Newton | Aave, sAAVE, IB, aETH |
-| `StableSwapNG` | StableSwap | Newton | StableSwap-NG (plain + meta) |
-| `StableSwapMeta` | StableSwap | Newton | GUSD, HUSD, factory meta |
-| `TwoCryptoV1` | CryptoSwap | Newton | CRV/ETH (legacy) |
-| `TwoCryptoNG` | CryptoSwap | Cardano cubic | crvUSD/FXN (twocrypto-ng) |
-| `TriCryptoV1` | CryptoSwap | Newton | tricrypto2 (USDT/WBTC/WETH) |
-| `TriCryptoNG` | CryptoSwap | Hybrid cubic+Newton | tricrypto-ng (USDC/WBTC/WETH) |
+| Variant | Type | Solver | Example pools | Vyper source |
+|---------|------|--------|---------------|--------------|
+| `StableSwapV0` | StableSwap | Newton | sUSD, Compound, USDT, y, BUSD | [StableSwapSUSD.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/susd/StableSwapSUSD.vy) |
+| `StableSwapV1` | StableSwap | Newton | 3pool, ren, sbtc, hbtc | [StableSwap3Pool.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy) |
+| `StableSwapV2` | StableSwap | Newton | FRAX/USDC, stETH, factory plain | [SwapTemplateBase.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/base/SwapTemplateBase.vy) |
+| `StableSwapALend` | StableSwap | Newton | Aave, sAAVE, IB, aETH | [SwapTemplateA.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/a/SwapTemplateA.vy) |
+| `StableSwapNG` | StableSwap | Newton | StableSwap-NG (plain + meta) | [CurveStableSwapNG.vy](https://github.com/curvefi/stableswap-ng/blob/main/contracts/main/CurveStableSwapNG.vy) |
+| `StableSwapMeta` | StableSwap | Newton | GUSD, HUSD, factory meta | [SwapTemplateMeta.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/meta/SwapTemplateMeta.vy) |
+| `TwoCryptoV1` | CryptoSwap | Newton | CRV/ETH (legacy) | [CurveCryptoSwap2ETH.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/two/CurveCryptoSwap2ETH.vy) |
+| `TwoCryptoNG` | CryptoSwap | Cardano cubic | crvUSD/FXN (twocrypto-ng) | [CurveTwocryptoOptimized.vy](https://github.com/curvefi/twocrypto-ng/blob/main/contracts/main/CurveTwocryptoOptimized.vy) |
+| `TriCryptoV1` | CryptoSwap | Newton | tricrypto2 (USDT/WBTC/WETH) | [CurveCryptoMath3.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/tricrypto/CurveCryptoMath3.vy) |
+| `TriCryptoNG` | CryptoSwap | Hybrid cubic+Newton | tricrypto-ng (USDC/WBTC/WETH) | [CurveTricryptoOptimized.vy](https://github.com/curvefi/tricrypto-ng/blob/main/contracts/main/CurveTricryptoOptimized.vy) |
 
-Each variant is verified against on-chain `get_dy` with `assert_eq` (exact match, not approximate).
+## Verification
+
+Every variant is verified at three levels:
+
+| Level | What | How |
+|-------|------|-----|
+| **Unit tests** | Core math (get_d, get_y, newton_y) and swap logic (roundtrip, monotonicity, spot_price) | `cargo test --features swap` — 48 tests |
+| **On-chain differential fuzz** | Random swap amounts compared with `assert_eq` against deployed contracts on Ethereum mainnet | `cargo test --features swap --test fuzz_differential -- --ignored` — 10 pools × 100+ random inputs each |
+| **Edge case coverage** | Fuzz includes 0, 1 wei, 0.1%/10%/50%/100%/200% of balance, and U256::MAX | Logarithmically-spaced + boundary values |
+
+The differential fuzz tests use a deterministic PRNG seeded from the block number for reproducibility. Each test reads live pool state, generates random swap amounts across several orders of magnitude, and asserts **exact wei-level match** with the on-chain `get_dy` result. No tolerances.
 
 ## Identifying the right variant
 
@@ -47,9 +57,11 @@ src/
   core/       # Pure math — Newton solvers, Cardano cubic, fee functions
   swap/       # get_amount_out/in, spot_price per variant (feature-gated)
   pool.rs     # Pool enum — unified API over all variants (feature-gated)
+tests/
+  fuzz_differential.rs  # On-chain differential fuzz tests (feature-gated)
 ```
 
-- **`core`** (always available): Stateless math functions ported line-by-line from Vyper. No pool state, no normalization. Each variant file is self-contained — no cross-file dependencies.
+- **`core`** (always available): Stateless math functions ported line-by-line from Vyper. No pool state, no normalization. Each variant file is self-contained — no cross-file dependencies. Every file links to the exact Vyper source it was verified against.
 
 - **`swap`** + **`Pool`** (behind `swap` feature): Pool simulation with normalization, fees, and denormalization. Use the `Pool` enum for a unified interface, or call variant-specific functions directly.
 
@@ -98,10 +110,17 @@ let y = get_y(0, 1, x_new, &xp, d, amp)?;
 ## Testing
 
 ```bash
-cargo test                                           # core unit tests
-cargo test --features swap                           # + swap unit tests + roundtrip tests
+# Unit tests (no network required)
+cargo test                                           # core only
+cargo test --features swap                           # + swap layer
+
+# On-chain differential fuzz (requires Ethereum mainnet RPC)
 RPC_URL=<ethereum-mainnet> \
-  cargo test --features swap -- --ignored            # + 10 on-chain verification tests
+  cargo test --features swap --test fuzz_differential -- --ignored
+
+# Single variant, custom iteration count
+FUZZ_ITERATIONS=500 RPC_URL=<ethereum-mainnet> \
+  cargo test --features swap --test fuzz_differential -- fuzz_stableswap_v2 --ignored
 ```
 
 ## Dependencies
