@@ -96,9 +96,12 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
     print(f"  {factory_cfg['label']}: {count} pools")
 
     candidates = []
-    for i in range(count):
-        if len(candidates) >= max_new:
+    checked = 0
+    max_check = max_new * 20  # check at most 20x max_new pools (from newest to oldest)
+    for i in range(count - 1, -1, -1):  # iterate newest first
+        if len(candidates) >= max_new or checked >= max_check:
             break
+        checked += 1
 
         pool_addr = factory.functions.pool_list(i).call()
         addr_lower = pool_addr.lower()
