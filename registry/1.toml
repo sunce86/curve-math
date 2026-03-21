@@ -439,3 +439,53 @@ address = "0xdE495223F7cD7EE0cDe1AddbD6836046bBdf3ad3"
 variant = "StableSwapMeta"
 name = "USDS/3Crv"
 
+[[pools]]
+address = "0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1"
+variant = "StableSwapMeta"
+name = "TUSD/3Crv"
+
+[[pools]]
+address = "0xc270b3B858c335B6BA5D5b10e2Da8a09976005ad"
+variant = "StableSwapMeta"
+name = "USDP/3Crv (factory)"
+
+[[pools]]
+address = "0xD6Ac1CB9019137a896343Da59dDE6d097F710538"
+variant = "StableSwapV2"
+name = "ibGBP/sGBP"
+
+[[pools]]
+address = "0xC18cC39da8b11dA8c3541C598eE022258F9744da"
+variant = "StableSwapMeta"
+name = "RSV/3Crv"
+
+[[pools]]
+address = "0xBaaa1F5DbA42C3389bDbc2c9D2dE134F5cD0Dc89"
+variant = "StableSwapV2"
+name = "FRAX/FEI/alUSD"
+
+[[pools]]
+address = "0xb9446c4Ef5EBE66268dA6700D26f96273DE3d571"
+variant = "StableSwapV2"
+name = "EURA/EURT/EURS"
+
+[[pools]]
+address = "0x8fdb0bB9365a46B145Db80D0B1C5C5e979C84190"
+variant = "StableSwapMeta"
+name = "BUSD/crvFRAX"
+
+[[pools]]
+address = "0x76264772707c8Bc24261516b560cBF3Cbe6F7819"
+variant = "StableSwapMeta"
+name = "USX/3Crv"
+
+[[pools]]
+address = "0x04c90C198b2eFF55716079bc06d7CCc4aa4d7512"
+variant = "StableSwapV2"
+name = "CVX/bveCVX"
+
+[[pools]]
+address = "0xf083FBa98dED0f9C970e5a418500bad08D8b9732"
+variant = "StableSwapV2"
+name = "CVX/bentCVX"
+
