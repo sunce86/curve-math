@@ -1,7 +1,7 @@
 //! StableSwapV0 — Oldest pools (sUSD, Compound, USDT, y, BUSD).
 //!
 //! a_precision=1, no -1 offset, fee after denormalize, static fee.
-//! Vyper: `curvefi/curve-contract/pools/susd/StableSwapSUSD.vy`
+//! Vyper: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/susd/StableSwapSUSD.vy
 
 use alloy_primitives::U256;
 

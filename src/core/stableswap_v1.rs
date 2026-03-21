@@ -1,7 +1,7 @@
 //! StableSwapV1 — 3pool era (3pool, ren, sbtc, hbtc).
 //!
 //! a_precision=1, -1 offset, fee after denormalize, static fee.
-//! Vyper: `curvefi/curve-contract/pools/3pool/StableSwap3Pool.vy`
+//! Vyper: https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy
 
 use alloy_primitives::U256;
 

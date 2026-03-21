@@ -1,7 +1,7 @@
 //! StableSwapNG — Next-gen StableSwap (plain + meta NG pools).
 //!
 //! a_precision=100, -1 offset, fee before denormalize, dynamic fee with avg xp.
-//! Vyper: `curvefi/stableswap-ng/CurveStableSwapNGViews.vy`
+//! Vyper: https://github.com/curvefi/stableswap-ng/blob/main/contracts/main/CurveStableSwapNG.vy
 
 use alloy_primitives::U256;
 

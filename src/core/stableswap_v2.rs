@@ -1,7 +1,7 @@
 //! StableSwapV2 — Base/plain template (FRAX/USDC, stETH, factory plain pools).
 //!
 //! a_precision=100, -1 offset, fee before denormalize, static fee.
-//! Vyper: `curvefi/curve-contract/pool-templates/base/SwapTemplateBase.vy`
+//! Vyper: https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/base/SwapTemplateBase.vy
 
 use alloy_primitives::U256;
 

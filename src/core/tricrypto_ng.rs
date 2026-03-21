@@ -1,7 +1,8 @@
 //! TriCryptoNG — Next-gen 3-coin CryptoSwap (USDC/WBTC/WETH).
 //!
 //! Uses hybrid cubic+Newton solver (get_y) instead of pure Newton.
-//! Vyper source: `curvefi/tricrypto-ng/CurveTricryptoOptimized.vy` + `CurveCryptoMathOptimized3.vy`
+//! Vyper: https://github.com/curvefi/tricrypto-ng/blob/main/contracts/main/CurveTricryptoOptimized.vy
+//!      + https://github.com/curvefi/tricrypto-ng/blob/main/contracts/main/CurveCryptoMathOptimized3.vy
 
 use alloy_primitives::{I256, U256};
 

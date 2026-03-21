@@ -1,7 +1,7 @@
 //! StableSwapMeta — Meta pools (GUSD/3CRV, HUSD, factory meta).
 //!
 //! a_precision=100, -1 offset, fee before denormalize, static fee.
-//! Vyper: `curvefi/curve-contract/pool-templates/meta/SwapTemplateMeta.vy`
+//! Vyper: https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/meta/SwapTemplateMeta.vy
 
 use alloy_primitives::U256;
 

@@ -1,6 +1,11 @@
-//! TwoCryptoV1 — Legacy 2-coin CryptoSwap (CurveCryptoSwap2).
+//! TwoCryptoV1 — Legacy 2-coin CryptoSwap (CurveCryptoSwap2ETH).
 //!
-//! Vyper source: `curvefi/curve-crypto-contract/two/CurveCryptoSwap2.vy`
+//! Vyper: https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/two/CurveCryptoSwap2ETH.vy
+//!
+//! NOTE: The repo also contains CurveCryptoSwap2.vy (non-ETH variant) which has a different
+//! `mul2` formula: `unsafe_div(10**18 + 2*10**18*K0, _g1k0)` (divides entire sum).
+//! The ETH variant uses: `10**18 + (2*10**18)*K0 / _g1k0` (divides only second term).
+//! Deployed CRV/ETH pool matches the ETH variant.
 
 use alloy_primitives::U256;
 

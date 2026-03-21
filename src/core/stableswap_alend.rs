@@ -1,7 +1,7 @@
 //! StableSwapALend — Aave-style lending pools (Aave, sAAVE, IB, aETH).
 //!
 //! a_precision=100, no -1 offset, fee after denormalize, dynamic fee with avg xp.
-//! Vyper: `curvefi/curve-contract/pool-templates/a/SwapTemplateA.vy`
+//! Vyper: https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/a/SwapTemplateA.vy
 //!
 //! IMPORTANT: Uses PRECISION_MUL directly (not stored_rates/PRECISION).
 //! Normalization: xp[k] = balance[k] * precision_mul[k]

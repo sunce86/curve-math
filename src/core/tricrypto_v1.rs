@@ -1,6 +1,7 @@
 //! TriCryptoV1 — Legacy 3-coin CryptoSwap (tricrypto2: USDT/WBTC/WETH).
 //!
-//! Vyper source: `curvefi/curve-crypto-contract/tricrypto/CurveCryptoViews3.vy`
+//! Vyper: https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/tricrypto/CurveCryptoMath3.vy (newton_y)
+//!      + https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/tricrypto/CurveCryptoSwap3.vy (_fee)
 
 use alloy_primitives::U256;
 
