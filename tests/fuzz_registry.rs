@@ -464,6 +464,10 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
                 }
             }
         }
+        if pairs.is_empty() {
+            println!("  SKIP {}: no valid coin pairs", entry.name);
+            continue;
+        }
         let per_pair = (n / pairs.len()).max(1);
 
         let mut passed = 0u64;
