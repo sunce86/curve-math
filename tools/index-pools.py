@@ -161,8 +161,6 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new):
             "name": name,
             "coins": len(coins),
             "decimals": decimals,
-            "fuzz_verified": False,
-            "note": "",
         })
 
     return candidates
@@ -248,14 +246,11 @@ def main():
         print(f"  Checking {entry['name']} ({entry['address']})... ", end="", flush=True)
         ok, msg = verify_pool_quick(w3, entry)
         if ok:
-            # Mark as pending — full fuzz happens in CI on the PR
-            entry["fuzz_verified"] = False
-            entry["note"] = f"pending fuzz verification ({msg})"
+            # Pool passes sanity check — add to registry, full fuzz happens in CI on the PR
             print(f"OK ({msg})")
             verified += 1
         else:
-            entry["fuzz_verified"] = False
-            entry["note"] = f"sanity check failed: {msg}"
+            continue  # don't add to registry
             print(f"SKIP ({msg})")
             failed += 1
         registry["pools"].append(entry)

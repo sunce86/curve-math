@@ -33,10 +33,6 @@ struct PoolEntry {
     name: String,
     coins: usize,
     decimals: Vec<u8>,
-    fuzz_verified: bool,
-    #[allow(dead_code)]
-    #[serde(default)]
-    note: String,
 }
 
 // ── On-chain interfaces ─────────────────────────────────────────────────────
@@ -389,15 +385,15 @@ async fn fuzz_chain(chain_id: u64) {
     let toml_str = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("{path} not found"));
     let registry: Registry = toml::from_str(&toml_str).unwrap_or_else(|_| panic!("invalid {path}"));
 
-    let verified: Vec<&PoolEntry> = registry.pools.iter().filter(|p| p.fuzz_verified).collect();
-    println!("[chain {chain_id}] {}/{} pools verified, block {bn}", verified.len(), registry.pools.len());
+    let pools = &registry.pools;
+    println!("[chain {chain_id}] {} pools, block {bn}", pools.len());
 
     let n = fuzz_iterations();
     let mut total_passed = 0u64;
     let mut total_skipped = 0u64;
     let mut pools_ok = 0u64;
 
-    for entry in &verified {
+    for entry in pools {
         let pool = match build_pool(entry, &provider, block).await {
             Some(p) => p,
             None => {
