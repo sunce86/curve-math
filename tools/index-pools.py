@@ -226,8 +226,6 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
             "address": addr,
             "variant": variant,
             "name": name,
-            "coins": len(coins),
-            "decimals": decimals,
         })
 
     return candidates

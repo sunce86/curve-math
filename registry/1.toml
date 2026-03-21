@@ -12,315 +12,225 @@ last_updated = "2026-03-21"
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
 name = "sUSD (DAI/USDC/USDT/sUSD)"
-coins = 4
-decimals = [ 18, 6, 6, 18,]
 
 [[pools]]
 address = "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"
 variant = "StableSwapV1"
 name = "3pool (DAI/USDC/USDT)"
-coins = 3
-decimals = [ 18, 6, 6,]
 
 [[pools]]
 address = "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022"
 variant = "StableSwapV1"
 name = "stETH/ETH"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
 variant = "StableSwapV2"
 name = "FRAX/USDC"
-coins = 2
-decimals = [ 18, 6,]
 
 [[pools]]
 address = "0xDeBF20617708857ebe4F679508E7b7863a8A8EeE"
 variant = "StableSwapALend"
 name = "Aave (aDAI/aUSDC/aUSDT)"
-coins = 3
-decimals = [ 18, 6, 6,]
 
 [[pools]]
 address = "0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d"
 variant = "StableSwapNG"
 name = "USDe/DAI"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x167478921b907422F8E88B43C4Af2B8BEa278d3A"
 variant = "StableSwapNG"
 name = "sDAI/sUSDe"
-coins = 2
-decimals = [ 18, 18,]
 oracle_rates = true
 
 [[pools]]
 address = "0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f"
 variant = "StableSwapNG"
 name = "PYUSD/USDS"
-coins = 2
-decimals = [ 6, 18,]
 
 [[pools]]
 address = "0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956"
 variant = "StableSwapMeta"
 name = "GUSD/3CRV"
-coins = 2
-decimals = [ 2, 18,]
 
 [[pools]]
 address = "0x8301AE4fc9c624d1D396cbDAa1ed877821D7C511"
 variant = "TwoCryptoV1"
 name = "CRV/ETH"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009"
 variant = "TwoCryptoNG"
 name = "crvUSD/FXN (v2.0.0)"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x6e5492F8ea2370844EE098A56DD88e1717e4A9C2"
 variant = "TwoCryptoStable"
 name = "crvUSD/WETH (MATH v0.1.0)"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xD51a44d3FaE010294C616388b506AcdA1bfAAE46"
 variant = "TriCryptoV1"
 name = "tricrypto2 (USDT/WBTC/WETH)"
-coins = 3
-decimals = [ 6, 8, 18,]
 
 [[pools]]
 address = "0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B"
 variant = "TriCryptoNG"
 name = "tricrypto-ng (USDC/WBTC/WETH)"
-coins = 3
-decimals = [ 6, 8, 18,]
 
 [[pools]]
 address = "0xE1B96555BbecA40E583BbB41a11C68Ca4706A414"
 variant = "StableSwapNG"
 name = "apxUSD/USDC"
-coins = 2
-decimals = [ 18, 6,]
 
 [[pools]]
 address = "0xBf5047039F2980C21eB5692c790BAd8A9533b900"
 variant = "StableSwapNG"
 name = "pmUSD/frxUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xEcb0F0d68C19BdAaDAEbE24f6752A4Db34e2c2cb"
 variant = "StableSwapNG"
 name = "pmUSD/crvUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x2C7C98A3b1582D83c43987202aEFf638312478aE"
 variant = "StableSwapNG"
 name = "USDS/stUSDS"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x9A9e2e70919c75D80aAaA1D483c46CdBb8ac4d1b"
 variant = "StableSwapNG"
 name = "frxUSD/msUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x7E19F0253A564e026C63eeAA9338d6DBddeF3b09"
 variant = "StableSwapNG"
 name = "NUSD/USDC"
-coins = 2
-decimals = [ 18, 6,]
 
 [[pools]]
 address = "0x64273624eb57c5cA961d366CBF3968e760Bf0452"
 variant = "StableSwapNG"
 name = "DOLA/wstUSR"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x57129759d0E23116c1e7402dbC084E53d2e209a2"
 variant = "TwoCryptoStable"
 name = "pmUSD/iREET"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x56A344F1aA03943f536b94436dE6A6e10116Cf86"
 variant = "TwoCryptoNG"
 name = "OGN/OETH"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xD9A436d687B04DD5CD3Edc3325C9776fba685159"
 variant = "TwoCryptoNG"
 name = "HEMI/WETH"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x7d9d79c8a6f82ee07982FA13b610722C8DF386C6"
 variant = "TwoCryptoNG"
 name = "SPANK/RLUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xB8F31c4d60EA12088c59d6dadbB47840aB10d594"
 variant = "TwoCryptoNG"
 name = "TEST1/crvUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xf1F435B05D255a5dBdE37333C0f61DA6F69c6127"
 variant = "TwoCryptoStable"
 name = "crvUSD/tBTC"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x83f24023d15d835a213df24fd309c47dAb5BEb32"
 variant = "TwoCryptoStable"
 name = "crvUSD/cbBTC"
-coins = 2
-decimals = [ 18, 8,]
 
 [[pools]]
 address = "0xD9FF8396554A0d18B2CFbeC53e1979b7ecCe8373"
 variant = "TwoCryptoStable"
 name = "crvUSD/WBTC"
-coins = 2
-decimals = [ 18, 8,]
 
 [[pools]]
 address = "0x605333Cf9EC8f17C9FBd9254948c7fFdB83228e3"
 variant = "TwoCryptoNG"
 name = "BABYPEPE/SPANK"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xC49Bb18E80deDfC98A3ab3952a16D045135A066d"
 variant = "StableSwapNG"
 name = "sBOND/BOND"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x4c1044A1b6474486a88cDd6a3d40f839ABDaE283"
 variant = "StableSwapNG"
 name = "apyUSD/apxUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x8273Cb2cF9AF3228fD14AF25B5B1De2A9676C372"
 variant = "StableSwapNG"
 name = "FIDD/USDT"
-coins = 2
-decimals = [ 18, 6,]
 
 [[pools]]
 address = "0xE47E8Ced9D94AA43C922627782E29b41a93202AF"
 variant = "StableSwapNG"
 name = "FIDD/USDC"
-coins = 2
-decimals = [ 18, 6,]
 
 [[pools]]
 address = "0x42CB0274c6492e3991BDE2Ce75aBf8cDf7F11d66"
 variant = "StableSwapNG"
 name = "BUCK/USDC"
-coins = 2
-decimals = [ 18, 6,]
 
 [[pools]]
 address = "0xf76329c6dc10FdfbEe6CA520d0BF4d474E95E46E"
 variant = "StableSwapNG"
 name = "frxUSD/avUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x17F9682c9cd1a448b31C0428F1D0783eD13a9Fa3"
 variant = "StableSwapNG"
 name = "alUSD/frxUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x5Ee9606e5611Fd6CE14BD2BC12db70BD53dC9daA"
 variant = "StableSwapNG"
 name = "YB/yYB"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xFFd3b4D343A8964a5C3c1caAc20f319C41A97BFF"
 variant = "StableSwapNG"
 name = "ynRWAx/ynUSDx"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x68d03Ed49800e92D7Aa8aB171424007e55Fd1F49"
 variant = "StableSwapNG"
 name = "frxUSD/OUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xF292eB6c5dcb693Eaaf392D0562a01C3710E5978"
 variant = "StableSwapNG"
 name = "sfrxUSD/frxUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xB5571E76693ba60110B5811DD650FFefce1C955f"
 variant = "StableSwapNG"
 name = "MUSD/crv2pool"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x138Bb0f3208bd729a561F3786DDb97BBc69e6628"
 variant = "StableSwapNG"
 name = "msUSD/fxUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0x13e12BB0E6A2f1A3d6901a59a9d585e89A6243e1"
 variant = "StableSwapNG"
 name = "frxUSD/crvUSD"
-coins = 2
-decimals = [ 18, 18,]
 
 [[pools]]
 address = "0xB3B0d0288c51b7e717F0466aCcF9d55b9d645F1c"
 variant = "StableSwapNG"
 name = "SPANK/BABYPEPE"
-coins = 2
-decimals = [ 18, 18,]
 
