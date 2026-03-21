@@ -7,4 +7,5 @@ pub mod stableswap_v2;
 pub mod tricrypto_ng;
 pub mod tricrypto_v1;
 pub mod twocrypto_ng;
+pub mod twocrypto_stable;
 pub mod twocrypto_v1;

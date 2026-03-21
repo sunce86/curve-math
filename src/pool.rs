@@ -127,6 +127,20 @@ pub enum Pool {
         fee_gamma: U256,
     },
 
+    /// TwoCryptoNG pools using StableSwap MATH (v0.1.0).
+    /// CryptoSwap interface but StableSwap invariant (gamma ignored).
+    /// Detect via: pool.MATH().version() == "v0.1.0"
+    TwoCryptoStable {
+        balances: [U256; 2],
+        precisions: [U256; 2],
+        price_scale: U256,
+        d: U256,
+        ann: U256,
+        mid_fee: U256,
+        out_fee: U256,
+        fee_gamma: U256,
+    },
+
     /// Legacy 3-coin CryptoSwap (tricrypto2).
     /// Newton iteration for y.
     TriCryptoV1 {
@@ -257,6 +271,28 @@ impl Pool {
                 *d,
                 *ann,
                 *gamma,
+                *mid_fee,
+                *out_fee,
+                *fee_gamma,
+                i,
+                j,
+                dx,
+            ),
+            Pool::TwoCryptoStable {
+                balances,
+                precisions,
+                price_scale,
+                d,
+                ann,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+            } => swap::twocrypto_stable::get_amount_out(
+                balances,
+                precisions,
+                *price_scale,
+                *d,
+                *ann,
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
@@ -455,6 +491,7 @@ impl Pool {
                 j,
                 desired_output,
             ),
+            Pool::TwoCryptoStable { .. } => None, // TODO: implement get_amount_in
             Pool::TriCryptoV1 {
                 balances,
                 precisions,
@@ -603,6 +640,27 @@ impl Pool {
                 *d,
                 *ann,
                 *gamma,
+                *mid_fee,
+                *out_fee,
+                *fee_gamma,
+                i,
+                j,
+            ),
+            Pool::TwoCryptoStable {
+                balances,
+                precisions,
+                price_scale,
+                d,
+                ann,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+            } => swap::twocrypto_stable::spot_price(
+                balances,
+                precisions,
+                *price_scale,
+                *d,
+                *ann,
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,

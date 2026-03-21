@@ -87,6 +87,13 @@ coins = 2
 decimals = [ 18, 18,]
 
 [[pools]]
+address = "0x6e5492F8ea2370844EE098A56DD88e1717e4A9C2"
+variant = "TwoCryptoStable"
+name = "crvUSD/WETH (MATH v0.1.0)"
+coins = 2
+decimals = [18, 18]
+
+[[pools]]
 address = "0xD51a44d3FaE010294C616388b506AcdA1bfAAE46"
 variant = "TriCryptoV1"
 name = "tricrypto2 (USDT/WBTC/WETH)"

@@ -314,6 +314,22 @@ async fn build_pool(
                 Some(Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma })
             }
         }
+        "TwoCryptoStable" => {
+            let c = ICrypto2::new(addr, provider);
+            let b0 = c.balances(U256::from(0)).block(block).call().await.ok()?;
+            let b1 = c.balances(U256::from(1)).block(block).call().await.ok()?;
+            let ann = c.A().block(block).call().await.ok()?;
+            let d = c.D().block(block).call().await.ok()?;
+            let ps = c.price_scale().block(block).call().await.ok()?;
+            let mid_fee = c.mid_fee().block(block).call().await.ok()?;
+            let out_fee = c.out_fee().block(block).call().await.ok()?;
+            let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
+            let precisions: [U256; 2] = [
+                precision_for_decimals(entry.decimals[0]),
+                precision_for_decimals(entry.decimals[1]),
+            ];
+            Some(Pool::TwoCryptoStable { balances: [b0, b1], precisions, price_scale: ps, d, ann, mid_fee, out_fee, fee_gamma })
+        }
         "TriCryptoV1" | "TriCryptoNG" => {
             let c = ICrypto3::new(addr, provider);
             let b0 = c.balances(U256::from(0)).block(block).call().await.ok()?;
@@ -364,7 +380,7 @@ async fn on_chain_get_dy(
             let c = IStable::new(addr, provider);
             c.get_dy(i as i128, j as i128, dx).block(block).call().await.ok()
         }
-        "TwoCryptoV1" | "TwoCryptoNG" => {
+        "TwoCryptoV1" | "TwoCryptoNG" | "TwoCryptoStable" => {
             let c = ICrypto2::new(addr, provider);
             c.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await.ok()
         }
@@ -425,7 +441,7 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
             | Pool::StableSwapALend { balances, .. }
             | Pool::StableSwapNG { balances, .. }
             | Pool::StableSwapMeta { balances, .. } => balances.clone(),
-            Pool::TwoCryptoV1 { balances, .. } | Pool::TwoCryptoNG { balances, .. } => balances.to_vec(),
+            Pool::TwoCryptoV1 { balances, .. } | Pool::TwoCryptoNG { balances, .. } | Pool::TwoCryptoStable { balances, .. } => balances.to_vec(),
             Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => balances.to_vec(),
         };
 
