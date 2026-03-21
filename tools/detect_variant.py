@@ -69,9 +69,9 @@ def detect_variant(w3, addr, block="latest"):
                 _, version = probe(w3, math_addr,
                     '[{"name":"version","outputs":[{"type":"string"}],"inputs":[],"stateMutability":"view","type":"function"}]',
                     "version", block=block)
-                if version == "v2.0.0":
+                if version in ("v2.0.0", "v2.1.0"):
                     return "TwoCryptoNG"
-                elif version in ("v0.1.0", "v2.1.0"):
+                elif version == "v0.1.0":
                     return "TwoCryptoStable"
                 else:
                     return f"TwoCryptoNG (unknown MATH {version})"

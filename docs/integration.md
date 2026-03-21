@@ -21,16 +21,16 @@ Pools deployed from NG factories emit a deployment event that contains all infor
 | MATH version | Invariant | Variant | How to detect |
 |---|---|---|---|
 | `v2.0.0` | CryptoSwap (with gamma) | `TwoCryptoNG` | `math.version() == "v2.0.0"` |
+| `v2.1.0` | CryptoSwap (with gamma) | `TwoCryptoNG` | `math.version() == "v2.1.0"` |
 | `v0.1.0` | StableSwap (gamma ignored) | `TwoCryptoStable` | `math.version() == "v0.1.0"` |
-| `v2.1.0` | StableSwap (gamma ignored) | `TwoCryptoStable` | `math.version() == "v2.1.0"` |
 
 Since there are only a few MATH contract addresses per chain, you can maintain a small lookup table instead of calling `version()` at runtime:
 
 ```
 # Ethereum mainnet MATH addresses
 0x2005995a71243be9FB995DaB4742327dc76564Df → TwoCryptoNG  (v2.0.0)
+0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1 → TwoCryptoNG  (v2.1.0)
 0x79839c2D74531A8222C0F555865aAc1834e82e51 → TwoCryptoStable (v0.1.0)
-0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1 → TwoCryptoStable (v2.1.0)
 ```
 
 ### Legacy pools (pre-factory)
