@@ -299,3 +299,13 @@ address = "0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B"
 variant = "StableSwapMeta"
 name = "FRAX/3Crv"
 
+[[pools]]
+address = "0x5B3b5DF2BF2B6543f78e053bD91C4Bdd820929f1"
+variant = "StableSwapMeta"
+name = "USDM/3Crv"
+
+[[pools]]
+address = "0xbcb91E689114B9Cc865AD7871845C95241Df4105"
+variant = "StableSwapMeta"
+name = "PWRD/3Crv"
+
