@@ -5,6 +5,10 @@ on:
     - cron: '0 6 * * *'  # Daily at 6am UTC
   workflow_dispatch:       # Manual trigger
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   index:
     name: Discover & Verify Pools
