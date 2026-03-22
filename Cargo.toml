@@ -3,7 +3,7 @@ members = [".", "benches/revm-comparison"]
 
 [package]
 name = "curve-math"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 edition = "2021"
 rust-version = "1.80"
 description = "Pure Rust port of Curve Finance AMM math (StableSwap + CryptoSwap). Wei-level precision, fuzz-verified against on-chain get_dy for 200+ pools."
