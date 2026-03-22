@@ -488,20 +488,10 @@ async fn build_pool(
             if entry.variant == "TwoCryptoV1" {
                 Some((Pool::TwoCryptoV1 { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
             } else {
-                // Detect MATH version to select fee formula.
-                // v2.0.0: both _exchange and fee_calc use V1 formula.
-                // v2.1.0: _exchange uses NG formula (pool._fee), but fee_calc/get_dy uses V1.
-                // We match _exchange (actual swap behavior), not get_dy (view query).
-                let fee_formula = match c.MATH().block(block).call().await {
-                    Ok(math_addr) => {
-                        let math = IMathVersion::new(math_addr, provider);
-                        match math.version().block(block).call().await {
-                            Ok(v) if v.contains("2.1") => curve_math::swap::twocrypto_ng::FeeFormula::NG,
-                            _ => curve_math::swap::twocrypto_ng::FeeFormula::V1,
-                        }
-                    }
-                    _ => curve_math::swap::twocrypto_ng::FeeFormula::V1,
-                };
+                // Fuzz tests compare against on-chain get_dy (view function).
+                // Both v2.0.0 and v2.1.0 get_dy use V1 fee via pool.fee_calc().
+                // Note: actual swaps (_exchange) on v2.1.0 use NG fee via pool._fee().
+                let fee_formula = curve_math::swap::twocrypto_ng::FeeFormula::V1;
                 Some((Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma, fee_formula }, n_coins))
             }
         }

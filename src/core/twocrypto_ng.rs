@@ -302,10 +302,13 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
         .wrapping_div(e18)
         .wrapping_mul(second_cbrt)
         .wrapping_div(e18);
+    // Vyper: (10^18*C1 - 10^18*b - 10^18*b//C1*delta0) // (3*a)
+    // The inner `10^18*b // C1` uses truncation (SDIV) in deployed bytecode,
+    // not floor division. Using wrapping_div matches both v2.0.0 and v2.1.0.
     let root: I256 = fdiv(
         e18.wrapping_mul(c1)
             - e18.wrapping_mul(b)
-            - fdiv(e18.wrapping_mul(b), c1).wrapping_mul(delta0),
+            - e18.wrapping_mul(b).wrapping_div(c1).wrapping_mul(delta0),
         s(3).wrapping_mul(a),
     );
     let y_out = U256::try_from(
