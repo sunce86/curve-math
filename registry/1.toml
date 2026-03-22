@@ -918,3 +918,68 @@ address = "0x86bF09aCB47AB31686bE413d614E9ded3666a1d3"
 variant = "TriCryptoNG"
 name = "crvUSD/frxETH/Silo"
 
+[[pools]]
+address = "0x0C2Ab2fa20dC10fD726DeBeB406bd9c25b6f4c38"
+variant = "StableSwapNG"
+name = "sCBD/CBD/scrvUSD"
+
+[[pools]]
+address = "0xD780Eae3D940db701ccfd24c16332af4a8F925d0"
+variant = "StableSwapNG"
+name = "BOND/scrvUSD"
+
+[[pools]]
+address = "0x4DE61e58f5f1E495e3BC58516268Bba25b5a57Fd"
+variant = "StableSwapNG"
+name = "sdUSD/sfrxUSD"
+
+[[pools]]
+address = "0x5ca4C908aF7d02d3433d1F9f5d449579CE676C9F"
+variant = "StableSwapNG"
+name = "crvUSD/credUSD"
+
+[[pools]]
+address = "0xBDf86bD28cB3a8Af5D46cCD2f56131Be6718B1d8"
+variant = "StableSwapNG"
+name = "ynRWAx/fxUSD"
+
+[[pools]]
+address = "0xb1a3edB33E06743B0Efd82b30337604a9bE11Fb3"
+variant = "StableSwapNG"
+name = "YUSD/sYUSD"
+
+[[pools]]
+address = "0x791341bd3739Ba8A3DDE41e9411689A1e453FB71"
+variant = "StableSwapNG"
+name = "USDFI/BOLD"
+
+[[pools]]
+address = "0x42cf3B7e98a1BBc51ED6e5C09F5A93743E600889"
+variant = "StableSwapNG"
+name = "wstUSR/RLP"
+
+[[pools]]
+address = "0xfcCa47DdD4336F08835005d912124b472eD29448"
+variant = "StableSwapNG"
+name = "ynUSDx/USDC"
+
+[[pools]]
+address = "0x98E9599dab3A936C35DE48E13E026Ef4eA20B5e6"
+variant = "StableSwapNG"
+name = "frxUSD/USDf"
+
+[[pools]]
+address = "0xC57Ce1aC61081C51596E55DE38D35B19720D421e"
+variant = "StableSwapNG"
+name = "USDO/USDC"
+
+[[pools]]
+address = "0xB6aF437ceEa0DBeA524115eFC905F0F44fd1eBAF"
+variant = "StableSwapNG"
+name = "fxUSD/USDN"
+
+[[pools]]
+address = "0xc2FcdD48209DD383B1f2AC120b84b2A75EE18BD3"
+variant = "TriCryptoNG"
+name = "RZR/frxETH/scrvUSD"
+
