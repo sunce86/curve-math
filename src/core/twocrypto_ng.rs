@@ -325,26 +325,6 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
     Some((y_out, k0_prev))
 }
 
-pub fn crypto_fee(xp: &[U256], mid_fee: U256, out_fee: U256, fee_gamma: U256) -> Option<U256> {
-    let wad = U256::from(WAD);
-    let s: U256 = xp
-        .iter()
-        .try_fold(U256::ZERO, |acc, v| acc.checked_add(*v))?;
-    if s.is_zero() {
-        return None;
-    }
-    let n = U256::from(xp.len());
-    let mut k = wad;
-    for x_i in xp {
-        k = k * n * (*x_i) / s;
-    }
-    let f = if fee_gamma > U256::ZERO {
-        fee_gamma * wad / (fee_gamma + wad - k)
-    } else {
-        k
-    };
-    Some((mid_fee * f + out_fee * (wad - f)) / wad)
-}
 
 #[cfg(test)]
 mod tests {
@@ -424,15 +404,4 @@ mod tests {
         assert!(y < d);
     }
 
-    #[test]
-    fn crypto_fee_balanced() {
-        let wad = U256::from(WAD);
-        let mid_fee = U256::from(3_000_000u64);
-        let out_fee = U256::from(30_000_000u64);
-        let fee_gamma = U256::from(230_000_000_000_000u64);
-        let xp = [U256::from(100_000u64) * wad, U256::from(100_000u64) * wad];
-        let fee = crypto_fee(&xp, mid_fee, out_fee, fee_gamma).expect("fee");
-        assert!(fee >= mid_fee);
-        assert!(fee < out_fee);
-    }
 }

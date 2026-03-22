@@ -140,6 +140,12 @@ alloy::sol! {
         function mid_fee() external view returns (uint256);
         function out_fee() external view returns (uint256);
         function fee_gamma() external view returns (uint256);
+        function MATH() external view returns (address);
+    }
+
+    #[sol(rpc)]
+    interface IMathVersion {
+        function version() external view returns (string);
     }
 
     #[sol(rpc)]
@@ -482,7 +488,18 @@ async fn build_pool(
             if entry.variant == "TwoCryptoV1" {
                 Some((Pool::TwoCryptoV1 { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
             } else {
-                Some((Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
+                // Detect MATH version: v2.1.0 uses NG fee formula, v2.0.0 uses V1
+                let fee_formula = match c.MATH().block(block).call().await {
+                    Ok(math_addr) => {
+                        let math = IMathVersion::new(math_addr, provider);
+                        match math.version().block(block).call().await {
+                            Ok(v) if v.contains("2.1") => curve_math::swap::twocrypto_ng::FeeFormula::NG,
+                            _ => curve_math::swap::twocrypto_ng::FeeFormula::V1,
+                        }
+                    }
+                    _ => curve_math::swap::twocrypto_ng::FeeFormula::V1,
+                };
+                Some((Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma, fee_formula }, n_coins))
             }
         }
         "TwoCryptoStable" => {
