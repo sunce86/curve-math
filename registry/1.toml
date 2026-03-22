@@ -873,3 +873,48 @@ address = "0x181A7464554E68333193a71719eb164E0dB7c038"
 variant = "TriCryptoNG"
 name = "XBEN/WETH/USDT"
 
+[[pools]]
+address = "0x3e823bd1015Ba1A12F2F8aFD631c822a1CBA0de7"
+variant = "StableSwapNG"
+name = "iUSD/frxUSD"
+
+[[pools]]
+address = "0x80F596e6DFb34ba0731adB02352C9B760CAEf019"
+variant = "StableSwapNG"
+name = "CJPY/JPYC"
+
+[[pools]]
+address = "0x2Cc565dDe7C078A8E477763a34C40e52b13e6396"
+variant = "StableSwapNG"
+name = "YUSD/frxUSD"
+
+[[pools]]
+address = "0xcc7d5785AD5755B6164e21495E07aDb0Ff11C2A8"
+variant = "StableSwapNG"
+name = "OETH/WETH"
+
+[[pools]]
+address = "0xEa2F331f084DC1119B0d59F17Fb2cD2B2532131e"
+variant = "TwoCryptoNG"
+name = "USD69/USD69-29Y"
+
+[[pools]]
+address = "0xdCb72c163de84618417Bec9aeF7ae32B5336d70E"
+variant = "TwoCryptoNG"
+name = "StUSDV/VLP"
+
+[[pools]]
+address = "0x1df759511FeBf10C6AE3a30Ccf2da4c81CdF05C1"
+variant = "TriCryptoNG"
+name = "NIGGER/pBTC/SPANK"
+
+[[pools]]
+address = "0xB8ac7ce449Ed72FF61dE8043d67B507f9F523Fa2"
+variant = "TriCryptoNG"
+name = "OGN/OUSD/OETH"
+
+[[pools]]
+address = "0x86bF09aCB47AB31686bE413d614E9ded3666a1d3"
+variant = "TriCryptoNG"
+name = "crvUSD/frxETH/Silo"
+
