@@ -6,11 +6,16 @@ use crate::core::twocrypto_ng::{get_y_2_ng, FEE_DENOMINATOR, WAD};
 
 /// Which fee formula to use for CryptoSwap pools.
 ///
-/// v2.0.0 deployed bytecode uses the V1 formula (confirmed by comparing deployed
-/// bytecode with GitHub source). v2.1.0 uses the NG formula matching GitHub source.
+/// The fee formula determines how pool imbalance affects the fee rate.
+/// v2.0.0 deployed pools use the V1 formula. v2.1.0 pools use the NG formula
+/// for actual swaps (`_exchange`).
+///
+/// **Note:** Curve's `get_dy` view function on v2.1.0 pools uses V1 via
+/// `pool.fee_calc()`, creating a discrepancy with the actual swap fee.
+/// This library matches the actual swap behavior (`_exchange`), not `get_dy`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeeFormula {
-    /// `f = fee_gamma * WAD / (fee_gamma + WAD - K)` — used by v2.0.0 deployed pools.
+    /// `f = fee_gamma * WAD / (fee_gamma + WAD - K)` — used by v2.0.0 pools.
     V1,
     /// `f = fee_gamma * K / (fee_gamma * K / WAD + WAD - K)` — used by v2.1.0 pools.
     NG,

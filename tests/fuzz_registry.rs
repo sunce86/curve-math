@@ -488,7 +488,10 @@ async fn build_pool(
             if entry.variant == "TwoCryptoV1" {
                 Some((Pool::TwoCryptoV1 { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
             } else {
-                // Detect MATH version: v2.1.0 uses NG fee formula, v2.0.0 uses V1
+                // Detect MATH version to select fee formula.
+                // v2.0.0: both _exchange and fee_calc use V1 formula.
+                // v2.1.0: _exchange uses NG formula (pool._fee), but fee_calc/get_dy uses V1.
+                // We match _exchange (actual swap behavior), not get_dy (view query).
                 let fee_formula = match c.MATH().block(block).call().await {
                     Ok(math_addr) => {
                         let math = IMathVersion::new(math_addr, provider);
