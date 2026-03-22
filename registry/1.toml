@@ -983,3 +983,73 @@ address = "0xc2FcdD48209DD383B1f2AC120b84b2A75EE18BD3"
 variant = "TriCryptoNG"
 name = "RZR/frxETH/scrvUSD"
 
+[[pools]]
+address = "0xAFbA5800252530CE71b03Ba2BCa2Dd5aE44a7F3d"
+variant = "StableSwapNG"
+name = "VUSD/crvUSD"
+
+[[pools]]
+address = "0x18478E7b09BCF64b394F829a053BbEe6c3f90C28"
+variant = "StableSwapNG"
+name = "STAK/scrvUSD"
+
+[[pools]]
+address = "0xd80ccB411c01ceB2f22911a482D90fA303E9fda3"
+variant = "StableSwapNG"
+name = "crvUSD/USX"
+
+[[pools]]
+address = "0x23EA9a51CC7b252d63A364e3398682e927f749d9"
+variant = "StableSwapNG"
+name = "PUSSY/PUSSY"
+
+[[pools]]
+address = "0x86fecb2f93c537397f9dFD894bCf6A95fa87a25e"
+variant = "StableSwapNG"
+name = "sfrxUSD/USDe"
+
+[[pools]]
+address = "0x2c683fAd51da2cd17793219CC86439C1875c353e"
+variant = "StableSwapNG"
+name = "ETH+/WETH"
+
+[[pools]]
+address = "0x9804C30875127246AC92D72D5CDF0630aA356861"
+variant = "StableSwapNG"
+name = "YUSD/USDC"
+
+[[pools]]
+address = "0xd221b4C109841a97f241d8bfd45aD8F2B99cf22D"
+variant = "TwoCryptoNG"
+name = "MET/WETH"
+
+[[pools]]
+address = "0x586E760AbBD93Bb56bDaabEfb325Da40066A64b2"
+variant = "TwoCryptoNG"
+name = "crvUSD/SQUID"
+
+[[pools]]
+address = "0x27CB06F65d8B7228147375E15d37912b93b501CC"
+variant = "TwoCryptoNG"
+name = "MANA/WETH"
+
+[[pools]]
+address = "0x6811D3883EC472038E426a4926471965c1Ff7B44"
+variant = "TwoCryptoNG"
+name = "cUSDO/PT-cUSDO@19/11/2025"
+
+[[pools]]
+address = "0xd54211778da813D0a0D2764eaf18e3D12F8cD81D"
+variant = "TwoCryptoNG"
+name = "cUSDO/PT-cUSDO@15/6/2025"
+
+[[pools]]
+address = "0x705Bcff0a45A78c089a6C16FC957195e35aA667C"
+variant = "TriCryptoNG"
+name = "sBOND/BOND/crvUSD"
+
+[[pools]]
+address = "0x75f07532450FE3C6132844d647C7F8E35a1B83DD"
+variant = "TriCryptoNG"
+name = "QUINTA/GTEC/GEAR"
+
