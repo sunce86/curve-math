@@ -5,7 +5,7 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-03-21"
+last_updated = "2026-03-22"
 total_factory_pools = 1227
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
@@ -787,4 +787,34 @@ name = "QOM/O/CAW"
 address = "0x4eBdF703948ddCEA3B11f675B4D1Fba9d2414A14"
 variant = "TriCryptoNG"
 name = "crvUSD/WETH/CRV"
+
+[[pools]]
+address = "0xCF8A5C32953D08C197f0A92676CFb59314b5c62e"
+variant = "StableSwapNG"
+name = "OUSD/eUSD"
+
+[[pools]]
+address = "0x7163E1d13793cd8a5D967567f0A0529AF0079Be9"
+variant = "TwoCryptoNG"
+name = "ASF/opASF"
+
+[[pools]]
+address = "0x43b98EEA5C689F0036918f590a4B55f22D853734"
+variant = "TwoCryptoNG"
+name = "reUSDe/sUSDe"
+
+[[pools]]
+address = "0xC907ba505C2E1cbc4658c395d4a2c7E6d2c32656"
+variant = "TwoCryptoNG"
+name = "USR/RLP"
+
+[[pools]]
+address = "0x69CAe865bb5EfEc4990692BdEb2DaCAAcC77086F"
+variant = "TwoCryptoNG"
+name = "BNANA/WETH"
+
+[[pools]]
+address = "0x2889302a794dA87fBF1D6Db415C1492194663D13"
+variant = "TriCryptoNG"
+name = "crvUSD/tBTC/wstETH"
 
