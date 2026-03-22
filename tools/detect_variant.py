@@ -5,6 +5,16 @@ Detect Curve pool variant by probing on-chain functions.
 Usage:
     python tools/detect_variant.py <pool_address> [--rpc <url>]
     python tools/detect_variant.py 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7
+
+Known Ethereum mainnet factories (all use pool_count/pool_list interface):
+  NG factories:
+    0x6A8cbed756804B16E05E741eDaBd5cB544AE21bf  StableSwap-NG       → StableSwapNG
+    0x98ee851a00abee0d95d08cf4ca2bdce32aeaaf7f  TwoCrypto-NG        → TwoCryptoNG / TwoCryptoStable
+    0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963  TriCrypto-NG        → TriCryptoNG
+  Legacy factories:
+    0xB9fC157394Af804a3578134A6585C0dc9cc990d4  MetaPool Factory    → StableSwapMeta
+    0xF18056Bbd320E96A48e3Fbf8bC061322531aac99  CryptoSwap Factory  → TwoCryptoV1
+    0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d  crvUSD StableSwap   → auto-detect
 """
 
 import json

@@ -30,6 +30,7 @@ except ImportError:
 
 FACTORIES = {
     1: [  # Ethereum
+        # ── NG factories ────────────────────────────────────────────────
         {
             "address": "0x6A8cbed756804B16E05E741eDaBd5cB544AE21bf",
             "variant": "StableSwapNG",
@@ -45,6 +46,22 @@ FACTORIES = {
             "variant": "TriCryptoNG",
             "label": "TriCrypto-NG",
         },
+        # ── Legacy factories ────────────────────────────────────────────
+        {
+            "address": "0xB9fC157394Af804a3578134A6585C0dc9cc990d4",
+            "variant": "StableSwapMeta",
+            "label": "MetaPool Factory (legacy)",
+        },
+        {
+            "address": "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99",
+            "variant": "TwoCryptoV1",
+            "label": "CryptoSwap Factory (legacy)",
+        },
+        {
+            "address": "0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d",
+            "variant": "auto",
+            "label": "crvUSD StableSwap Factory",
+        },
     ],
 }
 
@@ -58,6 +75,12 @@ TOKEN_ABI = json.loads('[{"name":"decimals","outputs":[{"type":"uint8"}],"inputs
 
 MATH_GETTER_ABI = json.loads('[{"name":"MATH","outputs":[{"type":"address"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 VERSION_ABI = json.loads('[{"name":"version","outputs":[{"type":"string"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+
+# ABIs for on-chain variant probing (used by detect_variant_onchain)
+GAMMA_ABI = json.loads('[{"name":"gamma","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+OFFPEG_ABI = json.loads('[{"name":"offpeg_fee_multiplier","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+STORED_RATES_ABI = json.loads('[{"name":"stored_rates","outputs":[{"type":"uint256[]"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+BASE_POOL_ABI = json.loads('[{"name":"base_pool","outputs":[{"type":"address"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 
 
 def get_rpc_url(chain_id: int) -> str:
@@ -105,6 +128,59 @@ def _batch_call(w3, calls, block):
             idx, val = future.result()
             results[idx] = val
     return results
+
+
+def _probe(w3, addr, abi, fn_name, args=None, block="latest"):
+    """Try calling a function on a contract. Returns (True, result) or (False, None)."""
+    try:
+        c = w3.eth.contract(address=Web3.to_checksum_address(addr), abi=abi)
+        fn = getattr(c.functions, fn_name)(*(args or []))
+        return True, fn.call(block_identifier=block)
+    except Exception:
+        return False, None
+
+
+def detect_variant_onchain(w3, addr, block):
+    """Detect pool variant by probing on-chain functions.
+
+    Same logic as tools/detect_variant.py but inlined for use in the indexer.
+    Used for factories where the variant isn't known from the factory alone
+    (e.g., crvUSD StableSwap Factory).
+    """
+    has_gamma, _ = _probe(w3, addr, GAMMA_ABI, "gamma", block=block)
+    if has_gamma:
+        # CryptoSwap — count coins to distinguish TwoCrypto vs TriCrypto
+        n_coins = 0
+        for i in range(4):
+            ok, _ = _probe(w3, addr, POOL_ABI, "coins", [i], block=block)
+            if ok:
+                n_coins += 1
+            else:
+                break
+        if n_coins == 3:
+            return "TriCryptoNG"
+        if n_coins == 2:
+            has_math, math_addr = _probe(w3, addr, MATH_GETTER_ABI, "MATH", block=block)
+            if has_math and math_addr:
+                _, version = _probe(w3, math_addr, VERSION_ABI, "version", block=block)
+                if version == "v0.1.0":
+                    return "TwoCryptoStable"
+                return "TwoCryptoNG"
+            return "TwoCryptoV1"
+        return "TwoCryptoNG"
+
+    has_offpeg, _ = _probe(w3, addr, OFFPEG_ABI, "offpeg_fee_multiplier", block=block)
+    if has_offpeg:
+        has_stored_rates, _ = _probe(w3, addr, STORED_RATES_ABI, "stored_rates", block=block)
+        if has_stored_rates:
+            return "StableSwapNG"
+        return "StableSwapALend"
+
+    has_base_pool, _ = _probe(w3, addr, BASE_POOL_ABI, "base_pool", block=block)
+    if has_base_pool:
+        return "StableSwapMeta"
+
+    return "StableSwapV2"
 
 
 def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
@@ -219,6 +295,9 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
             math_ver = math_versions.get(addr, "v2.0.0")
             if math_ver == "v0.1.0":
                 variant = "TwoCryptoStable"
+        # Auto-detect variant by probing on-chain functions
+        elif variant == "auto":
+            variant = detect_variant_onchain(w3, addr, block)
 
         name = "/".join(symbols)
         print(f"    {addr} {name} ({len(coins)}-coin, ~${tvl:,}, {variant})")

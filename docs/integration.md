@@ -33,6 +33,18 @@ Since there are only a few MATH contract addresses per chain, you can maintain a
 0x79839c2D74531A8222C0F555865aAc1834e82e51 → TwoCryptoStable (v0.1.0)
 ```
 
+### Factory-deployed pools (legacy)
+
+Three legacy factories also use the same `pool_count()` / `pool_list(uint256)` interface as NG factories. The variant is either fixed per factory or detected on-chain.
+
+| Factory | Address | Variant |
+|---------|---------|---------|
+| MetaPool Factory | `0xB9fC157394Af804a3578134A6585C0dc9cc990d4` | `StableSwapMeta` |
+| CryptoSwap Factory | `0xF18056Bbd320E96A48e3Fbf8bC061322531aac99` | `TwoCryptoV1` |
+| crvUSD StableSwap Factory | `0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d` | Probe on-chain (see `detect_variant.py`) |
+
+The [pool indexer](../tools/index-pools.py) discovers pools from all 6 factories (3 NG + 3 legacy).
+
 ### Legacy pools (pre-factory)
 
 Legacy pools were deployed individually before factories existed. There is no deployment event to parse. Use the [verified pool registry](../registry/) as the source of truth:
