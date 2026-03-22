@@ -4,10 +4,14 @@
 
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 
-## Chain Status
+## Verified Pools
 
-| Chain | Fuzz | Registered pools | Last indexed |
-|-------|------|-----------------|-------------|
+Every registered pool is **differentially fuzz-tested** against its on-chain `get_dy`: our `get_amount_out` is called with random swap amounts and the result is compared with an on-chain call at the same block. The test requires **exact wei-level match** — no tolerances, no approximations. Pools that don't match are not registered.
+
+The pool registry covers all Curve factory pools above ~$1K TVL and all legacy (pre-factory) pools above ~$5K TVL.
+
+| Chain | Fuzz | Verified pools | Last indexed |
+|-------|------|----------------|-------------|
 | Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 209 / 1227 ![](https://geps.dev/progress/17?successColor=6366f1) | 2026-03-22 |
 
 ## Coverage
