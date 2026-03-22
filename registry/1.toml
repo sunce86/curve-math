@@ -818,3 +818,58 @@ address = "0x2889302a794dA87fBF1D6Db415C1492194663D13"
 variant = "TriCryptoNG"
 name = "crvUSD/tBTC/wstETH"
 
+[[pools]]
+address = "0xDa12D298ABe4e87C93cb1cC869A301d5E77658A7"
+variant = "StableSwapNG"
+name = "pmUSD/USDT"
+
+[[pools]]
+address = "0x2877ece562057ee8B0A711bFfA10987C3D6398E7"
+variant = "StableSwapNG"
+name = "USST/USDC"
+
+[[pools]]
+address = "0x90855478815d65Cd698F7f36A64723adFFf75854"
+variant = "StableSwapNG"
+name = "AUTO/TOKE"
+
+[[pools]]
+address = "0x1791bBFa950F7db0B52Ecb0729584BaD886665F5"
+variant = "StableSwapNG"
+name = "OUSD/USDnr"
+
+[[pools]]
+address = "0xA256D38e73ccE6e00447fa64a95069ea7d32f841"
+variant = "StableSwapNG"
+name = "ynUSDx/scrvUSD"
+
+[[pools]]
+address = "0x2D1eB1704D0EE227B7528C5BDB4Fd256d6aC5B09"
+variant = "StableSwapNG"
+name = "cUSD/crvUSD"
+
+[[pools]]
+address = "0x2CA7FD8279cA9B431cAe1a60327645283E1a123D"
+variant = "StableSwapNG"
+name = "CVX/tCVX"
+
+[[pools]]
+address = "0x7a2330c9AcB154B3dF925321493C97D0056A536f"
+variant = "TwoCryptoStable"
+name = "tGBP/USDC"
+
+[[pools]]
+address = "0x440f952bC4aeA933113817B79F8C746fb0A38b34"
+variant = "TwoCryptoNG"
+name = "crvUSD/PROS"
+
+[[pools]]
+address = "0x12FF8c636c72Efce1E05c93c6aC84F192B643A89"
+variant = "TriCryptoNG"
+name = "BOND/CBD/cbdETH"
+
+[[pools]]
+address = "0x181A7464554E68333193a71719eb164E0dB7c038"
+variant = "TriCryptoNG"
+name = "XBEN/WETH/USDT"
+
