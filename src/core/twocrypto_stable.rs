@@ -14,7 +14,9 @@ const MAX_ITERATIONS: usize = 255;
 pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
     let a_mul = U256::from(A_MULTIPLIER);
-    let sum: U256 = xp.iter().try_fold(U256::ZERO, |acc, b| acc.checked_add(*b))?;
+    let sum: U256 = xp
+        .iter()
+        .try_fold(U256::ZERO, |acc, b| acc.checked_add(*b))?;
     if sum.is_zero() {
         return Some(U256::ZERO);
     }
@@ -110,7 +112,11 @@ mod tests {
         let amp = U256::from(25000u64); // on-chain A
         let d = get_d(&[bal, bal], amp).expect("converge");
         let expected = bal * U256::from(2u64);
-        let diff = if d > expected { d - expected } else { expected - d };
+        let diff = if d > expected {
+            d - expected
+        } else {
+            expected - d
+        };
         assert!(diff <= U256::from(1));
     }
 

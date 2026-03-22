@@ -211,7 +211,10 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
     let c: I256 = s(3).wrapping_mul(s(10u128.pow(32)))
         + s(4).wrapping_mul(gamma_s).wrapping_mul(s(10u128.pow(14)))
         + fdiv(gamma2, s(10u128.pow(4)))
-        + fdiv(fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000)).wrapping_mul(x_j_s), d_s)
+        + fdiv(
+            fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000)).wrapping_mul(x_j_s),
+            d_s,
+        )
         - fdiv(s(4).wrapping_mul(ann_gamma2), s(400_000_000));
     // Vyper: d = -unsafe_div((10^18 + gamma)^2, 10^4)
     // Negate AFTER truncation-dividing positive values (not floor-dividing negative)
@@ -221,7 +224,10 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
 
     let delta0: I256 = fdiv(s(3).wrapping_mul(a).wrapping_mul(c), b) - b;
     let delta1: I256 = s(3).wrapping_mul(delta0) + b
-        - fdiv(fdiv(s(27).wrapping_mul(a).wrapping_mul(a), b).wrapping_mul(d_coeff), b);
+        - fdiv(
+            fdiv(s(27).wrapping_mul(a).wrapping_mul(a), b).wrapping_mul(d_coeff),
+            b,
+        );
 
     let threshold = delta0.abs().min(delta1.abs()).min(a);
     let threshold_u = U256::try_from(threshold.abs()).unwrap_or(U256::ZERO);
@@ -328,7 +334,6 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
     Some((y_out, k0_prev))
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -406,5 +411,4 @@ mod tests {
         assert!(y > U256::ZERO);
         assert!(y < d);
     }
-
 }

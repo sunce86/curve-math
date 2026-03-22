@@ -13,18 +13,28 @@ pub const FEE_DENOMINATOR: u64 = 10_000_000_000;
 
 fn crypto_fee(xp: &[U256], mid_fee: U256, out_fee: U256, fee_gamma: U256) -> Option<U256> {
     let wad = U256::from(WAD);
-    let s: U256 = xp.iter().try_fold(U256::ZERO, |acc, v| acc.checked_add(*v))?;
-    if s.is_zero() { return None; }
+    let s: U256 = xp
+        .iter()
+        .try_fold(U256::ZERO, |acc, v| acc.checked_add(*v))?;
+    if s.is_zero() {
+        return None;
+    }
     let n = U256::from(xp.len());
     // Vyper V1 _fee: K = WAD * N^N * xp[0] / S * xp[1] / S
     let mut nn = U256::from(1u64);
-    for _ in 0..xp.len() { nn = nn * n; }
+    for _ in 0..xp.len() {
+        nn *= n;
+    }
     let mut k = wad * nn;
-    for x_i in xp { k = k * (*x_i) / s; }
+    for x_i in xp {
+        k = k * (*x_i) / s;
+    }
     // NG fee formula: f = fee_gamma * k / (fee_gamma * k / WAD + WAD - k)
     let f = if fee_gamma > U256::ZERO {
         fee_gamma * k / (fee_gamma * k / wad + wad - k)
-    } else { k };
+    } else {
+        k
+    };
     Some((mid_fee * f + out_fee * (wad - f)) / wad)
 }
 
@@ -49,7 +59,10 @@ pub fn get_amount_out(
     let price_scale_local = price_scale * precisions[1];
 
     // CryptoSwap normalization — compute xp BEFORE and AFTER dx
-    let xp_orig: [U256; 2] = [balances[0] * precisions[0], balances[1] * price_scale_local / wad];
+    let xp_orig: [U256; 2] = [
+        balances[0] * precisions[0],
+        balances[1] * price_scale_local / wad,
+    ];
     let mut bal = *balances;
     bal[i] += dx;
     let xp: [U256; 2] = [bal[0] * precisions[0], bal[1] * price_scale_local / wad];
@@ -62,7 +75,11 @@ pub fn get_amount_out(
     }
 
     let dy = xp[j] - y_new - U256::from(1);
-    let xp_after: [U256; 2] = if j == 0 { [y_new, xp[1]] } else { [xp[0], y_new] };
+    let xp_after: [U256; 2] = if j == 0 {
+        [y_new, xp[1]]
+    } else {
+        [xp[0], y_new]
+    };
 
     // CryptoSwap denormalization
     let dy_native = if j > 0 {
@@ -104,7 +121,10 @@ pub fn get_amount_in(
     let fee_denom = U256::from(FEE_DENOMINATOR);
     let price_scale_local = price_scale * precisions[1];
 
-    let xp_orig: [U256; 2] = [balances[0] * precisions[0], balances[1] * price_scale_local / wad];
+    let xp_orig: [U256; 2] = [
+        balances[0] * precisions[0],
+        balances[1] * price_scale_local / wad,
+    ];
 
     // Estimate fee from pre-swap state
     let fee_est = crypto_fee(&xp_orig, mid_fee, out_fee, fee_gamma)?;
@@ -139,7 +159,21 @@ pub fn get_amount_in(
     } + U256::from(1);
 
     // Binary search to ensure get_amount_out(dx) >= desired_output
-    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, mid_fee, out_fee, fee_gamma, i, j, amt);
+    let forward = |amt: U256| {
+        get_amount_out(
+            balances,
+            precisions,
+            price_scale,
+            d,
+            ann,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            i,
+            j,
+            amt,
+        )
+    };
     match forward(dx) {
         Some(dy_check) if dy_check >= desired_output => return Some(dx),
         _ => {}
@@ -149,13 +183,19 @@ pub fn get_amount_in(
     for _ in 0..64 {
         hi = hi + hi / U256::from(10u64) + U256::from(1u64);
         if let Some(dy_check) = forward(hi) {
-            if dy_check >= desired_output { break; }
+            if dy_check >= desired_output {
+                break;
+            }
         }
     }
     for _ in 0..256 {
-        if lo >= hi { break; }
+        if lo >= hi {
+            break;
+        }
         let mid = (lo + hi) / U256::from(2u64);
-        if mid == lo { break; }
+        if mid == lo {
+            break;
+        }
         match forward(mid) {
             Some(dy_check) if dy_check >= desired_output => hi = mid,
             _ => lo = mid + U256::from(1u64),
@@ -180,8 +220,17 @@ pub fn spot_price(
 ) -> Option<(U256, U256)> {
     let dx = U256::from(1_000_000_000_000_000u64);
     let dy = get_amount_out(
-        balances, precisions, price_scale, d, ann,
-        mid_fee, out_fee, fee_gamma, i, j, dx,
+        balances,
+        precisions,
+        price_scale,
+        d,
+        ann,
+        mid_fee,
+        out_fee,
+        fee_gamma,
+        i,
+        j,
+        dx,
     )?;
     Some((dy, dx))
 }
@@ -206,13 +255,26 @@ mod tests {
         let fee_gamma = U256::from_str_radix("1395000000000000", 10).unwrap();
         // Compute D from xp (simulating stored D)
         let price_scale_local = price_scale * precisions[1];
-        let xp_orig: [U256; 2] = [balances[0] * precisions[0], balances[1] * price_scale_local / wad];
+        let xp_orig: [U256; 2] = [
+            balances[0] * precisions[0],
+            balances[1] * price_scale_local / wad,
+        ];
         let d = crate::core::twocrypto_stable::get_d(&xp_orig, ann).expect("D");
         let dx = wad; // 1 crvUSD
         let dy = get_amount_out(
-            &balances, &precisions, price_scale, d, ann,
-            mid_fee, out_fee, fee_gamma, 0, 1, dx,
-        ).expect("swap");
+            &balances,
+            &precisions,
+            price_scale,
+            d,
+            ann,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            dx,
+        )
+        .expect("swap");
         assert!(dy > U256::ZERO);
     }
 }

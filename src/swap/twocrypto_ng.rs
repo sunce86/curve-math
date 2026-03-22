@@ -4,12 +4,7 @@ use alloy_primitives::U256;
 
 use crate::core::twocrypto_ng::{get_y_2_ng, FEE_DENOMINATOR, WAD};
 
-fn crypto_fee(
-    xp: &[U256],
-    mid_fee: U256,
-    out_fee: U256,
-    fee_gamma: U256,
-) -> Option<U256> {
+fn crypto_fee(xp: &[U256], mid_fee: U256, out_fee: U256, fee_gamma: U256) -> Option<U256> {
     let wad = U256::from(WAD);
     let s: U256 = xp
         .iter()
@@ -160,7 +155,22 @@ pub fn get_amount_in(
     } else {
         (x_new - xp_orig[i]) / precisions[0]
     } + U256::from(1);
-    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, i, j, amt);
+    let forward = |amt: U256| {
+        get_amount_out(
+            balances,
+            precisions,
+            price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            i,
+            j,
+            amt,
+        )
+    };
     match forward(dx) {
         Some(dy_check) if dy_check >= desired_output => return Some(dx),
         _ => {}
@@ -170,13 +180,19 @@ pub fn get_amount_in(
     for _ in 0..64 {
         hi = hi + hi / U256::from(10u64) + U256::from(1u64);
         if let Some(dy_check) = forward(hi) {
-            if dy_check >= desired_output { break; }
+            if dy_check >= desired_output {
+                break;
+            }
         }
     }
     for _ in 0..256 {
-        if lo >= hi { break; }
+        if lo >= hi {
+            break;
+        }
         let mid = (lo + hi) / U256::from(2u64);
-        if mid == lo { break; }
+        if mid == lo {
+            break;
+        }
         match forward(mid) {
             Some(dy_check) if dy_check >= desired_output => hi = mid,
             _ => lo = mid + U256::from(1u64),
@@ -375,5 +391,4 @@ mod tests {
         assert!(!num.is_zero(), "numerator is zero");
         assert!(!den.is_zero(), "denominator is zero");
     }
-
 }

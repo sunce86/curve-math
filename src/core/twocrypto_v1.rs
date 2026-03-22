@@ -79,7 +79,7 @@ pub fn crypto_fee(xp: &[U256], mid_fee: U256, out_fee: U256, fee_gamma: U256) ->
     let n = U256::from(xp.len());
     let mut nn = U256::from(1u64);
     for _ in 0..xp.len() {
-        nn = nn * n;
+        nn *= n;
     }
     let mut k = wad * nn;
     for x_i in xp {

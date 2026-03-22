@@ -5,8 +5,14 @@ members = [".", "benches/revm-comparison"]
 name = "curve-math"
 version = "0.1.0"
 edition = "2021"
-description = "Pure Rust port of Curve Finance AMM math (StableSwap + CryptoSwap)"
+rust-version = "1.80"
+description = "Pure Rust port of Curve Finance AMM math (StableSwap + CryptoSwap). Wei-level precision, fuzz-verified against on-chain get_dy for 200+ pools."
 license = "MIT"
+repository = "https://github.com/sunce86/curve-math"
+readme = "README.md"
+keywords = ["curve", "amm", "defi", "stableswap", "cryptoswap"]
+categories = ["cryptography::cryptocurrencies", "mathematics"]
+exclude = ["benches/", "registry/", "tools/", ".github/", "docs/"]
 
 [dependencies]
 alloy-primitives = "1.5"

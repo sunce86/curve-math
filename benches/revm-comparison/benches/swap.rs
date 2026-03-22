@@ -8,13 +8,8 @@ use alloy_primitives::{Address, Bytes, U256};
 use criterion::{criterion_group, criterion_main, Criterion};
 use curve_math::Pool;
 use revm::{
-    bytecode::Bytecode,
-    context::TxEnv,
-    database::CacheDB,
-    database_interface::EmptyDB,
-    primitives::TxKind,
-    state::AccountInfo,
-    Context, ExecuteEvm, MainBuilder, MainContext,
+    bytecode::Bytecode, context::TxEnv, database::CacheDB, database_interface::EmptyDB,
+    primitives::TxKind, state::AccountInfo, Context, ExecuteEvm, MainBuilder, MainContext,
 };
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -89,8 +84,7 @@ fn setup_revm_db(fixture: &Fixture) -> CacheDB<EmptyDB> {
 
     for (addr_hex, state) in &fixture.accounts {
         let addr = Address::from_str(addr_hex).unwrap();
-        let code_bytes =
-            hex::decode(state.code.strip_prefix("0x").unwrap_or(&state.code)).unwrap();
+        let code_bytes = hex::decode(state.code.strip_prefix("0x").unwrap_or(&state.code)).unwrap();
         let bytecode = Bytecode::new_raw(Bytes::from(code_bytes));
 
         let info = AccountInfo {
@@ -144,7 +138,13 @@ fn build_pool(fixture: &Fixture) -> Pool {
             offpeg_fee_multiplier: u(p.offpeg_fee_multiplier.as_ref().unwrap()),
         },
         "TwoCryptoNG" => {
-            let prec: Vec<U256> = p.precisions.as_ref().unwrap().iter().map(|s| u(s)).collect();
+            let prec: Vec<U256> = p
+                .precisions
+                .as_ref()
+                .unwrap()
+                .iter()
+                .map(|s| u(s))
+                .collect();
             Pool::TwoCryptoNG {
                 balances: [bals[0], bals[1]],
                 precisions: [prec[0], prec[1]],
@@ -158,7 +158,13 @@ fn build_pool(fixture: &Fixture) -> Pool {
             }
         }
         "TriCryptoNG" => {
-            let prec: Vec<U256> = p.precisions.as_ref().unwrap().iter().map(|s| u(s)).collect();
+            let prec: Vec<U256> = p
+                .precisions
+                .as_ref()
+                .unwrap()
+                .iter()
+                .map(|s| u(s))
+                .collect();
             let ps = p.price_scale.as_ref().unwrap().as_array().unwrap();
             Pool::TriCryptoNG {
                 balances: [bals[0], bals[1], bals[2]],
@@ -195,8 +201,13 @@ fn bench_fixture(c: &mut Criterion, name: &str) {
     );
 
     let pool_addr = Address::from_str(&fixture.pool_address).unwrap();
-    let calldata =
-        hex::decode(fixture.calldata.strip_prefix("0x").unwrap_or(&fixture.calldata)).unwrap();
+    let calldata = hex::decode(
+        fixture
+            .calldata
+            .strip_prefix("0x")
+            .unwrap_or(&fixture.calldata),
+    )
+    .unwrap();
     let caller = Address::from_str("0x0000000000000000000000000000000000000001").unwrap();
 
     let mut group = c.benchmark_group(&fixture.name);

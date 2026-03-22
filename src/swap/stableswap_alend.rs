@@ -138,7 +138,9 @@ pub fn spot_price(
         return None;
     }
     let effective_fee = dynamic_fee(xp[i], xp[j], fee, offpeg_fee_multiplier);
-    let numerator = num_xp.checked_mul(balances[j])?.checked_mul(fee_denom - effective_fee)?;
+    let numerator = num_xp
+        .checked_mul(balances[j])?
+        .checked_mul(fee_denom - effective_fee)?;
     let denominator = den_xp.checked_mul(balances[i])?.checked_mul(fee_denom)?;
     Some((numerator, denominator))
 }
@@ -233,5 +235,4 @@ mod tests {
             "spot price inconsistent with swap"
         );
     }
-
 }

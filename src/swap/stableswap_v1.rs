@@ -111,7 +111,9 @@ pub fn spot_price(
     if den_xp.is_zero() {
         return None;
     }
-    let numerator = num_xp.checked_mul(balances[j])?.checked_mul(fee_denom - fee)?;
+    let numerator = num_xp
+        .checked_mul(balances[j])?
+        .checked_mul(fee_denom - fee)?;
     let denominator = den_xp.checked_mul(balances[i])?.checked_mul(fee_denom)?;
     Some((numerator, denominator))
 }
@@ -202,5 +204,4 @@ mod tests {
             "spot price inconsistent with swap"
         );
     }
-
 }

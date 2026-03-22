@@ -39,7 +39,9 @@ fn generate_amounts(n: usize, max: U256, seed: u64) -> Vec<U256> {
         let r = splitmix64(&mut s);
         let t = (r as f64) / (u64::MAX as f64);
         let val = (t * ln_max).exp();
-        let v = U256::from(val.min(1e38) as u128).max(U256::from(1u64)).min(max);
+        let v = U256::from(val.min(1e38) as u128)
+            .max(U256::from(1u64))
+            .min(max);
         out.push(v);
     }
     out
@@ -79,13 +81,22 @@ fn roundtrip_stableswap_v0() {
     for desired_dy in generate_amounts(n, balances[1] / U256::from(2u64), 42) {
         let dx = match get_amount_in(&balances, &rates, amp, fee, 0, 1, desired_dy) {
             Some(v) => v,
-            None => { skipped += 1; continue; }
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
         let actual_dy = match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
             Some(v) => v,
-            None => { skipped += 1; continue; }
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
-        assert!(actual_dy >= desired_dy, "V0 roundtrip: got {actual_dy} < desired {desired_dy}");
+        assert!(
+            actual_dy >= desired_dy,
+            "V0 roundtrip: got {actual_dy} < desired {desired_dy}"
+        );
         passed += 1;
     }
     println!("roundtrip_stableswap_v0: {passed} passed, {skipped} skipped");
@@ -113,12 +124,23 @@ fn roundtrip_stableswap_v1() {
     let mut skipped = 0u64;
     for desired_dy in generate_amounts(n, balances[1] / U256::from(2u64), 43) {
         let dx = match get_amount_in(&balances, &rates, amp, fee, 0, 1, desired_dy) {
-            Some(v) => v, None => { skipped += 1; continue; }
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
         let actual_dy = match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
-            Some(v) => v, None => { skipped += 1; continue; }
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
-        assert!(actual_dy >= desired_dy, "V1 roundtrip: got {actual_dy} < desired {desired_dy}");
+        assert!(
+            actual_dy >= desired_dy,
+            "V1 roundtrip: got {actual_dy} < desired {desired_dy}"
+        );
         passed += 1;
     }
     println!("roundtrip_stableswap_v1: {passed} passed, {skipped} skipped");
@@ -129,10 +151,13 @@ fn roundtrip_stableswap_v1() {
 
 #[test]
 fn roundtrip_stableswap_v2() {
-    use curve_math::swap::stableswap_v2::{get_amount_in, get_amount_out};
     use curve_math::core::stableswap_v2::A_PRECISION;
+    use curve_math::swap::stableswap_v2::{get_amount_in, get_amount_out};
     let wad = U256::from(1_000_000_000_000_000_000u128);
-    let balances = [U256::from(10_000_000u64) * wad, U256::from(10_000_000_000_000u64)];
+    let balances = [
+        U256::from(10_000_000u64) * wad,
+        U256::from(10_000_000_000_000u64),
+    ];
     let rate18 = wad;
     let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
     let rates = [rate18, rate6];
@@ -144,22 +169,44 @@ fn roundtrip_stableswap_v2() {
     // Both directions
     for desired_dy in generate_amounts(n / 2, balances[1] / U256::from(2u64), 44) {
         let dx = match get_amount_in(&balances, &rates, amp, fee, 0, 1, desired_dy) {
-            Some(v) => v, None => { skipped += 1; continue; }
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
         let actual_dy = match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
-            Some(v) => v, None => { skipped += 1; continue; }
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
-        assert!(actual_dy >= desired_dy, "V2 0→1 roundtrip: got {actual_dy} < desired {desired_dy}");
+        assert!(
+            actual_dy >= desired_dy,
+            "V2 0→1 roundtrip: got {actual_dy} < desired {desired_dy}"
+        );
         passed += 1;
     }
     for desired_dy in generate_amounts(n / 2, balances[0] / U256::from(2u64), 45) {
         let dx = match get_amount_in(&balances, &rates, amp, fee, 1, 0, desired_dy) {
-            Some(v) => v, None => { skipped += 1; continue; }
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
         let actual_dy = match get_amount_out(&balances, &rates, amp, fee, 1, 0, dx) {
-            Some(v) => v, None => { skipped += 1; continue; }
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
-        assert!(actual_dy >= desired_dy, "V2 1→0 roundtrip: got {actual_dy} < desired {desired_dy}");
+        assert!(
+            actual_dy >= desired_dy,
+            "V2 1→0 roundtrip: got {actual_dy} < desired {desired_dy}"
+        );
         passed += 1;
     }
     println!("roundtrip_stableswap_v2: {passed} passed, {skipped} skipped");
@@ -170,8 +217,8 @@ fn roundtrip_stableswap_v2() {
 
 #[test]
 fn roundtrip_twocrypto_v1() {
+    use curve_math::core::twocrypto_v1::{A_MULTIPLIER, WAD};
     use curve_math::swap::twocrypto_v1::{get_amount_in, get_amount_out};
-    use curve_math::core::twocrypto_v1::{WAD, A_MULTIPLIER};
     let wad = U256::from(WAD);
     let balances = [U256::from(5000u64) * wad, U256::from(5000u64) * wad];
     let precisions = [U256::from(1u64), U256::from(1u64)];
@@ -187,13 +234,50 @@ fn roundtrip_twocrypto_v1() {
     let mut skipped = 0u64;
     // CryptoSwap get_amount_in has a linear search loop, so use fewer iterations
     for desired_dy in generate_amounts(n / 4, balances[1] / U256::from(4u64), 50) {
-        let dx = match get_amount_in(&balances, &precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, 0, 1, desired_dy) {
-            Some(v) => v, None => { skipped += 1; continue; }
+        let dx = match get_amount_in(
+            &balances,
+            &precisions,
+            price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            desired_dy,
+        ) {
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
-        let actual_dy = match get_amount_out(&balances, &precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
-            Some(v) => v, None => { skipped += 1; continue; }
+        let actual_dy = match get_amount_out(
+            &balances,
+            &precisions,
+            price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            0,
+            1,
+            dx,
+        ) {
+            Some(v) => v,
+            None => {
+                skipped += 1;
+                continue;
+            }
         };
-        assert!(actual_dy >= desired_dy, "TwoCryptoV1 roundtrip: got {actual_dy} < desired {desired_dy}");
+        assert!(
+            actual_dy >= desired_dy,
+            "TwoCryptoV1 roundtrip: got {actual_dy} < desired {desired_dy}"
+        );
         passed += 1;
     }
     println!("roundtrip_twocrypto_v1: {passed} passed, {skipped} skipped");
@@ -206,12 +290,15 @@ fn roundtrip_twocrypto_v1() {
 
 #[test]
 fn spot_price_stableswap_v2() {
-    use curve_math::swap::stableswap_v2::{get_amount_out, spot_price};
     use curve_math::core::stableswap_v2::A_PRECISION;
+    use curve_math::swap::stableswap_v2::{get_amount_out, spot_price};
     let wad = U256::from(1_000_000_000_000_000_000u128);
 
     // Test with IMBALANCED pool to catch the formula bug
-    let balances = [U256::from(20_000_000u64) * wad, U256::from(5_000_000_000_000u64)];
+    let balances = [
+        U256::from(20_000_000u64) * wad,
+        U256::from(5_000_000_000_000u64),
+    ];
     let rate18 = wad;
     let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
     let rates = [rate18, rate6];
@@ -230,7 +317,9 @@ fn spot_price_stableswap_v2() {
     assert!(
         diff * U256::from(100u64) < rhs,
         "V2 spot_price inconsistent: num={num}, den={den}, dx={dx}, dy={dy}, diff%={:.4}",
-        diff.to_string().parse::<f64>().unwrap_or(0.0) / rhs.to_string().parse::<f64>().unwrap_or(1.0) * 100.0
+        diff.to_string().parse::<f64>().unwrap_or(0.0)
+            / rhs.to_string().parse::<f64>().unwrap_or(1.0)
+            * 100.0
     );
     println!("spot_price_stableswap_v2: OK (imbalanced pool, <1% error)");
 }
@@ -252,17 +341,21 @@ fn spot_price_stableswap_v1_imbalanced() {
     let fee = U256::from(1_000_000u64);
 
     // Test all 6 pairs
-    let pairs = [(0,1), (0,2), (1,0), (1,2), (2,0), (2,1)];
+    let pairs = [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)];
     for (i, j) in pairs {
         let (num, den) = spot_price(&balances, &rates, amp, fee, i, j).expect("price");
         // Small dx relative to balance
         let dx = balances[i] / U256::from(1_000_000u64);
-        if dx.is_zero() { continue; }
+        if dx.is_zero() {
+            continue;
+        }
         let dy = match get_amount_out(&balances, &rates, amp, fee, i, j, dx) {
             Some(v) => v,
             None => continue,
         };
-        if dy.is_zero() { continue; }
+        if dy.is_zero() {
+            continue;
+        }
         let lhs = num * dx;
         let rhs = dy * den;
         let diff = if lhs > rhs { lhs - rhs } else { rhs - lhs };
@@ -276,11 +369,14 @@ fn spot_price_stableswap_v1_imbalanced() {
 
 #[test]
 fn spot_price_stableswap_ng_imbalanced() {
-    use curve_math::swap::stableswap_ng::{get_amount_out, spot_price};
     use curve_math::core::stableswap_ng::A_PRECISION;
+    use curve_math::swap::stableswap_ng::{get_amount_out, spot_price};
     let wad = U256::from(1_000_000_000_000_000_000u128);
     // Moderately imbalanced 2-coin NG pool (dynamic fee shifts with trade size)
-    let balances = [U256::from(12_000_000u64) * wad, U256::from(10_000_000u64) * wad];
+    let balances = [
+        U256::from(12_000_000u64) * wad,
+        U256::from(10_000_000u64) * wad,
+    ];
     let rates = [wad, wad];
     let amp = U256::from(400u64 * A_PRECISION as u64);
     let fee = U256::from(4_000_000u64);

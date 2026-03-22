@@ -172,7 +172,15 @@ pub enum Pool {
 }
 
 impl Pool {
-    /// Compute output amount for a swap. Matches Curve on-chain `get_dy` exactly.
+    /// Compute output amount for swapping `dx` of coin `i` into coin `j`.
+    ///
+    /// Returns `None` if the swap would fail (zero input, out of range, etc.).
+    /// Matches Curve's on-chain `get_dy` at wei-level precision.
+    ///
+    /// # Arguments
+    /// * `i` — index of input coin
+    /// * `j` — index of output coin
+    /// * `dx` — amount of coin `i` to swap (in coin's native decimals)
     pub fn get_amount_out(&self, i: usize, j: usize, dx: U256) -> Option<U256> {
         match self {
             Pool::StableSwapV0 {
@@ -352,8 +360,10 @@ impl Pool {
         }
     }
 
-    /// Compute minimum input amount to receive at least `desired_output`.
-    /// Guaranteed: `get_amount_out(get_amount_in(dy)) >= dy`.
+    /// Compute minimum input of coin `i` to receive at least `desired_output` of coin `j`.
+    ///
+    /// Returns `None` if the swap is not feasible.
+    /// Guaranteed: `get_amount_out(i, j, get_amount_in(i, j, dy)) >= dy`.
     pub fn get_amount_in(&self, i: usize, j: usize, desired_output: U256) -> Option<U256> {
         match self {
             Pool::StableSwapV0 {
@@ -565,7 +575,10 @@ impl Pool {
         }
     }
 
-    /// Spot price as (numerator, denominator) ratio, fee-inclusive.
+    /// Marginal spot price dy/dx as `(numerator, denominator)`, fee-inclusive.
+    ///
+    /// For a small swap of coin `i` → coin `j`, the price is approximately
+    /// `numerator / denominator` in units of coin `j` per coin `i`.
     pub fn spot_price(&self, i: usize, j: usize) -> Option<(U256, U256)> {
         match self {
             Pool::StableSwapV0 {

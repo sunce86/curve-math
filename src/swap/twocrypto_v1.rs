@@ -145,7 +145,22 @@ pub fn get_amount_in(
         (x_new - xp_orig[i]) / precisions[0]
     } + U256::from(1);
     // Verify with forward pass and binary search if Newton tolerance caused undershoot
-    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, i, j, amt);
+    let forward = |amt: U256| {
+        get_amount_out(
+            balances,
+            precisions,
+            price_scale,
+            d,
+            ann,
+            gamma,
+            mid_fee,
+            out_fee,
+            fee_gamma,
+            i,
+            j,
+            amt,
+        )
+    };
     match forward(dx) {
         Some(dy_check) if dy_check >= desired_output => return Some(dx),
         _ => {}
@@ -156,13 +171,19 @@ pub fn get_amount_in(
     for _ in 0..64 {
         hi = hi + hi / U256::from(10u64) + U256::from(1u64); // grow by 10% + 1
         if let Some(dy_check) = forward(hi) {
-            if dy_check >= desired_output { break; }
+            if dy_check >= desired_output {
+                break;
+            }
         }
     }
     for _ in 0..256 {
-        if lo >= hi { break; }
+        if lo >= hi {
+            break;
+        }
         let mid = (lo + hi) / U256::from(2u64);
-        if mid == lo { break; }
+        if mid == lo {
+            break;
+        }
         match forward(mid) {
             Some(dy_check) if dy_check >= desired_output => hi = mid,
             _ => lo = mid + U256::from(1u64),
@@ -352,5 +373,4 @@ mod tests {
         assert!(!num.is_zero(), "numerator is zero");
         assert!(!den.is_zero(), "denominator is zero");
     }
-
 }

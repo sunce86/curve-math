@@ -33,14 +33,14 @@ fn generate_amounts(n: usize, balance: U256, block_seed: u64) -> Vec<U256> {
     let mut amounts = Vec::with_capacity(n + 6);
 
     // Edge cases: these stress the boundaries
-    amounts.push(U256::ZERO);                          // should revert/return None
-    amounts.push(U256::from(1u64));                    // 1 wei — minimum
-    amounts.push(balance / U256::from(1000u64));       // 0.1% of balance
-    amounts.push(balance / U256::from(10u64));         // 10% of balance
-    amounts.push(balance / U256::from(2u64));          // 50% of balance
-    amounts.push(balance);                             // 100% of balance
-    amounts.push(balance * U256::from(2u64));          // 200% — should revert
-    amounts.push(U256::MAX);                           // overflow — should revert
+    amounts.push(U256::ZERO); // should revert/return None
+    amounts.push(U256::from(1u64)); // 1 wei — minimum
+    amounts.push(balance / U256::from(1000u64)); // 0.1% of balance
+    amounts.push(balance / U256::from(10u64)); // 10% of balance
+    amounts.push(balance / U256::from(2u64)); // 50% of balance
+    amounts.push(balance); // 100% of balance
+    amounts.push(balance * U256::from(2u64)); // 200% — should revert
+    amounts.push(U256::MAX); // overflow — should revert
 
     // Random log-spaced: from 1 wei to full balance
     let remaining = n.saturating_sub(amounts.len());
@@ -92,7 +92,8 @@ async fn fuzz_stableswap_v0() {
     use curve_math::swap::stableswap_v0::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xA5407eAE9Ba41422680e2e00537571bcC53efBfD").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xA5407eAE9Ba41422680e2e00537571bcC53efBfD").unwrap();
     let curve = ICurvePoolOld::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
@@ -112,17 +113,30 @@ async fn fuzz_stableswap_v0() {
     let n = fuzz_iterations();
     let n_coins = 4usize;
     let mut pairs: Vec<(usize, usize)> = Vec::new();
-    for i in 0..n_coins { for j in 0..n_coins { if i != j { pairs.push((i, j)); } } }
+    for i in 0..n_coins {
+        for j in 0..n_coins {
+            if i != j {
+                pairs.push((i, j));
+            }
+        }
+    }
     let per_pair = (n / pairs.len()).max(1);
 
     let mut passed = 0u64;
     let mut skipped = 0u64;
     for (idx, &(i, j)) in pairs.iter().enumerate() {
         for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
-            let on_chain = curve.get_dy(i as i128, j as i128, dx).block(block).call().await;
+            let on_chain = curve
+                .get_dy(i as i128, j as i128, dx)
+                .block(block)
+                .call()
+                .await;
             match on_chain {
                 Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, i, j, dx) {
-                    Some(result) => { assert_eq!(result, expected, "V0 {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                    Some(result) => {
+                        assert_eq!(result, expected, "V0 {i}→{j} mismatch at dx={dx}");
+                        passed += 1;
+                    }
                     None => skipped += 1,
                 },
                 Err(_) => skipped += 1,
@@ -151,14 +165,30 @@ async fn fuzz_stableswap_v1() {
     use curve_math::swap::stableswap_v1::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
     let curve = ICurvePool3::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
-    let b2 = curve.balances(U256::from(2)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let amp = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
 
@@ -170,17 +200,30 @@ async fn fuzz_stableswap_v1() {
     let n = fuzz_iterations();
     let n_coins = 3usize;
     let mut pairs: Vec<(usize, usize)> = Vec::new();
-    for i in 0..n_coins { for j in 0..n_coins { if i != j { pairs.push((i, j)); } } }
+    for i in 0..n_coins {
+        for j in 0..n_coins {
+            if i != j {
+                pairs.push((i, j));
+            }
+        }
+    }
     let per_pair = (n / pairs.len()).max(1);
 
     let mut passed = 0u64;
     let mut skipped = 0u64;
     for (idx, &(i, j)) in pairs.iter().enumerate() {
         for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
-            let on_chain = curve.get_dy(i as i128, j as i128, dx).block(block).call().await;
+            let on_chain = curve
+                .get_dy(i as i128, j as i128, dx)
+                .block(block)
+                .call()
+                .await;
             match on_chain {
                 Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, i, j, dx) {
-                    Some(result) => { assert_eq!(result, expected, "V1 {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                    Some(result) => {
+                        assert_eq!(result, expected, "V1 {i}→{j} mismatch at dx={dx}");
+                        passed += 1;
+                    }
                     None => skipped += 1,
                 },
                 Err(_) => skipped += 1,
@@ -210,13 +253,24 @@ async fn fuzz_stableswap_v2() {
     use curve_math::swap::stableswap_v2::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2").unwrap();
     let curve = ICurvePoolV2::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let raw_a = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
 
@@ -235,7 +289,10 @@ async fn fuzz_stableswap_v2() {
         let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "V2 0→1 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "V2 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -245,7 +302,10 @@ async fn fuzz_stableswap_v2() {
         let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "V2 1→0 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "V2 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -274,38 +334,78 @@ async fn fuzz_stableswap_alend() {
     use curve_math::swap::stableswap_alend::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xDeBF20617708857ebe4F679508E7b7863a8A8EeE").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xDeBF20617708857ebe4F679508E7b7863a8A8EeE").unwrap();
     let curve = ICurvePoolALend::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
-    let b2 = curve.balances(U256::from(2)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let raw_a = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
-    let offpeg = curve.offpeg_fee_multiplier().block(block).call().await.unwrap();
+    let offpeg = curve
+        .offpeg_fee_multiplier()
+        .block(block)
+        .call()
+        .await
+        .unwrap();
 
     let balances = [b0, b1, b2];
-    let precision_mul = [U256::from(1u64), U256::from(1_000_000_000_000u64), U256::from(1_000_000_000_000u64)];
+    let precision_mul = [
+        U256::from(1u64),
+        U256::from(1_000_000_000_000u64),
+        U256::from(1_000_000_000_000u64),
+    ];
     let amp = raw_a * U256::from(curve_math::core::stableswap_alend::A_PRECISION as u64);
 
     let n = fuzz_iterations();
     let n_coins = 3usize;
     let mut pairs: Vec<(usize, usize)> = Vec::new();
-    for i in 0..n_coins { for j in 0..n_coins { if i != j { pairs.push((i, j)); } } }
+    for i in 0..n_coins {
+        for j in 0..n_coins {
+            if i != j {
+                pairs.push((i, j));
+            }
+        }
+    }
     let per_pair = (n / pairs.len()).max(1);
 
     let mut passed = 0u64;
     let mut skipped = 0u64;
     for (idx, &(i, j)) in pairs.iter().enumerate() {
         for dx in generate_amounts(per_pair, balances[i], bn + idx as u64) {
-            let on_chain = curve.get_dy(i as i128, j as i128, dx).block(block).call().await;
+            let on_chain = curve
+                .get_dy(i as i128, j as i128, dx)
+                .block(block)
+                .call()
+                .await;
             match on_chain {
-                Ok(expected) => match get_amount_out(&balances, &precision_mul, amp, fee, offpeg, i, j, dx) {
-                    Some(result) => { assert_eq!(result, expected, "ALend {i}→{j} mismatch at dx={dx}"); passed += 1; }
-                    None => skipped += 1,
-                },
+                Ok(expected) => {
+                    match get_amount_out(&balances, &precision_mul, amp, fee, offpeg, i, j, dx) {
+                        Some(result) => {
+                            assert_eq!(result, expected, "ALend {i}→{j} mismatch at dx={dx}");
+                            passed += 1;
+                        }
+                        None => skipped += 1,
+                    }
+                }
                 Err(_) => skipped += 1,
             }
         }
@@ -334,16 +434,32 @@ async fn fuzz_stableswap_ng() {
     use curve_math::swap::stableswap_ng::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d").unwrap();
     let curve = ICurvePoolNG::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let raw_a = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
-    let offpeg = curve.offpeg_fee_multiplier().block(block).call().await.unwrap();
+    let offpeg = curve
+        .offpeg_fee_multiplier()
+        .block(block)
+        .call()
+        .await
+        .unwrap();
 
     let rate18 = U256::from(1_000_000_000_000_000_000u128);
     let rates = [rate18, rate18];
@@ -359,7 +475,10 @@ async fn fuzz_stableswap_ng() {
         let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "NG 0→1 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "NG 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -369,13 +488,18 @@ async fn fuzz_stableswap_ng() {
         let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "NG 1→0 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "NG 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
-    println!("fuzz_stableswap_ng: {passed} passed, {skipped} skipped, both directions (block {bn})");
+    println!(
+        "fuzz_stableswap_ng: {passed} passed, {skipped} skipped, both directions (block {bn})"
+    );
     assert!(passed > 0, "no tests passed");
 }
 
@@ -405,25 +529,55 @@ async fn fuzz_stableswap_meta() {
     use curve_math::swap::stableswap_meta::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956").unwrap();
     let curve = ICurvePoolMeta::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let raw_a = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
 
     // Read virtual_price for 3CRV rate (same as verify_gusd)
     let base_pool_addr = curve.base_pool().block(block).call().await.unwrap();
     let base_pool = IBasePool::new(base_pool_addr, &provider);
-    let cached_vp = curve.base_virtual_price().block(block).call().await.unwrap();
-    let cache_updated = curve.base_cache_updated().block(block).call().await.unwrap();
-    let block_data = provider.get_block_by_number(bn.into()).await.unwrap().unwrap();
+    let cached_vp = curve
+        .base_virtual_price()
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let cache_updated = curve
+        .base_cache_updated()
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let block_data = provider
+        .get_block_by_number(bn.into())
+        .await
+        .unwrap()
+        .unwrap();
     let block_ts = U256::from(block_data.header.timestamp);
     let vp = if block_ts - cache_updated > U256::from(600u64) {
-        base_pool.get_virtual_price().block(block).call().await.unwrap()
+        base_pool
+            .get_virtual_price()
+            .block(block)
+            .call()
+            .await
+            .unwrap()
     } else {
         cached_vp
     };
@@ -444,7 +598,10 @@ async fn fuzz_stableswap_meta() {
         let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "Meta 0→1 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "Meta 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -455,13 +612,18 @@ async fn fuzz_stableswap_meta() {
         let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "Meta 1→0 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "Meta 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
-    println!("fuzz_stableswap_meta: {passed} passed, {skipped} skipped, both directions (block {bn})");
+    println!(
+        "fuzz_stableswap_meta: {passed} passed, {skipped} skipped, both directions (block {bn})"
+    );
     assert!(passed > 0, "no tests passed");
 }
 
@@ -488,13 +650,24 @@ async fn fuzz_twocrypto_v1() {
     use curve_math::swap::twocrypto_v1::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0x8301AE4fc9c624d1D396cbDAa1ed877821D7C511").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0x8301AE4fc9c624d1D396cbDAa1ed877821D7C511").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let a = curve.A().block(block).call().await.unwrap();
     let gamma = curve.gamma().block(block).call().await.unwrap();
     let d = curve.D().block(block).call().await.unwrap();
@@ -512,20 +685,60 @@ async fn fuzz_twocrypto_v1() {
     let mut skipped = 0u64;
 
     for dx in generate_amounts(half, balances[0], bn) {
-        let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(0), U256::from(1), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoV1 0→1 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                0,
+                1,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(result, expected, "TwoCryptoV1 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
-        let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(1), U256::from(0), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoV1 1→0 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                1,
+                0,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(result, expected, "TwoCryptoV1 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -543,13 +756,24 @@ async fn fuzz_twocrypto_ng() {
     use curve_math::swap::twocrypto_ng::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let a = curve.A().block(block).call().await.unwrap();
     let gamma = curve.gamma().block(block).call().await.unwrap();
     let d = curve.D().block(block).call().await.unwrap();
@@ -567,20 +791,60 @@ async fn fuzz_twocrypto_ng() {
     let mut skipped = 0u64;
 
     for dx in generate_amounts(half, balances[0], bn) {
-        let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(0), U256::from(1), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoNG 0→1 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                0,
+                1,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(result, expected, "TwoCryptoNG 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
-        let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(1), U256::from(0), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoNG 1→0 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                1,
+                0,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(result, expected, "TwoCryptoNG 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -613,29 +877,59 @@ async fn fuzz_tricrypto_v1() {
     use curve_math::swap::tricrypto_v1::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xD51a44d3FaE010294C616388b506AcdA1bfAAE46").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xD51a44d3FaE010294C616388b506AcdA1bfAAE46").unwrap();
     let curve = ITriCryptoPool::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
-    let b2 = curve.balances(U256::from(2)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let a = curve.A().block(block).call().await.unwrap();
     let gamma = curve.gamma().block(block).call().await.unwrap();
     let d = curve.D().block(block).call().await.unwrap();
-    let ps0 = curve.price_scale(U256::from(0)).block(block).call().await.unwrap();
-    let ps1 = curve.price_scale(U256::from(1)).block(block).call().await.unwrap();
+    let ps0 = curve
+        .price_scale(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let ps1 = curve
+        .price_scale(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let mid_fee = curve.mid_fee().block(block).call().await.unwrap();
     let out_fee = curve.out_fee().block(block).call().await.unwrap();
     let fee_gamma = curve.fee_gamma().block(block).call().await.unwrap();
 
     let balances = [b0, b1, b2];
-    let precisions = [U256::from(1_000_000_000_000u64), U256::from(10_000_000_000u64), U256::from(1u64)];
+    let precisions = [
+        U256::from(1_000_000_000_000u64),
+        U256::from(10_000_000_000u64),
+        U256::from(1u64),
+    ];
     let price_scale = [ps0, ps1];
 
     let n = fuzz_iterations();
-    let pairs: [(usize, usize); 6] = [(0,1), (0,2), (1,0), (1,2), (2,0), (2,1)];
+    let pairs: [(usize, usize); 6] = [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)];
     let per_pair = (n / pairs.len()).max(1);
     let mut passed = 0u64;
     let mut skipped = 0u64;
@@ -643,10 +937,30 @@ async fn fuzz_tricrypto_v1() {
     for (idx, &(i, j)) in pairs.iter().enumerate() {
         let max_dx = balances[i];
         for dx in generate_amounts(per_pair, max_dx, bn + idx as u64) {
-            let on_chain = curve.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await;
+            let on_chain = curve
+                .get_dy(U256::from(i), U256::from(j), dx)
+                .block(block)
+                .call()
+                .await;
             match on_chain {
-                Ok(expected) => match get_amount_out(&balances, &precisions, &price_scale, d, a, gamma, mid_fee, out_fee, fee_gamma, i, j, dx) {
-                    Some(result) => { assert_eq!(result, expected, "TriCryptoV1 {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                Ok(expected) => match get_amount_out(
+                    &balances,
+                    &precisions,
+                    &price_scale,
+                    d,
+                    a,
+                    gamma,
+                    mid_fee,
+                    out_fee,
+                    fee_gamma,
+                    i,
+                    j,
+                    dx,
+                ) {
+                    Some(result) => {
+                        assert_eq!(result, expected, "TriCryptoV1 {i}→{j} mismatch at dx={dx}");
+                        passed += 1;
+                    }
                     None => skipped += 1,
                 },
                 Err(_) => skipped += 1,
@@ -665,29 +979,59 @@ async fn fuzz_tricrypto_ng() {
     use curve_math::swap::tricrypto_ng::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B").unwrap();
     let curve = ITriCryptoPool::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
-    let b2 = curve.balances(U256::from(2)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let a = curve.A().block(block).call().await.unwrap();
     let gamma = curve.gamma().block(block).call().await.unwrap();
     let d = curve.D().block(block).call().await.unwrap();
-    let ps0 = curve.price_scale(U256::from(0)).block(block).call().await.unwrap();
-    let ps1 = curve.price_scale(U256::from(1)).block(block).call().await.unwrap();
+    let ps0 = curve
+        .price_scale(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let ps1 = curve
+        .price_scale(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let mid_fee = curve.mid_fee().block(block).call().await.unwrap();
     let out_fee = curve.out_fee().block(block).call().await.unwrap();
     let fee_gamma = curve.fee_gamma().block(block).call().await.unwrap();
 
     let balances = [b0, b1, b2];
-    let precisions = [U256::from(1_000_000_000_000u64), U256::from(10_000_000_000u64), U256::from(1u64)];
+    let precisions = [
+        U256::from(1_000_000_000_000u64),
+        U256::from(10_000_000_000u64),
+        U256::from(1u64),
+    ];
     let price_scale = [ps0, ps1];
 
     let n = fuzz_iterations();
-    let pairs: [(usize, usize); 6] = [(0,1), (0,2), (1,0), (1,2), (2,0), (2,1)];
+    let pairs: [(usize, usize); 6] = [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)];
     let per_pair = (n / pairs.len()).max(1);
     let mut passed = 0u64;
     let mut skipped = 0u64;
@@ -695,10 +1039,30 @@ async fn fuzz_tricrypto_ng() {
     for (idx, &(i, j)) in pairs.iter().enumerate() {
         let max_dx = balances[i];
         for dx in generate_amounts(per_pair, max_dx, bn + idx as u64) {
-            let on_chain = curve.get_dy(U256::from(i), U256::from(j), dx).block(block).call().await;
+            let on_chain = curve
+                .get_dy(U256::from(i), U256::from(j), dx)
+                .block(block)
+                .call()
+                .await;
             match on_chain {
-                Ok(expected) => match get_amount_out(&balances, &precisions, &price_scale, d, a, gamma, mid_fee, out_fee, fee_gamma, i, j, dx) {
-                    Some(result) => { assert_eq!(result, expected, "TriCryptoNG {i}→{j} mismatch at dx={dx}"); passed += 1; }
+                Ok(expected) => match get_amount_out(
+                    &balances,
+                    &precisions,
+                    &price_scale,
+                    d,
+                    a,
+                    gamma,
+                    mid_fee,
+                    out_fee,
+                    fee_gamma,
+                    i,
+                    j,
+                    dx,
+                ) {
+                    Some(result) => {
+                        assert_eq!(result, expected, "TriCryptoNG {i}→{j} mismatch at dx={dx}");
+                        passed += 1;
+                    }
                     None => skipped += 1,
                 },
                 Err(_) => skipped += 1,
@@ -722,16 +1086,32 @@ async fn fuzz_stableswap_ng_pyusd() {
     use curve_math::swap::stableswap_ng::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xa632d59b9b804a956bfaa9b48af3a1b74808fc1f").unwrap();
     let curve = ICurvePoolNG::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let raw_a = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
-    let offpeg = curve.offpeg_fee_multiplier().block(block).call().await.unwrap();
+    let offpeg = curve
+        .offpeg_fee_multiplier()
+        .block(block)
+        .call()
+        .await
+        .unwrap();
 
     // PYUSD=6dec, USDS=18dec
     let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128); // 1e30
@@ -749,7 +1129,10 @@ async fn fuzz_stableswap_ng_pyusd() {
         let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "NG-PYUSD 0→1 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "NG-PYUSD 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -759,7 +1142,10 @@ async fn fuzz_stableswap_ng_pyusd() {
         let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, offpeg, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "NG-PYUSD 1→0 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "NG-PYUSD 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -777,13 +1163,24 @@ async fn fuzz_twocrypto_ng_cbbtc() {
     use curve_math::swap::twocrypto_ng::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0x83f24023d15d835a213df24fd309c47dab5beb32").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0x83f24023d15d835a213df24fd309c47dab5beb32").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let a = curve.A().block(block).call().await.unwrap();
     let gamma = curve.gamma().block(block).call().await.unwrap();
     let d = curve.D().block(block).call().await.unwrap();
@@ -802,20 +1199,66 @@ async fn fuzz_twocrypto_ng_cbbtc() {
     let mut skipped = 0u64;
 
     for dx in generate_amounts(half, balances[0], bn) {
-        let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(0), U256::from(1), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-cbBTC 0→1 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                0,
+                1,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(
+                        result, expected,
+                        "TwoCryptoNG-cbBTC 0→1 mismatch at dx={dx}"
+                    );
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
-        let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(1), U256::from(0), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-cbBTC 1→0 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                1,
+                0,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(
+                        result, expected,
+                        "TwoCryptoNG-cbBTC 1→0 mismatch at dx={dx}"
+                    );
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -833,14 +1276,25 @@ async fn fuzz_stableswap_v1_steth() {
     use curve_math::swap::stableswap_v1::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xdc24316b9ae028f1497c275eb9192a3ea0f67022").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xdc24316b9ae028f1497c275eb9192a3ea0f67022").unwrap();
     // stETH pool uses balances(uint256) like 3pool
     let curve = ICurvePool3::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let amp = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
 
@@ -858,7 +1312,10 @@ async fn fuzz_stableswap_v1_steth() {
         let on_chain = curve.get_dy(0i128, 1i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "V1-stETH 0→1 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "V1-stETH 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -868,7 +1325,10 @@ async fn fuzz_stableswap_v1_steth() {
         let on_chain = curve.get_dy(1i128, 0i128, dx).block(block).call().await;
         match on_chain {
             Ok(expected) => match get_amount_out(&balances, &rates, amp, fee, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "V1-stETH 1→0 mismatch at dx={dx}"); passed += 1; }
+                Some(result) => {
+                    assert_eq!(result, expected, "V1-stETH 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
@@ -886,13 +1346,24 @@ async fn fuzz_twocrypto_ng_tbtc() {
     use curve_math::swap::twocrypto_ng::get_amount_out;
 
     let provider = make_provider!();
-    let addr = alloy_primitives::Address::from_str("0xf1f435b05d255a5dbde37333c0f61da6f69c6127").unwrap();
+    let addr =
+        alloy_primitives::Address::from_str("0xf1f435b05d255a5dbde37333c0f61da6f69c6127").unwrap();
     let curve = ICryptoPool2::new(addr, &provider);
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let a = curve.A().block(block).call().await.unwrap();
     let gamma = curve.gamma().block(block).call().await.unwrap();
     let d = curve.D().block(block).call().await.unwrap();
@@ -911,20 +1382,60 @@ async fn fuzz_twocrypto_ng_tbtc() {
     let mut skipped = 0u64;
 
     for dx in generate_amounts(half, balances[0], bn) {
-        let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(0), U256::from(1), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-tBTC 0→1 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                0,
+                1,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(result, expected, "TwoCryptoNG-tBTC 0→1 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,
         }
     }
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
-        let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
+        let on_chain = curve
+            .get_dy(U256::from(1), U256::from(0), dx)
+            .block(block)
+            .call()
+            .await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
-                Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-tBTC 1→0 mismatch at dx={dx}"); passed += 1; }
+            Ok(expected) => match get_amount_out(
+                &balances,
+                &precisions,
+                ps,
+                d,
+                a,
+                gamma,
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                1,
+                0,
+                dx,
+            ) {
+                Some(result) => {
+                    assert_eq!(result, expected, "TwoCryptoNG-tBTC 1→0 mismatch at dx={dx}");
+                    passed += 1;
+                }
                 None => skipped += 1,
             },
             Err(_) => skipped += 1,

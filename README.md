@@ -1,6 +1,8 @@
 # curve-math
 
-[![Unit Tests](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
+[![CI](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/unit-tests.yml)
+[![crates.io](https://img.shields.io/crates/v/curve-math.svg)](https://crates.io/crates/curve-math)
+[![docs.rs](https://docs.rs/curve-math/badge.svg)](https://docs.rs/curve-math)
 
 Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact on-chain match — no tolerances, no approximations, wei-level precision.
 

@@ -66,7 +66,9 @@ async fn read_pool_coins(
         };
         match coin_result {
             Ok(coin_addr) => {
-                if coin_addr == Address::ZERO { break; }
+                if coin_addr == Address::ZERO {
+                    break;
+                }
                 let token = IToken::new(coin_addr, provider);
                 let dec = match token.decimals().block(block).call().await {
                     Ok(d) => d,
@@ -80,7 +82,9 @@ async fn read_pool_coins(
             Err(_) => break,
         }
     }
-    if decimals.is_empty() { return None; }
+    if decimals.is_empty() {
+        return None;
+    }
     Some((decimals.len(), decimals))
 }
 
@@ -179,8 +183,8 @@ alloy::sol! {
 }
 
 const MULTICALL3: Address = Address::new([
-    0xca, 0x11, 0xbd, 0xe0, 0x59, 0x77, 0xb3, 0x63, 0x11, 0x67,
-    0x02, 0x88, 0x62, 0xbE, 0x2a, 0x17, 0x39, 0x76, 0xCA, 0x11,
+    0xca, 0x11, 0xbd, 0xe0, 0x59, 0x77, 0xb3, 0x63, 0x11, 0x67, 0x02, 0x88, 0x62, 0xbE, 0x2a, 0x17,
+    0x39, 0x76, 0xCA, 0x11,
 ]);
 const BATCH_SIZE: usize = 100;
 
@@ -285,7 +289,9 @@ fn generate_amounts(n: usize, balance: U256, seed: u64) -> Vec<U256> {
             let r = splitmix64(&mut s);
             let t = (r as f64) / (u64::MAX as f64);
             let val = (t * ln_max).exp();
-            let v = U256::from(val.min(1e38) as u128).max(U256::from(1u64)).min(balance);
+            let v = U256::from(val.min(1e38) as u128)
+                .max(U256::from(1u64))
+                .min(balance);
             amounts.push(v);
         }
     }
@@ -354,7 +360,15 @@ async fn build_pool(
             let amp = c.A().block(block).call().await.ok()?;
             let fee = c.fee().block(block).call().await.ok()?;
             let rates: Vec<U256> = decimals.iter().map(|d| rate_for_decimals(*d)).collect();
-            Some((Pool::StableSwapV0 { balances, rates, amp, fee }, n_coins))
+            Some((
+                Pool::StableSwapV0 {
+                    balances,
+                    rates,
+                    amp,
+                    fee,
+                },
+                n_coins,
+            ))
         }
         "StableSwapV1" => {
             let c = IStable::new(addr, provider);
@@ -365,7 +379,15 @@ async fn build_pool(
             let amp = c.A().block(block).call().await.ok()?;
             let fee = c.fee().block(block).call().await.ok()?;
             let rates: Vec<U256> = decimals.iter().map(|d| rate_for_decimals(*d)).collect();
-            Some((Pool::StableSwapV1 { balances, rates, amp, fee }, n_coins))
+            Some((
+                Pool::StableSwapV1 {
+                    balances,
+                    rates,
+                    amp,
+                    fee,
+                },
+                n_coins,
+            ))
         }
         "StableSwapV2" => {
             let c = IStable::new(addr, provider);
@@ -377,7 +399,15 @@ async fn build_pool(
             let fee = c.fee().block(block).call().await.ok()?;
             let rates: Vec<U256> = decimals.iter().map(|d| rate_for_decimals(*d)).collect();
             let amp = raw_a * a_prec_100;
-            Some((Pool::StableSwapV2 { balances, rates, amp, fee }, n_coins))
+            Some((
+                Pool::StableSwapV2 {
+                    balances,
+                    rates,
+                    amp,
+                    fee,
+                },
+                n_coins,
+            ))
         }
         "StableSwapALend" => {
             let c = IStableOffpeg::new(addr, provider);
@@ -388,9 +418,21 @@ async fn build_pool(
             let raw_a = c.A().block(block).call().await.ok()?;
             let fee = c.fee().block(block).call().await.ok()?;
             let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok()?;
-            let precision_mul: Vec<U256> = decimals.iter().map(|d| precision_mul_for_decimals(*d)).collect();
+            let precision_mul: Vec<U256> = decimals
+                .iter()
+                .map(|d| precision_mul_for_decimals(*d))
+                .collect();
             let amp = raw_a * a_prec_100;
-            Some((Pool::StableSwapALend { balances, precision_mul, amp, fee, offpeg_fee_multiplier: offpeg }, n_coins))
+            Some((
+                Pool::StableSwapALend {
+                    balances,
+                    precision_mul,
+                    amp,
+                    fee,
+                    offpeg_fee_multiplier: offpeg,
+                },
+                n_coins,
+            ))
         }
         "StableSwapNG" => {
             let c = IStableOffpeg::new(addr, provider);
@@ -408,7 +450,16 @@ async fn build_pool(
                 _ => decimals.iter().map(|d| rate_for_decimals(*d)).collect(),
             };
             let amp = raw_a * a_prec_100;
-            Some((Pool::StableSwapNG { balances, rates, amp, fee, offpeg_fee_multiplier: offpeg }, n_coins))
+            Some((
+                Pool::StableSwapNG {
+                    balances,
+                    rates,
+                    amp,
+                    fee,
+                    offpeg_fee_multiplier: offpeg,
+                },
+                n_coins,
+            ))
         }
         "StableSwapMeta" => {
             let c = IStableMeta::new(addr, provider);
@@ -426,12 +477,21 @@ async fn build_pool(
                 Err(_) => {
                     // Legacy meta pool — find base pool via LP token's minter()
                     let lp_token = ICoinInfo::new(addr, provider)
-                        .coins(U256::from(1)).block(block).call().await.ok()?;
+                        .coins(U256::from(1))
+                        .block(block)
+                        .call()
+                        .await
+                        .ok()?;
                     alloy::sol! {
                         #[sol(rpc)]
                         interface ILPToken { function minter() external view returns (address); }
                     }
-                    match ILPToken::new(lp_token, provider).minter().block(block).call().await {
+                    match ILPToken::new(lp_token, provider)
+                        .minter()
+                        .block(block)
+                        .call()
+                        .await
+                    {
                         Ok(a) => a,
                         Err(_) => {
                             // CurveTokenV2 (3Crv) has no minter() — fallback to 3pool
@@ -447,18 +507,31 @@ async fn build_pool(
                 c.base_cache_updated().block(block).call().await,
             ) {
                 (Ok(cached_vp), Ok(cache_updated)) => {
-                    let bn_num = match block { alloy::eips::BlockId::Number(n) => n.as_number().unwrap_or(0), _ => 0 };
+                    let bn_num = match block {
+                        alloy::eips::BlockId::Number(n) => n.as_number().unwrap_or(0),
+                        _ => 0,
+                    };
                     let block_data = provider.get_block_by_number(bn_num.into()).await.ok()??;
                     let block_ts = U256::from(block_data.header.timestamp);
                     if block_ts - cache_updated > U256::from(600u64) {
-                        base_pool.get_virtual_price().block(block).call().await.ok()?
+                        base_pool
+                            .get_virtual_price()
+                            .block(block)
+                            .call()
+                            .await
+                            .ok()?
                     } else {
                         cached_vp
                     }
                 }
                 _ => {
                     // Legacy meta pool — read virtual_price directly from base pool
-                    base_pool.get_virtual_price().block(block).call().await.ok()?
+                    base_pool
+                        .get_virtual_price()
+                        .block(block)
+                        .call()
+                        .await
+                        .ok()?
                 }
             };
             let mut rates: Vec<U256> = decimals.iter().map(|d| rate_for_decimals(*d)).collect();
@@ -467,7 +540,15 @@ async fn build_pool(
                 *last = vp;
             }
             let amp = raw_a * a_prec_100;
-            Some((Pool::StableSwapMeta { balances, rates, amp, fee }, n_coins))
+            Some((
+                Pool::StableSwapMeta {
+                    balances,
+                    rates,
+                    amp,
+                    fee,
+                },
+                n_coins,
+            ))
         }
         "TwoCryptoV1" | "TwoCryptoNG" => {
             let c = ICrypto2::new(addr, provider);
@@ -486,12 +567,38 @@ async fn build_pool(
             ];
             let balances = [b0, b1];
             if entry.variant == "TwoCryptoV1" {
-                Some((Pool::TwoCryptoV1 { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
+                Some((
+                    Pool::TwoCryptoV1 {
+                        balances,
+                        precisions,
+                        price_scale: ps,
+                        d,
+                        ann,
+                        gamma,
+                        mid_fee,
+                        out_fee,
+                        fee_gamma,
+                    },
+                    n_coins,
+                ))
             } else {
                 // Fuzz tests compare against on-chain get_dy (view function).
                 // Both v2.0.0 and v2.1.0 get_dy use V1 fee via pool.fee_calc().
                 // Note: actual swaps (_exchange) on v2.1.0 use NG fee via pool._fee().
-                Some((Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
+                Some((
+                    Pool::TwoCryptoNG {
+                        balances,
+                        precisions,
+                        price_scale: ps,
+                        d,
+                        ann,
+                        gamma,
+                        mid_fee,
+                        out_fee,
+                        fee_gamma,
+                    },
+                    n_coins,
+                ))
             }
         }
         "TwoCryptoStable" => {
@@ -508,7 +615,19 @@ async fn build_pool(
                 precision_for_decimals(decimals[0]),
                 precision_for_decimals(decimals[1]),
             ];
-            Some((Pool::TwoCryptoStable { balances: [b0, b1], precisions, price_scale: ps, d, ann, mid_fee, out_fee, fee_gamma }, n_coins))
+            Some((
+                Pool::TwoCryptoStable {
+                    balances: [b0, b1],
+                    precisions,
+                    price_scale: ps,
+                    d,
+                    ann,
+                    mid_fee,
+                    out_fee,
+                    fee_gamma,
+                },
+                n_coins,
+            ))
         }
         "TriCryptoV1" | "TriCryptoNG" => {
             let c = ICrypto3::new(addr, provider);
@@ -518,8 +637,18 @@ async fn build_pool(
             let ann = c.A().block(block).call().await.ok()?;
             let gamma = c.gamma().block(block).call().await.ok()?;
             let d = c.D().block(block).call().await.ok()?;
-            let ps0 = c.price_scale(U256::from(0)).block(block).call().await.ok()?;
-            let ps1 = c.price_scale(U256::from(1)).block(block).call().await.ok()?;
+            let ps0 = c
+                .price_scale(U256::from(0))
+                .block(block)
+                .call()
+                .await
+                .ok()?;
+            let ps1 = c
+                .price_scale(U256::from(1))
+                .block(block)
+                .call()
+                .await
+                .ok()?;
             let mid_fee = c.mid_fee().block(block).call().await.ok()?;
             let out_fee = c.out_fee().block(block).call().await.ok()?;
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
@@ -531,9 +660,35 @@ async fn build_pool(
             let balances = [b0, b1, b2];
             let price_scale = [ps0, ps1];
             if entry.variant == "TriCryptoV1" {
-                Some((Pool::TriCryptoV1 { balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
+                Some((
+                    Pool::TriCryptoV1 {
+                        balances,
+                        precisions,
+                        price_scale,
+                        d,
+                        ann,
+                        gamma,
+                        mid_fee,
+                        out_fee,
+                        fee_gamma,
+                    },
+                    n_coins,
+                ))
             } else {
-                Some((Pool::TriCryptoNG { balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
+                Some((
+                    Pool::TriCryptoNG {
+                        balances,
+                        precisions,
+                        price_scale,
+                        d,
+                        ann,
+                        gamma,
+                        mid_fee,
+                        out_fee,
+                        fee_gamma,
+                    },
+                    n_coins,
+                ))
             }
         }
         _ => None,
@@ -543,7 +698,10 @@ async fn build_pool(
 // ── Shared fuzz runner ───────────────────────────────────────────────────────
 
 async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
-    let chain_id: u64 = std::env::var("FUZZ_CHAIN_ID").unwrap_or_else(|_| "1".into()).parse().unwrap();
+    let chain_id: u64 = std::env::var("FUZZ_CHAIN_ID")
+        .unwrap_or_else(|_| "1".into())
+        .parse()
+        .unwrap();
     let env_key = format!("RPC_URL_{chain_id}");
     let rpc_url = std::env::var(&env_key)
         .or_else(|_| std::env::var("RPC_URL"))
@@ -553,7 +711,10 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
     let bn = latest - 5; // use a settled block to avoid inconsistent state
     let block = alloy::eips::BlockId::number(bn);
 
-    println!("[{label}] {} pools, block {bn} (latest {latest})", pools.len());
+    println!(
+        "[{label}] {} pools, block {bn} (latest {latest})",
+        pools.len()
+    );
 
     let n = fuzz_iterations();
     let mut total_passed = 0u64;
@@ -593,8 +754,12 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
             | Pool::StableSwapALend { balances, .. }
             | Pool::StableSwapNG { balances, .. }
             | Pool::StableSwapMeta { balances, .. } => balances.clone(),
-            Pool::TwoCryptoV1 { balances, .. } | Pool::TwoCryptoNG { balances, .. } | Pool::TwoCryptoStable { balances, .. } => balances.to_vec(),
-            Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => balances.to_vec(),
+            Pool::TwoCryptoV1 { balances, .. }
+            | Pool::TwoCryptoNG { balances, .. }
+            | Pool::TwoCryptoStable { balances, .. } => balances.to_vec(),
+            Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => {
+                balances.to_vec()
+            }
         };
 
         let mut test_cases: Vec<(usize, usize, U256)> = Vec::new();
@@ -626,7 +791,10 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
             }
         }
 
-        println!("  {} ({}): {passed} passed, {skipped} skipped", entry.name, entry.variant);
+        println!(
+            "  {} ({}): {passed} passed, {skipped} skipped",
+            entry.name, entry.variant
+        );
         total_passed += passed;
         total_skipped += skipped;
         pools_ok += 1;
