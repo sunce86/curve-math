@@ -6,7 +6,7 @@
 # against on-chain get_dy with random swap amounts.
 
 last_updated = "2026-03-22"
-total_factory_pools = 1227
+total_factory_pools = 2043
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -1052,4 +1052,14 @@ name = "sBOND/BOND/crvUSD"
 address = "0x75f07532450FE3C6132844d647C7F8E35a1B83DD"
 variant = "TriCryptoNG"
 name = "QUINTA/GTEC/GEAR"
+
+[[pools]]
+address = "0xa7B0E924c2dBB9B4F576CCE96ac80657E42c3e42"
+variant = "TwoCryptoV1"
+name = "CVG/crvFRAX"
+
+[[pools]]
+address = "0xfC636D819d1a98433402eC9dEC633d864014F28C"
+variant = "StableSwapV2"
+name = "UZD/crvUSD"
 
