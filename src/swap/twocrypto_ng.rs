@@ -4,29 +4,11 @@ use alloy_primitives::U256;
 
 use crate::core::twocrypto_ng::{get_y_2_ng, FEE_DENOMINATOR, WAD};
 
-/// Which fee formula to use for CryptoSwap pools.
-///
-/// The fee formula determines how pool imbalance affects the fee rate.
-/// v2.0.0 deployed pools use the V1 formula. v2.1.0 pools use the NG formula
-/// for actual swaps (`_exchange`).
-///
-/// **Note:** Curve's `get_dy` view function on v2.1.0 pools uses V1 via
-/// `pool.fee_calc()`, creating a discrepancy with the actual swap fee.
-/// This library matches the actual swap behavior (`_exchange`), not `get_dy`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeeFormula {
-    /// `f = fee_gamma * WAD / (fee_gamma + WAD - K)` — used by v2.0.0 pools.
-    V1,
-    /// `f = fee_gamma * K / (fee_gamma * K / WAD + WAD - K)` — used by v2.1.0 pools.
-    NG,
-}
-
 fn crypto_fee(
     xp: &[U256],
     mid_fee: U256,
     out_fee: U256,
     fee_gamma: U256,
-    formula: FeeFormula,
 ) -> Option<U256> {
     let wad = U256::from(WAD);
     let s: U256 = xp
@@ -40,11 +22,10 @@ fn crypto_fee(
     for x_i in xp {
         k = k * n * (*x_i) / s;
     }
+    // fee_gamma * WAD / (fee_gamma + WAD - K)
+    // Matches both v2.0.0 and v2.1.0 deployed pool.fee_calc() / get_dy.
     let f = if fee_gamma > U256::ZERO {
-        match formula {
-            FeeFormula::V1 => fee_gamma * wad / (fee_gamma + wad - k),
-            FeeFormula::NG => fee_gamma * k / (fee_gamma * k / wad + wad - k),
-        }
+        fee_gamma * wad / (fee_gamma + wad - k)
     } else {
         k
     };
@@ -61,7 +42,6 @@ pub fn get_amount_out(
     mid_fee: U256,
     out_fee: U256,
     fee_gamma: U256,
-    fee_formula: FeeFormula,
     i: usize,
     j: usize,
     dx: U256,
@@ -95,7 +75,7 @@ pub fn get_amount_out(
         dy / precisions[0]
     };
 
-    let fee = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma, fee_formula)?;
+    let fee = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma)?;
     let fee_amount = fee * dy_native / U256::from(FEE_DENOMINATOR);
     let result = dy_native - fee_amount;
 
@@ -116,7 +96,6 @@ pub fn get_amount_in(
     mid_fee: U256,
     out_fee: U256,
     fee_gamma: U256,
-    fee_formula: FeeFormula,
     i: usize,
     j: usize,
     desired_output: U256,
@@ -135,7 +114,7 @@ pub fn get_amount_in(
     ];
 
     // First pass: estimate fee from pre-swap state
-    let fee_est = crypto_fee(&xp_orig, mid_fee, out_fee, fee_gamma, fee_formula)?;
+    let fee_est = crypto_fee(&xp_orig, mid_fee, out_fee, fee_gamma)?;
     let complement_est = fee_denom - fee_est;
     let dy_native = (desired_output * fee_denom + complement_est - U256::from(1)) / complement_est;
 
@@ -156,7 +135,7 @@ pub fn get_amount_in(
     let mut xp_after = [U256::ZERO; 2];
     xp_after[i] = x_new;
     xp_after[j] = y;
-    let fee_actual = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma, fee_formula)?;
+    let fee_actual = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma)?;
     let complement_actual = fee_denom - fee_actual;
     let dy_native =
         (desired_output * fee_denom + complement_actual - U256::from(1)) / complement_actual;
@@ -181,7 +160,7 @@ pub fn get_amount_in(
     } else {
         (x_new - xp_orig[i]) / precisions[0]
     } + U256::from(1);
-    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, fee_formula, i, j, amt);
+    let forward = |amt: U256| get_amount_out(balances, precisions, price_scale, d, ann, gamma, mid_fee, out_fee, fee_gamma, i, j, amt);
     match forward(dx) {
         Some(dy_check) if dy_check >= desired_output => return Some(dx),
         _ => {}
@@ -218,7 +197,6 @@ pub fn spot_price(
     mid_fee: U256,
     out_fee: U256,
     fee_gamma: U256,
-    fee_formula: FeeFormula,
     i: usize,
     j: usize,
 ) -> Option<(U256, U256)> {
@@ -233,7 +211,6 @@ pub fn spot_price(
         mid_fee,
         out_fee,
         fee_gamma,
-        fee_formula,
         i,
         j,
         dx,
@@ -268,7 +245,6 @@ mod tests {
             mid_fee,
             out_fee,
             fee_gamma,
-            FeeFormula::V1,
             0,
             1,
             dx,
@@ -284,7 +260,6 @@ mod tests {
             mid_fee,
             out_fee,
             fee_gamma,
-            FeeFormula::V1,
             0,
             1,
             dy,
@@ -300,7 +275,6 @@ mod tests {
             mid_fee,
             out_fee,
             fee_gamma,
-            FeeFormula::V1,
             0,
             1,
             dx_recovered,
@@ -332,7 +306,6 @@ mod tests {
             mid_fee,
             out_fee,
             fee_gamma,
-            FeeFormula::V1,
             0,
             1,
             dx,
@@ -348,7 +321,6 @@ mod tests {
             mid_fee,
             out_fee,
             fee_gamma,
-            FeeFormula::V1,
             0,
             1,
         )
@@ -369,7 +341,7 @@ mod tests {
         let out_fee = U256::from(30_000_000u64);
         let fee_gamma = U256::from(230_000_000_000_000u64);
         let xp = [U256::from(100_000u64) * wad, U256::from(100_000u64) * wad];
-        let fee = crypto_fee(&xp, mid_fee, out_fee, fee_gamma, FeeFormula::V1).expect("fee");
+        let fee = crypto_fee(&xp, mid_fee, out_fee, fee_gamma).expect("fee");
         assert!(fee >= mid_fee);
         assert!(fee < out_fee);
     }
@@ -396,7 +368,6 @@ mod tests {
             mid_fee,
             out_fee,
             fee_gamma,
-            FeeFormula::V1,
             0,
             1,
         )

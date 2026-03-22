@@ -155,7 +155,6 @@ fn build_pool(fixture: &Fixture) -> Pool {
                 mid_fee: u(p.mid_fee.as_ref().unwrap()),
                 out_fee: u(p.out_fee.as_ref().unwrap()),
                 fee_gamma: u(p.fee_gamma.as_ref().unwrap()),
-                fee_formula: curve_math::swap::twocrypto_ng::FeeFormula::V1,
             }
         }
         "TriCryptoNG" => {

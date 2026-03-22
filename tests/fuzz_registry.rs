@@ -491,8 +491,7 @@ async fn build_pool(
                 // Fuzz tests compare against on-chain get_dy (view function).
                 // Both v2.0.0 and v2.1.0 get_dy use V1 fee via pool.fee_calc().
                 // Note: actual swaps (_exchange) on v2.1.0 use NG fee via pool._fee().
-                let fee_formula = curve_math::swap::twocrypto_ng::FeeFormula::V1;
-                Some((Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma, fee_formula }, n_coins))
+                Some((Pool::TwoCryptoNG { balances, precisions, price_scale: ps, d, ann, gamma, mid_fee, out_fee, fee_gamma }, n_coins))
             }
         }
         "TwoCryptoStable" => {

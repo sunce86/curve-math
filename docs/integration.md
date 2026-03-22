@@ -105,7 +105,6 @@ let pool = Pool::StableSwapNG {
 };
 
 // CryptoSwap example
-use curve_math::core::twocrypto_ng::FeeFormula;
 let pool = Pool::TwoCryptoNG {
     balances: [b0, b1],
     precisions: [prec0, prec1],  // 10^(18 - decimals)
@@ -114,7 +113,6 @@ let pool = Pool::TwoCryptoNG {
     ann,                          // from pool.A() (already includes A_MULTIPLIER)
     gamma,
     mid_fee, out_fee, fee_gamma,
-    fee_formula: FeeFormula::V1,  // V1 for MATH v2.0.0, NG for MATH v2.1.0
 };
 
 // TwoCryptoStable (StableSwap math with CryptoSwap interface)

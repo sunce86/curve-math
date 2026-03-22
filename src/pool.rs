@@ -24,7 +24,6 @@
 
 use alloy_primitives::U256;
 
-use crate::swap::twocrypto_ng::FeeFormula;
 use crate::swap;
 
 /// All known Curve pool variants with their parameters.
@@ -117,7 +116,6 @@ pub enum Pool {
 
     /// Next-gen 2-coin CryptoSwap (twocrypto-ng).
     /// Cardano cubic formula for y.
-    /// `fee_formula`: `V1` for MATH v2.0.0 deployed pools, `NG` for MATH v2.1.0 pools.
     TwoCryptoNG {
         balances: [U256; 2],
         precisions: [U256; 2],
@@ -128,7 +126,6 @@ pub enum Pool {
         mid_fee: U256,
         out_fee: U256,
         fee_gamma: U256,
-        fee_formula: FeeFormula,
     },
 
     /// TwoCryptoNG pools using StableSwap MATH (v0.1.0).
@@ -268,7 +265,6 @@ impl Pool {
                 mid_fee,
                 out_fee,
                 fee_gamma,
-                fee_formula,
             } => swap::twocrypto_ng::get_amount_out(
                 balances,
                 precisions,
@@ -279,7 +275,6 @@ impl Pool {
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
-                *fee_formula,
                 i,
                 j,
                 dx,
@@ -483,7 +478,6 @@ impl Pool {
                 mid_fee,
                 out_fee,
                 fee_gamma,
-                fee_formula,
             } => swap::twocrypto_ng::get_amount_in(
                 balances,
                 precisions,
@@ -494,7 +488,6 @@ impl Pool {
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
-                *fee_formula,
                 i,
                 j,
                 desired_output,
@@ -662,7 +655,6 @@ impl Pool {
                 mid_fee,
                 out_fee,
                 fee_gamma,
-                fee_formula,
             } => swap::twocrypto_ng::spot_price(
                 balances,
                 precisions,
@@ -673,7 +665,6 @@ impl Pool {
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
-                *fee_formula,
                 i,
                 j,
             ),

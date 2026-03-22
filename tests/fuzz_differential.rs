@@ -541,7 +541,6 @@ async fn fuzz_twocrypto_v1() {
 #[ignore = "requires RPC_URL"]
 async fn fuzz_twocrypto_ng() {
     use curve_math::swap::twocrypto_ng::get_amount_out;
-    use curve_math::swap::twocrypto_ng::FeeFormula;
 
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009").unwrap();
@@ -561,8 +560,6 @@ async fn fuzz_twocrypto_ng() {
 
     let balances = [b0, b1];
     let precisions = [U256::from(1u64), U256::from(1u64)];
-    // crvUSD/FXN pool uses MATH v2.0.0 → V1 fee formula
-    let ff = FeeFormula::V1;
 
     let n = fuzz_iterations();
     let half = n / 2;
@@ -572,7 +569,7 @@ async fn fuzz_twocrypto_ng() {
     for dx in generate_amounts(half, balances[0], bn) {
         let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, ff, 0, 1, dx) {
+            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
                 Some(result) => { assert_eq!(result, expected, "TwoCryptoNG 0→1 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
@@ -582,7 +579,7 @@ async fn fuzz_twocrypto_ng() {
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
         let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, ff, 1, 0, dx) {
+            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
                 Some(result) => { assert_eq!(result, expected, "TwoCryptoNG 1→0 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
@@ -778,7 +775,6 @@ async fn fuzz_stableswap_ng_pyusd() {
 #[ignore = "requires RPC_URL — KNOWN FAIL: v2.1.0 pools not yet supported"]
 async fn fuzz_twocrypto_ng_cbbtc() {
     use curve_math::swap::twocrypto_ng::get_amount_out;
-    use curve_math::swap::twocrypto_ng::FeeFormula;
 
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0x83f24023d15d835a213df24fd309c47dab5beb32").unwrap();
@@ -799,8 +795,6 @@ async fn fuzz_twocrypto_ng_cbbtc() {
     // crvUSD=18dec, cbBTC=8dec → precisions = [1, 10^10]
     let balances = [b0, b1];
     let precisions = [U256::from(1u64), U256::from(10_000_000_000u64)];
-    // v2.1.0 pool — uses NG fee formula
-    let ff = FeeFormula::NG;
 
     let n = fuzz_iterations();
     let half = n / 2;
@@ -810,7 +804,7 @@ async fn fuzz_twocrypto_ng_cbbtc() {
     for dx in generate_amounts(half, balances[0], bn) {
         let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, ff, 0, 1, dx) {
+            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
                 Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-cbBTC 0→1 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
@@ -820,7 +814,7 @@ async fn fuzz_twocrypto_ng_cbbtc() {
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
         let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, ff, 1, 0, dx) {
+            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
                 Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-cbBTC 1→0 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
@@ -890,7 +884,6 @@ async fn fuzz_stableswap_v1_steth() {
 #[ignore = "requires RPC_URL — KNOWN FAIL: v2.1.0 pools not yet supported"]
 async fn fuzz_twocrypto_ng_tbtc() {
     use curve_math::swap::twocrypto_ng::get_amount_out;
-    use curve_math::swap::twocrypto_ng::FeeFormula;
 
     let provider = make_provider!();
     let addr = alloy_primitives::Address::from_str("0xf1f435b05d255a5dbde37333c0f61da6f69c6127").unwrap();
@@ -911,8 +904,6 @@ async fn fuzz_twocrypto_ng_tbtc() {
     // Both crvUSD and tBTC are 18 decimals
     let balances = [b0, b1];
     let precisions = [U256::from(1u64), U256::from(1u64)];
-    // v2.1.0 pool — uses NG fee formula
-    let ff = FeeFormula::NG;
 
     let n = fuzz_iterations();
     let half = n / 2;
@@ -922,7 +913,7 @@ async fn fuzz_twocrypto_ng_tbtc() {
     for dx in generate_amounts(half, balances[0], bn) {
         let on_chain = curve.get_dy(U256::from(0), U256::from(1), dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, ff, 0, 1, dx) {
+            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 0, 1, dx) {
                 Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-tBTC 0→1 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
@@ -932,7 +923,7 @@ async fn fuzz_twocrypto_ng_tbtc() {
     for dx in generate_amounts(n - half, balances[1], bn + 1) {
         let on_chain = curve.get_dy(U256::from(1), U256::from(0), dx).block(block).call().await;
         match on_chain {
-            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, ff, 1, 0, dx) {
+            Ok(expected) => match get_amount_out(&balances, &precisions, ps, d, a, gamma, mid_fee, out_fee, fee_gamma, 1, 0, dx) {
                 Some(result) => { assert_eq!(result, expected, "TwoCryptoNG-tBTC 1→0 mismatch at dx={dx}"); passed += 1; }
                 None => skipped += 1,
             },
