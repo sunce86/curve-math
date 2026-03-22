@@ -50,15 +50,17 @@ jobs:
         id: summary
         run: |
           if [ -f .pr-summary.md ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
             echo "body<<EOF" >> $GITHUB_OUTPUT
             cat .pr-summary.md >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
             rm .pr-summary.md
           else
-            echo "body=No changes." >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Create PR if changes
+        if: steps.summary.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "Update pool registry (auto-indexed)"
