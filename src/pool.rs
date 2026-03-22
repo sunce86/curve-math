@@ -42,6 +42,7 @@ use crate::swap;
 /// For `rates`: plain tokens have static rates (`10^(36-decimals)`), but ERC4626/oracle
 /// tokens have dynamic rates that change per-block. Read `stored_rates()` from the pool
 /// contract to get current rates for oracle-enabled pools.
+#[derive(Clone)]
 pub enum Pool {
     /// Oldest StableSwap pools (sUSD, Compound, USDT, y, BUSD).
     /// A_PRECISION=1, no -1 offset, fee after denormalize.

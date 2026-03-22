@@ -14,6 +14,30 @@ The pool registry covers all Curve factory pools above ~$1K TVL and all legacy (
 |-------|------|----------------|-------------|
 | Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 209 / 1227 ![](https://geps.dev/progress/17?successColor=6366f1) | 2026-03-22 |
 
+## Performance
+
+Compared against [revm](https://github.com/bluealloy/revm) executing the same pool's on-chain `get_dy` bytecode. Both produce identical results (wei-exact).
+
+**Pure computation** — revm with pre-loaded state (EVM interpretation overhead only):
+
+| Pool type | curve-math | revm | Speedup |
+|-----------|-----------|------|---------|
+| StableSwap 2-coin (3pool) | 1.6 µs | 13 µs | **8x** |
+| StableSwapNG with oracle rates (sUSDS/USDT) | 1.4 µs | 38 µs | **27x** |
+| TwoCryptoNG Cardano cubic (crvUSD/FXN) | 6.4 µs | 34 µs | **5x** |
+| TriCryptoNG 3-coin hybrid (crvUSD/WETH/CRV) | 4.5 µs | 52 µs | **12x** |
+
+**Realistic simulation** — revm with full EVM setup (DB, accounts, storage, bytecode):
+
+| Pool type | curve-math | revm | Speedup |
+|-----------|-----------|------|---------|
+| StableSwap 2-coin (3pool) | 1.6 µs | 150 µs | **94x** |
+| StableSwapNG with oracle rates (sUSDS/USDT) | 1.4 µs | 448 µs | **320x** |
+| TwoCryptoNG Cardano cubic (crvUSD/FXN) | 6.4 µs | 313 µs | **49x** |
+| TriCryptoNG 3-coin hybrid (crvUSD/WETH/CRV) | 4.5 µs | 358 µs | **80x** |
+
+<sub>MacBook M2, Rust 1.82, revm 36. Reproduce: `cd benches/revm-comparison && cargo bench`</sub>
+
 ## Coverage
 
 All 11 Curve pool variants:
