@@ -357,3 +357,198 @@ address = "0x5A38a92b8a23E07A88a92c2d8ac0691cF95be590"
 variant = "TriCryptoNG"
 name = "crvUSD/SNL/TOP"
 
+[[pools]]
+address = "0xF25E1dB1f0c7BD1a29761a1FcDaE187B8718CF18"
+variant = "StableSwapNG"
+name = "cbBTC/usBTC/tBTC"
+
+[[pools]]
+address = "0x365E957364f52d02b46e6Ea1D1DcBFb10cEcC555"
+variant = "StableSwapNG"
+name = "EDU/USDC/aBasUSDC"
+
+[[pools]]
+address = "0xC72F768d8fcBA0B66B4ff51035a3d051763219C0"
+variant = "StableSwapNG"
+name = "bXBT/tBTC"
+
+[[pools]]
+address = "0xBD43A29b40efa5C1862c9E2590072637aE024cc8"
+variant = "StableSwapNG"
+name = "TIR/USDC"
+
+[[pools]]
+address = "0xeE454138083b9B9714cac3c7cF12560248d76D6B"
+variant = "StableSwapNG"
+name = "crvUSD/USDbC/axlUSDC/USDC/DAI"
+
+[[pools]]
+address = "0x63d64A76C2D616676CBAC3068D3C6548F8485314"
+variant = "StableSwapNG"
+name = "XLT/crvUSD"
+
+[[pools]]
+address = "0x60868043f1F63Aaf6Ed9499CB00F60B8b0D6B802"
+variant = "StableSwapNG"
+name = "USDC/crvUSD"
+
+[[pools]]
+address = "0xd3E3B0FE036295A9e531bd72b024F7B308bca4f7"
+variant = "TwoCryptoStable"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0x3CeA080D303bD105c48cA4C24D8426da99f75524"
+variant = "TwoCryptoStable"
+name = "USDC/AERO"
+
+[[pools]]
+address = "0xc4a556892887C8684ad46700C6ae2F7Dcb57BAF4"
+variant = "TwoCryptoStable"
+name = "USDC/IDRX"
+
+[[pools]]
+address = "0x6771Bb9ec8da900eeBa738599c3CC4f8Fc07aEa7"
+variant = "TwoCryptoStable"
+name = "USDC/BRZ"
+
+[[pools]]
+address = "0xba0C274085A078D19C46F2D902698A841cBFb289"
+variant = "TwoCryptoNG"
+name = "LCAP/eUSD"
+
+[[pools]]
+address = "0x65cC89Ed45d1B351F13F4769460780F6fCE3Afa1"
+variant = "TwoCryptoNG"
+name = "Unitos.net/USDT"
+
+[[pools]]
+address = "0xa719BBBBabAdbC724CA4E80b2b62CC0A15408E2a"
+variant = "TwoCryptoNG"
+name = "ARAT/USDC"
+
+[[pools]]
+address = "0xdbf876301953031e103780b3F66eFb984900706f"
+variant = "TriCryptoNG"
+name = "SNL/TOP/BCoW-80TOP-20NIPZ"
+
+[[pools]]
+address = "0x1C228Cd8C385AB861740801BD3f6B6B709243936"
+variant = "TriCryptoNG"
+name = "APENIPZ/tnmx/MXAPEMX"
+
+[[pools]]
+address = "0xD7154D7A419359ADAC542F65f205Caf5B4a6cb88"
+variant = "TriCryptoNG"
+name = "NIPZ/TOP/mxapemx"
+
+[[pools]]
+address = "0x0A2f5c5954bA0322a090823c16ed193a043106c1"
+variant = "TriCryptoNG"
+name = "USDC/NIPZ/SIAM"
+
+[[pools]]
+address = "0x147489a942481aE4Af481D5AaB5FFe6602687001"
+variant = "TriCryptoNG"
+name = "CRV/SUSA/PROS"
+
+[[pools]]
+address = "0x0B02779e4A93438aBD9396F9aa0ebeE0505f3C3d"
+variant = "TriCryptoNG"
+name = "BRETTSKY/FOFAR/TOP"
+
+[[pools]]
+address = "0xf4DB23e504cd7DbdF91fa83cc4C16CA42Cff40ff"
+variant = "TriCryptoNG"
+name = "SIAM/mxapemx/NIPZ"
+
+[[pools]]
+address = "0xbC3705b2bfD42d38e8FA2c8EFDC3Fdda645C3b2a"
+variant = "StableSwapNG"
+name = "USDC/USDbC"
+
+[[pools]]
+address = "0x1aB35116c3FA0B2F507d8C8C3261d42683c1e31e"
+variant = "StableSwapNG"
+name = "USDbC/USDC"
+
+[[pools]]
+address = "0x602C281D739357ccd54479960b3196f27571e5da"
+variant = "StableSwapNG"
+name = "crvUSD/USDC"
+
+[[pools]]
+address = "0xD4e59bfd7bCe4A5Bc1Ee12Ea930C7495831D6aeF"
+variant = "StableSwapNG"
+name = "USDbC/USDC"
+
+[[pools]]
+address = "0xd876fdB964652072c9D57988831b1e1f04A98E80"
+variant = "StableSwapNG"
+name = "cgUSD/crvUSD"
+
+[[pools]]
+address = "0x63Eb7846642630456707C3efBb50A03c79B89D81"
+variant = "StableSwapNG"
+name = "USDC/USDM"
+
+[[pools]]
+address = "0x63202232178c949938Fa4a5117C868d72CA4B41D"
+variant = "TwoCryptoNG"
+name = "ysUSDC/PT-ysUSDC@30/9/2025"
+
+[[pools]]
+address = "0x451C64deC35170B9fc73c877d6aD1346D59Da6A5"
+variant = "TwoCryptoNG"
+name = "scrvUSD/SANCHO"
+
+[[pools]]
+address = "0x72CFCC3d98F3f805Fa1A34A342263888dfdB5B8B"
+variant = "TwoCryptoNG"
+name = "ysUSDC/PT-ysUSDC@31/7/2025"
+
+[[pools]]
+address = "0x351Da413AFD91188E0dCd450Cf50361fC48094A9"
+variant = "TwoCryptoNG"
+name = "TOP/SIAM"
+
+[[pools]]
+address = "0xF583C95C5F2D4245044A8c35B7890DA649a7777F"
+variant = "TwoCryptoNG"
+name = "ION/superOETHb"
+
+[[pools]]
+address = "0x22559fC36A9B0c936DfF0AB1d0DE9a2aC5e6A059"
+variant = "TwoCryptoNG"
+name = "USDGLO/superOETHb"
+
+[[pools]]
+address = "0x3490B07C107a6836f2Fd9Dd0F53cfA8eFd4aD6ef"
+variant = "TwoCryptoNG"
+name = "USR/PT-USR@17/6/2025"
+
+[[pools]]
+address = "0xBF9BaD3fBf282843e5728132378D306Ea36F8271"
+variant = "TriCryptoNG"
+name = "MXAPEMX/NIPZ/TOP"
+
+[[pools]]
+address = "0xf908ff79Fdced84184d681Ee687E1bD28c2F8B7F"
+variant = "TriCryptoNG"
+name = "MXAPEMX/TOP/NIPZ"
+
+[[pools]]
+address = "0x2baf504E343C0502df962D2F2307A9062E181b4C"
+variant = "TriCryptoNG"
+name = "USDT/crvUSD/XA9"
+
+[[pools]]
+address = "0xB2484cEBE9482d842eAfCCa18973dD89aDde02E0"
+variant = "TriCryptoNG"
+name = "TOP/MXAPEMX/MAGA"
+
+[[pools]]
+address = "0x6e53131F68a034873b6bFA15502aF094Ef0c5854"
+variant = "TriCryptoNG"
+name = "crvUSD/tBTC/WETH"
+
