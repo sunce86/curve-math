@@ -39,7 +39,7 @@ Three legacy factories also use the same `pool_count()` / `pool_list(uint256)` i
 
 | Factory | Address | Variant |
 |---------|---------|---------|
-| MetaPool Factory | `0xB9fC157394Af804a3578134A6585C0dc9cc990d4` | `StableSwapMeta` |
+| MetaPool Factory | `0xB9fC157394Af804a3578134A6585C0dc9cc990d4` | Probe on-chain (see `detect_variant.py`) |
 | CryptoSwap Factory | `0xF18056Bbd320E96A48e3Fbf8bC061322531aac99` | `TwoCryptoV1` |
 | crvUSD StableSwap Factory | `0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d` | Probe on-chain (see `detect_variant.py`) |
 
