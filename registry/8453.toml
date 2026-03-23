@@ -552,3 +552,38 @@ address = "0x6e53131F68a034873b6bFA15502aF094Ef0c5854"
 variant = "TriCryptoNG"
 name = "crvUSD/tBTC/WETH"
 
+[[pools]]
+address = "0xB54fD820725Cb2DE27958FD08B76743D3C04bb25"
+variant = "TwoCryptoNG"
+name = "crvUSD/WETH"
+
+[[pools]]
+address = "0x9af2D0fC4625aCCD8b2376ECbF0af75342127EC7"
+variant = "TwoCryptoNG"
+name = "SUSA/WETH"
+
+[[pools]]
+address = "0x0e280Ee6563DF84071452E8772D8A9a675116b9c"
+variant = "TwoCryptoNG"
+name = "hSTACKED/WETH"
+
+[[pools]]
+address = "0x25B26B6e94db341AEefdD1E063B3378Bb988f615"
+variant = "TwoCryptoNG"
+name = "cgUSD/wcgUSD"
+
+[[pools]]
+address = "0x6e71501C8b6d5A091Ca6513e0596CB858E02BA2c"
+variant = "TwoCryptoNG"
+name = "hSTACKED/WETH"
+
+[[pools]]
+address = "0xa8E5e41ba16E7eE19A7CD46C15DaD09Af73746C6"
+variant = "TwoCryptoNG"
+name = "DEGEN/TALENT"
+
+[[pools]]
+address = "0x02116C8ea08Ef0459f5B5f276A0eA9Cd73a603A9"
+variant = "TwoCryptoNG"
+name = "XAG/cbBTC"
+
