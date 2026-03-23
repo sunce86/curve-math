@@ -107,3 +107,53 @@ address = "0x915DCef92Cf0c5fba056b57a7B6cEd217378ACB7"
 variant = "StableSwapNG"
 name = "USDC/GHO/USDS/crvUSD/USDbC/aBasUSDC/aBasUSDbC/aBasGHO"
 
+[[pools]]
+address = "0xE843A0762738Ac1CFFc0B74cF1d8A5361e5444DB"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x53e39CBC5c16DB183A8dBD873d5E2B5985F103b7"
+variant = "StableSwapNG"
+name = "USDT/nara.com"
+
+[[pools]]
+address = "0xd6c283655B42FA0eb2685F7AB819784F071459dc"
+variant = "StableSwapNG"
+name = "USDC/GREEN"
+
+[[pools]]
+address = "0xa9D6867C347B8b5f395B8421FB31710B8Fb21a16"
+variant = "StableSwapNG"
+name = "USDC/cgUSD"
+
+[[pools]]
+address = "0xE091B1b525cEFEB83B8484EE518D6C08CD1C2f98"
+variant = "StableSwapNG"
+name = "USDC/crvUSD"
+
+[[pools]]
+address = "0x02D55aF4813a3a6826Ef185935E4FC1dEfA45FB0"
+variant = "StableSwapNG"
+name = "SPECTRA/sdSPECTRA"
+
+[[pools]]
+address = "0xf4d88051BbAFCF20f59A1f28783274eEfc2FACc7"
+variant = "StableSwapNG"
+name = "ynETHx/WETH"
+
+[[pools]]
+address = "0xE8E170B84F9f0A7E023496E6e6dD4d946567c046"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x8092736722A68c89B905cC71d2f2C926363cd255"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x9557c4F528A1b5ACF3Fd99a34EDF7cBaCA9c8b93"
+variant = "StableSwapNG"
+name = "USDC/WETH"
+
