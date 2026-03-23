@@ -7,13 +7,11 @@
 //!
 //! # When to use this
 //!
-//! Most consumers already know the variant:
-//! - **Substreams adapter** — variant comes from factory deploy event
-//! - **Solvent** — variant comes from tycho `pool_type` attribute
-//!
-//! Use this module only when you have a pool address and need to identify
+//! Use this module when you have a pool address and need to identify
 //! its variant via RPC probing (e.g., a standalone indexer discovering
-//! unknown pools).
+//! unknown pools). If you already know the variant from another source
+//! (deploy events, protocol metadata, etc.), skip this and pass the
+//! variant directly to [`RawPoolState`](crate::RawPoolState).
 //!
 //! # Limitations
 //!
