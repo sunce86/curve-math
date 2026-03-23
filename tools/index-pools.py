@@ -206,21 +206,61 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
     if not new_addrs:
         return []
 
-    # Step 2: batch fetch balance[0] for TVL filter
+    # Step 2: liveness filter — try get_dy(0, 1, bal0/1000) on each pool.
+    # Pools that revert or return 0 are dead (empty, paused, broken token).
+    # This replaces the old rough TVL filter which assumed all tokens = $1.
     pool_contracts = {a: w3.eth.contract(address=a, abi=POOL_ABI) for a in new_addrs}
     bal_calls = [(pool_contracts[a], "balances", [0]) for a in new_addrs]
     bal_results = _batch_call(w3, bal_calls, block)
 
-    # Filter by rough TVL
-    tvl_passed = []
+    # Build get_dy calls for pools with nonzero balance
+    GET_DY_STABLE = json.loads('[{"name":"get_dy","outputs":[{"type":"uint256"}],"inputs":[{"type":"int128"},{"type":"int128"},{"type":"uint256"}],"stateMutability":"view","type":"function"}]')
+    GET_DY_CRYPTO = json.loads('[{"name":"get_dy","outputs":[{"type":"uint256"}],"inputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"}],"stateMutability":"view","type":"function"}]')
+
+    is_crypto = factory_cfg["variant"] in ("TwoCryptoNG", "TwoCryptoV1", "TriCryptoNG")
+
+    dy_addrs = []
+    dy_calls = []
+    dx_per_pool = {}
     for addr, bal0 in zip(new_addrs, bal_results):
-        if bal0 and (bal0 // 10**18) * 3 >= min_tvl:
-            tvl_passed.append(addr)
-    if not tvl_passed:
+        if not bal0 or bal0 == 0:
+            continue
+        dx = max(bal0 // 1000, 1)
+        dx_per_pool[addr] = dx
+        # Crypto pools use uint256 indices, StableSwap uses int128
+        abi = GET_DY_CRYPTO if is_crypto else GET_DY_STABLE
+        c = w3.eth.contract(address=addr, abi=abi)
+        dy_calls.append((c, "get_dy", [0, 1, dx]))
+        dy_addrs.append(addr)
+
+    dy_results = _batch_call(w3, dy_calls, block) if dy_calls else []
+
+    # For non-crypto pools that failed, retry with the other ABI.
+    # MetaPool Factory deploys both plain (uint256) and meta (int128) pools.
+    retry_indices = []
+    if not is_crypto:
+        for i, (addr, dy) in enumerate(zip(dy_addrs, dy_results)):
+            if dy is None:
+                retry_indices.append(i)
+        if retry_indices:
+            retry_calls = []
+            for i in retry_indices:
+                addr = dy_addrs[i]
+                c = w3.eth.contract(address=addr, abi=GET_DY_CRYPTO)
+                retry_calls.append((c, "get_dy", [0, 1, dx_per_pool[addr]]))
+            retry_results = _batch_call(w3, retry_calls, block)
+            for i, dy in zip(retry_indices, retry_results):
+                dy_results[i] = dy
+
+    live_pools = []
+    for addr, dy in zip(dy_addrs, dy_results):
+        if dy and dy > 0:
+            live_pools.append(addr)
+    if not live_pools:
         return []
 
-    # Step 3: batch fetch coin details for TVL-passing pools (limit to max_new)
-    tvl_passed = tvl_passed[:max_new]
+    # Step 3: batch fetch coin details for live pools (limit to max_new)
+    tvl_passed = live_pools[:max_new]
     detail_calls = []
     for addr in tvl_passed:
         pc = pool_contracts[addr]
