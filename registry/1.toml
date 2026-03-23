@@ -7,6 +7,7 @@
 
 last_updated = "2026-03-23"
 total_factory_pools = 2043
+
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
