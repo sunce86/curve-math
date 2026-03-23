@@ -185,7 +185,6 @@ pub struct RawPoolState {
     /// pass that value directly.
     pub amp: U256,
 
-    // ── Fees ──────────────────────────────────────────────────────────────
     /// StableSwap fee. **Static** (set at pool creation).
     /// Required for all StableSwap variants.
     pub fee: Option<U256>,

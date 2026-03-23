@@ -111,11 +111,10 @@ crates/
     src/pool.rs        # Pool enum (feature "swap")
     tests/             # Differential fuzz tests (RPC-based)
       registry/        # Verified pool lists per chain
-  curve-adapter/       # Discovery + construction
+  curve-adapter/       # Variant detection + pool construction
     src/build.rs       # RawPoolState → Pool, interpolate_a()
+    src/detect.rs      # detect_variant() from on-chain probing
     src/variant.rs     # CurveVariant enum (11 variants)
-    src/factories.rs   # Factory addresses, MATH lookup
-    src/state.rs       # State requirements per variant
 ```
 
 ## License

@@ -4,9 +4,7 @@ Adapts raw on-chain Curve pool data into [`curve-math::Pool`](https://crates.io/
 
 ## What it does
 
-- **Pool discovery** — factory addresses, deploy event parsing, legacy pool registry (868 Ethereum pools)
-- **Variant detection** — classifies pools into one of 11 `CurveVariant`s
-- **State requirements** — which on-chain fields each variant needs and how often they change
+- **Variant detection** — classifies pools into one of 11 `CurveVariant`s via on-chain probing
 - **Pool construction** — `build_pool(RawPoolState) → Pool` with rate/precision computation and validation
 
 ## Usage
