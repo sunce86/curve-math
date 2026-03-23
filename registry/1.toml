@@ -1451,3 +1451,38 @@ address = "0x9A160D5db81552dbcfCC671bB03Be674a04558dD"
 variant = "StableSwapNG"
 name = "USDC/BABYSPANK"
 
+[[pools]]
+address = "0x138f59A485A058d4FC449CEA7a3A080F9Af467F1"
+variant = "StableSwapNG"
+name = "USDC/liUSD-8w"
+
+[[pools]]
+address = "0x46f27BD3eC8f8D602F7ce85D312F4387FBdA7b16"
+variant = "StableSwapNG"
+name = "USDC/liUSD-1w"
+
+[[pools]]
+address = "0x16cAEDAD77253Fd1020f423bb7B9712a7592Ed7B"
+variant = "StableSwapNG"
+name = "pBTC/pBTC/WBTC/eBTC"
+
+[[pools]]
+address = "0xb1461B2E4C0F48DcEB1198E42A6Da2faA6a861C5"
+variant = "StableSwapNG"
+name = "pBTC/pBTC"
+
+[[pools]]
+address = "0x95591348FE9718bE8bfa3afcC9b017D9Ec18A7fa"
+variant = "StableSwapNG"
+name = "USDaf/crv2pool"
+
+[[pools]]
+address = "0x6d92b33e7E1CadAE729488404E15e58305CaE98c"
+variant = "StableSwapNG"
+name = "WUSDN/crvUSD"
+
+[[pools]]
+address = "0x0AD87033C94be2421D39a9d6E1ca6d7d5663Ce01"
+variant = "StableSwapNG"
+name = "BABY/eBABY"
+
