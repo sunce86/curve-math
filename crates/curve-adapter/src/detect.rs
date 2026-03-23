@@ -20,7 +20,7 @@
 //! deploy events or `factory.is_meta()`) is more reliable. See
 //! [`factories`](crate::factories) for factory→variant mapping.
 
-use alloy_primitives::Address;
+use alloy_primitives::{address, Address};
 
 use crate::CurveVariant;
 
@@ -109,7 +109,7 @@ pub fn detect_variant(probing: &ProbingResults) -> Result<CurveVariant, DetectEr
 fn detect_cryptoswap(probing: &ProbingResults) -> Result<CurveVariant, DetectError> {
     match probing.n_coins {
         3 => {
-            if is_known_tricrypto_v1(probing.pool_address) {
+            if KNOWN_TRICRYPTO_V1.contains(&probing.pool_address) {
                 Ok(CurveVariant::TriCryptoV1)
             } else {
                 Ok(CurveVariant::TriCryptoNG)
@@ -155,10 +155,10 @@ fn detect_stableswap(probing: &ProbingResults) -> CurveVariant {
     }
 
     // Fallback: known addresses for V0/V1, else V2
-    let addr_lower = format!("{:?}", probing.pool_address).to_lowercase();
-    if is_known_v0(&addr_lower) {
+    let addr = probing.pool_address;
+    if KNOWN_V0.contains(&addr) {
         CurveVariant::StableSwapV0
-    } else if is_known_v1(&addr_lower) {
+    } else if KNOWN_V1.contains(&addr) {
         CurveVariant::StableSwapV1
     } else {
         CurveVariant::StableSwapV2
@@ -171,41 +171,27 @@ fn detect_stableswap(probing: &ProbingResults) -> CurveVariant {
 // address-based lookup. These are COMPLETE lists — no new pools of these
 // types can be created because no factory exists for them. All pre-factory
 // pools are deployed manually and the set is fixed.
-//
-// Verified against legacy_ethereum.toml: V0=8, V1=2, TriCryptoV1=2.
 
-fn is_known_tricrypto_v1(addr: Address) -> bool {
-    let addr_lower = format!("{:?}", addr).to_lowercase();
-    matches!(
-        addr_lower.as_str(),
-        // tricrypto2 (USDT/WBTC/WETH)
-        "0xd51a44d3fae010294c616388b506acda1bfaae46"
-        // tricrypto (original)
-        | "0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5"
-    )
-}
+const KNOWN_TRICRYPTO_V1: [Address; 2] = [
+    address!("D51a44d3FaE010294C616388b506AcdA1bfAAE46"), // tricrypto2 (USDT/WBTC/WETH)
+    address!("80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5"), // tricrypto (original)
+];
 
-fn is_known_v0(addr_lower: &str) -> bool {
-    matches!(
-        addr_lower,
-        "0xa5407eae9ba41422680e2e00537571bcc53efbfd"  // sUSD
-        | "0xa2b47e3d5c44877cca798226b7b8118f9bfb7a56" // compound
-        | "0x79a8c46dea5ada233abaffd40f3a0a2b1e5a4f27" // busd
-        | "0x45f783cce6b7ff23b2ab2d70e416cdb7d6055f51" // y
-        | "0x52ea46506b9cc5ef470c5bf89f17dc28bb35d85c" // usdt
-        | "0x06364f10b501e868329afbc005b3492902d6c763" // pax
-        | "0x93054188d876f558f4a66b2ef1d97d16edf0895b" // ren
-        | "0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714" // sbtc
-    )
-}
+const KNOWN_V0: [Address; 8] = [
+    address!("A5407eAE9Ba41422680e2e00537571bcC53efBfD"), // sUSD
+    address!("A2B47E3D5c44877cca798226B7B8118F9BFb7A56"), // compound
+    address!("79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27"), // busd
+    address!("45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51"), // y
+    address!("52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C"), // usdt
+    address!("06364f10B501e868329afBc005b3492902d6C763"), // pax
+    address!("93054188d876f558f4a66B2EF1d97d16eDf0895B"), // ren
+    address!("7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714"), // sbtc
+];
 
-fn is_known_v1(addr_lower: &str) -> bool {
-    matches!(
-        addr_lower,
-        "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"  // 3pool
-        | "0x4ca9b3063ec5866a4b82e437059d2c43d1be596f" // hbtc
-    )
-}
+const KNOWN_V1: [Address; 2] = [
+    address!("bEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"), // 3pool
+    address!("4CA9b3063Ec5866A4B82E437059D2C43d1be596F"), // hbtc
+];
 
 #[cfg(test)]
 mod tests {
