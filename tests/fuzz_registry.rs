@@ -105,6 +105,10 @@ alloy::sol! {
         function balances(uint256 i) external view returns (uint256);
         function A() external view returns (uint256);
         function fee() external view returns (uint256);
+        function initial_A() external view returns (uint256);
+        function future_A() external view returns (uint256);
+        function initial_A_time() external view returns (uint256);
+        function future_A_time() external view returns (uint256);
     }
 
     #[sol(rpc)]
@@ -395,10 +399,20 @@ async fn build_pool(
             for i in 0..n_coins {
                 balances.push(c.balances(U256::from(i)).block(block).call().await.ok()?);
             }
-            let raw_a = c.A().block(block).call().await.ok()?;
+            // Prefer initial_A when no ramping (avoids A() integer division precision loss).
+            // When ramping is active (initial_A != future_A), fall back to A() * A_PRECISION.
+            let amp = match (
+                c.initial_A().block(block).call().await,
+                c.future_A().block(block).call().await,
+            ) {
+                (Ok(ia), Ok(fa)) if ia == fa => ia,
+                _ => {
+                    let raw_a = c.A().block(block).call().await.ok()?;
+                    raw_a * a_prec_100
+                }
+            };
             let fee = c.fee().block(block).call().await.ok()?;
             let rates: Vec<U256> = decimals.iter().map(|d| rate_for_decimals(*d)).collect();
-            let amp = raw_a * a_prec_100;
             Some((
                 Pool::StableSwapV2 {
                     balances,
