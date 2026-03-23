@@ -69,7 +69,7 @@ FACTORIES = {
 
 FACTORY_ABI = json.loads('[{"name":"pool_count","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"pool_list","outputs":[{"type":"address"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"is_meta","outputs":[{"type":"bool"}],"inputs":[{"type":"address"}],"stateMutability":"view","type":"function"},{"name":"get_base_pool","outputs":[{"type":"address"}],"inputs":[{"type":"address"}],"stateMutability":"view","type":"function"}]')
 
-POOL_ABI = json.loads('[{"name":"coins","outputs":[{"type":"address"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"balances","outputs":[{"type":"uint256"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"A","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"fee","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
+POOL_ABI = json.loads('[{"name":"coins","outputs":[{"type":"address"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"balances","outputs":[{"type":"uint256"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"A","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"fee","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"N_COINS","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 
 TOKEN_ABI = json.loads('[{"name":"decimals","outputs":[{"type":"uint8"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"symbol","outputs":[{"type":"string"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 
@@ -258,26 +258,37 @@ def discover_pools(w3, factory_cfg, existing_addrs, max_new, block):
     if not live_pools:
         return []
 
-    # Step 3: batch fetch coin details for live pools (limit to max_new)
+    # Step 3: fetch N_COINS for each pool, then batch fetch coin details
     tvl_passed = live_pools[:max_new]
+    ncoin_calls = [(pool_contracts[a], "N_COINS", []) for a in tvl_passed]
+    ncoin_results = _batch_call(w3, ncoin_calls, block)
+    pool_ncoins = {}
+    for addr, n in zip(tvl_passed, ncoin_results):
+        pool_ncoins[addr] = n if n and n > 0 else 4  # fallback to 4 for legacy
+
     detail_calls = []
+    detail_layout = []  # (addr, n_coins) to reconstruct results
     for addr in tvl_passed:
         pc = pool_contracts[addr]
-        for ci in range(4):  # up to 4 coins
+        n = pool_ncoins[addr]
+        for ci in range(n):
             detail_calls.append((pc, "coins", [ci]))
             detail_calls.append((pc, "balances", [ci]))
+        detail_layout.append((addr, n))
     detail_results = _batch_call(w3, detail_calls, block)
 
     # Step 4: batch fetch decimals/symbols for coins
     coin_addrs = {}
-    for pi, addr in enumerate(tvl_passed):
+    offset = 0
+    for addr, n in detail_layout:
         coins_for_pool = []
-        for ci in range(4):
-            base = pi * 8 + ci * 2
+        for ci in range(n):
+            base = offset + ci * 2
             coin_addr = detail_results[base]
             if coin_addr and coin_addr != "0x" + "0" * 40:
                 coins_for_pool.append((coin_addr, detail_results[base + 1]))
         coin_addrs[addr] = coins_for_pool
+        offset += n * 2
 
     # Batch decimals/symbols
     token_calls = []

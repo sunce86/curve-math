@@ -1521,3 +1521,18 @@ address = "0x81301848168bAe6Add206aA50052E247Cb366d3A"
 variant = "StableSwapNG"
 name = "yUSD/USDC"
 
+[[pools]]
+address = "0xcA84572ccbb6b36a6F7666cEd11EeD3D67dF828D"
+variant = "StableSwapNG"
+name = "WBTC/eBTC/BTCSPANK-gauge/WEBTC-gauge"
+
+[[pools]]
+address = "0xbB8538B6c15D38De610F831C89FbA33BdEf854cD"
+variant = "StableSwapNG"
+name = "WBSPANK-gauge/CSPANK-gauge/UUG-gauge/USDC"
+
+[[pools]]
+address = "0x675EfEBFcf76D569c56F6021b12e9418932a602f"
+variant = "StableSwapNG"
+name = "USDT/USDC/USDT/USDT"
+

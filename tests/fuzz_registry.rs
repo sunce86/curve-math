@@ -56,7 +56,7 @@ async fn read_pool_coins(
 ) -> Option<(usize, Vec<u8>)> {
     let c = ICoinInfo::new(addr, provider);
     let mut decimals = Vec::new();
-    for i in 0..4u64 {
+    for i in 0..8u64 {
         let coin_result = match c.coins(U256::from(i)).block(block).call().await {
             Ok(v) => Ok(v),
             Err(_) => {
