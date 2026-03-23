@@ -524,7 +524,7 @@ def main():
 
         # Update verified pool count in README
         pool_count = len(registry["pools"])
-        update_readme_badge(pool_count, registry["last_updated"], total_factory_pools)
+        update_readme_badge(args.chain_id, pool_count, registry["last_updated"], total_factory_pools)
 
         # Write PR summary for CI
         write_pr_summary(verified, failed, added_names, skipped_names)
@@ -550,20 +550,28 @@ def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list
     print(f"PR summary written to .pr-summary.md")
 
 
-def update_readme_badge(count: int, last_updated: str, total: int = 0):
-    """Update the chain status table in README.md."""
+CHAIN_NAMES = {1: "Ethereum", 8453: "Base"}
+CHAIN_FUZZ_BADGES = {
+    1: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)",
+}
+
+
+def update_readme_badge(chain_id: int, count: int, last_updated: str, total: int = 0):
+    """Update the chain status table row for the given chain in README.md."""
     readme = Path("README.md")
     if not readme.exists():
         return
     content = readme.read_text()
 
     import re
-    # Update Ethereum row in chain status table
+    chain_name = CHAIN_NAMES.get(chain_id, f"Chain {chain_id}")
+    badge = CHAIN_FUZZ_BADGES.get(chain_id, "")
     pct = (count * 100 // total) if total else 0
     pool_str = f"{count} / {total} ![](https://geps.dev/progress/{pct}?successColor=6366f1)" if total else str(count)
+    new_row = f"| {chain_name} | {badge} | {pool_str} | {last_updated} |"
     content = re.sub(
-        r'\| Ethereum \|.*\|.*\|.*\|',
-        f'| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | {pool_str} | {last_updated} |',
+        rf'\| {re.escape(chain_name)} \|.*\|.*\|.*\|',
+        new_row,
         content,
     )
     readme.write_text(content)
