@@ -587,3 +587,33 @@ address = "0x02116C8ea08Ef0459f5B5f276A0eA9Cd73a603A9"
 variant = "TwoCryptoNG"
 name = "XAG/cbBTC"
 
+[[pools]]
+address = "0x8f78E0671f238c06fd07B947b7981cCc092986b2"
+variant = "TwoCryptoNG"
+name = "USDC/MXAPEMX"
+
+[[pools]]
+address = "0x0fB2C121D75f4b64E24412AB9C7d0bc93FCdBD61"
+variant = "TwoCryptoNG"
+name = "nARS/USDC"
+
+[[pools]]
+address = "0xB14f7Bc54991D755dd21A889ccD09345b1553c6E"
+variant = "TwoCryptoNG"
+name = "USDC/COIM"
+
+[[pools]]
+address = "0xb2EAE46253c5fE6D4EC0A11ce5d98f446c3442FA"
+variant = "TwoCryptoNG"
+name = "BALD/BASED"
+
+[[pools]]
+address = "0x749eF4ab10aef61151E14C9336B07727ffA5a323"
+variant = "TwoCryptoNG"
+name = "USDC/CRV"
+
+[[pools]]
+address = "0xa0D3911349e701A1F49C1Ba2dDA34b4ce9636569"
+variant = "TwoCryptoNG"
+name = "FROK/WETH"
+
