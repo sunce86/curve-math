@@ -190,11 +190,10 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
         abi=FACTORY_ABI,
     )
     count = factory.functions.pool_count().call(block_identifier=block)
-    max_check = min(max_new * 20, count)
-    print(f"  {factory_cfg['label']}: {count} pools (checking newest {max_check})")
+    print(f"  {factory_cfg['label']}: {count} pools (checking all)")
 
     # Step 1: batch fetch pool addresses (newest first)
-    indices = list(range(count - 1, max(count - 1 - max_check, -1), -1))
+    indices = list(range(count - 1, -1, -1))
     addr_calls = [(factory, "pool_list", [i]) for i in indices]
     pool_addrs = _batch_call(w3, addr_calls, block)
 
@@ -322,12 +321,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
         info = token_info.get(addr, [])
         if not coins or not info:
             continue
-        decimals = [d for d, _ in info]
         symbols = [s for _, s in info]
-        balances = [b for _, b in coins]
-        tvl = sum(b // 10**d for b, d in zip(balances, decimals) if b)
-        if tvl < min_tvl:
-            continue
 
         variant = factory_cfg["variant"]
         # Detect TwoCryptoStable: MATH v0.1.0 = StableSwap math
