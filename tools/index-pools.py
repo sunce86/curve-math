@@ -510,7 +510,7 @@ def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list
     if not added:
         lines.append("No new pools added.\n")
     lines.append(f"\n> Full fuzz verification runs automatically on this PR.")
-    Path(".pr-summary.md").write_text("\n".join(lines))
+    Path(".pr-summary.md").write_text("\n".join(lines) + "\n")
     print(f"PR summary written to .pr-summary.md")
 
 

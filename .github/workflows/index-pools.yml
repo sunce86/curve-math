@@ -51,9 +51,10 @@ jobs:
         run: |
           if [ -f .pr-summary.md ]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "body<<EOF" >> $GITHUB_OUTPUT
+            echo "body<<ENDOFBODY" >> $GITHUB_OUTPUT
             cat .pr-summary.md >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "ENDOFBODY" >> $GITHUB_OUTPUT
             rm .pr-summary.md
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
