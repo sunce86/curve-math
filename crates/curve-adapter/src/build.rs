@@ -161,15 +161,16 @@ pub struct RawPoolState {
     /// ```text
     /// let amp = pool_contract.A().block(block_number).call().await?;
     /// ```
-    /// **Warning:** for V2+ StableSwap, `A()` returns `initial_A / A_PRECISION`
-    /// via integer division, losing the remainder:
+    /// **Warning:** for all A_PRECISION=100 variants (V2, Meta, NG, ALend),
+    /// `A()` returns `initial_A / A_PRECISION` via integer division, losing
+    /// the remainder:
     /// ```text
     /// initial_A = 79258
     /// A() = 79258 / 100 = 792      (truncated)
     /// A() * 100 = 79200 ≠ 79258    (lost 58)
     /// ```
-    /// For exact precision, read `initial_A()` + `future_A()` + timestamps
-    /// and use [`interpolate_a`] instead.
+    /// For exact precision, read `initial_A()` directly when no ramping
+    /// (`initial_A == future_A`), or use [`interpolate_a`] during ramps.
     ///
     /// **Substreams / storage-based consumer:**
     /// Read `initial_A`, `future_A`, `initial_A_time`, `future_A_time` from
