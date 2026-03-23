@@ -85,6 +85,16 @@ FACTORIES = {
             "variant": "TwoCryptoV1",
             "label": "CryptoSwap Factory (legacy)",
         },
+        {
+            "address": "0x3093f9B57A428F3EB6285a589cb35bEA6e78c336",
+            "variant": "auto",
+            "label": "StableSwap Factory (legacy, 15 pools)",
+        },
+        {
+            "address": "0x87DD13Dd25a1DBde0E1EdcF5B8Fa6cfff7eABCaD",
+            "variant": "auto",
+            "label": "StableSwap Factory (legacy, 725 pools)",
+        },
     ],
 }
 
