@@ -698,10 +698,11 @@ async fn build_pool(
 // ── Shared fuzz runner ───────────────────────────────────────────────────────
 
 async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
-    let chain_id: u64 = std::env::var("FUZZ_CHAIN_ID")
-        .unwrap_or_else(|_| "1".into())
-        .parse()
-        .unwrap();
+    // Extract chain ID from label (e.g. "chain 8453 pending" → 8453)
+    let chain_id: u64 = label
+        .split_whitespace()
+        .find_map(|w| w.parse().ok())
+        .unwrap_or(1);
     let env_key = format!("RPC_URL_{chain_id}");
     let rpc_url = std::env::var(&env_key)
         .or_else(|_| std::env::var("RPC_URL"))
@@ -835,4 +836,29 @@ async fn fuzz_1_pending() {
         return;
     }
     fuzz_pools("chain 1 pending", &pools).await;
+}
+
+/// Fuzz all Base pools.
+#[tokio::test]
+#[ignore = "requires RPC_URL_8453"]
+async fn fuzz_8453() {
+    let pools = load_registry("registry/8453.toml");
+    fuzz_pools("chain 8453", &pools).await;
+}
+
+/// Pending fuzz for Base.
+#[tokio::test]
+#[ignore = "requires RPC_URL_8453"]
+async fn fuzz_8453_pending() {
+    let path = "registry/8453_pending.toml";
+    if !std::path::Path::new(path).exists() {
+        println!("No pending pools at {path}");
+        return;
+    }
+    let pools = load_registry(path);
+    if pools.is_empty() {
+        println!("No pending pools");
+        return;
+    }
+    fuzz_pools("chain 8453 pending", &pools).await;
 }

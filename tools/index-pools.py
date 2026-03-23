@@ -63,6 +63,23 @@ FACTORIES = {
             "label": "crvUSD StableSwap Factory",
         },
     ],
+    8453: [  # Base
+        {
+            "address": "0xd2002373543Ce3527023C75e7518C274A51ce712",
+            "variant": "StableSwapNG",
+            "label": "StableSwap-NG",
+        },
+        {
+            "address": "0xc9Fe0C63Af9A39402e8a5514f9c43Af0322b665F",
+            "variant": "TwoCryptoNG",
+            "label": "TwoCrypto-NG",
+        },
+        {
+            "address": "0xA5961898870943c68037F6848d2D866Ed2016bcB",
+            "variant": "TriCryptoNG",
+            "label": "TriCrypto-NG",
+        },
+    ],
 }
 
 # ── Minimal ABIs ─────────────────────────────────────────────────────────────
