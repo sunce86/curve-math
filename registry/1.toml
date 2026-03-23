@@ -1486,3 +1486,38 @@ address = "0x0AD87033C94be2421D39a9d6E1ca6d7d5663Ce01"
 variant = "StableSwapNG"
 name = "BABY/eBABY"
 
+[[pools]]
+address = "0xd89760b5b188D77dA878Ab09fF475569883A5B96"
+variant = "StableSwapNG"
+name = "slvlUSD/lvlUSD"
+
+[[pools]]
+address = "0x6A0c68Bc96658A2B97201d94986Bf7753000f2cF"
+variant = "StableSwapNG"
+name = "USDC/jUSD"
+
+[[pools]]
+address = "0xFfF8634dE89271b6075C55FA89B4E9A087Fdb9FE"
+variant = "StableSwapNG"
+name = "tacBTC/cbBTC/FBTC"
+
+[[pools]]
+address = "0x51F5466690978173f45270f57e06e25b0c888261"
+variant = "StableSwapNG"
+name = "USDT/tacUSD"
+
+[[pools]]
+address = "0x4cB813861d34eD66B6D9Aa83712919db01a36521"
+variant = "StableSwapNG"
+name = "yUSD/sDOLA"
+
+[[pools]]
+address = "0x4E32d84b25E56df669a978db635B9Acf1312Bb29"
+variant = "StableSwapNG"
+name = "yUSD/USR"
+
+[[pools]]
+address = "0x81301848168bAe6Add206aA50052E247Cb366d3A"
+variant = "StableSwapNG"
+name = "yUSD/USDC"
+
