@@ -41,7 +41,8 @@ use crate::swap;
 /// For `rates`: plain tokens have static rates (`10^(36-decimals)`), but ERC4626/oracle
 /// tokens have dynamic rates that change per-block. Read `stored_rates()` from the pool
 /// contract to get current rates for oracle-enabled pools.
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Pool {
     /// Oldest StableSwap pools (sUSD, Compound, USDT, y, BUSD).
     /// A_PRECISION=1, no -1 offset, fee after denormalize.
@@ -172,6 +173,36 @@ pub enum Pool {
 }
 
 impl Pool {
+    /// Number of coins in this pool.
+    pub fn n_coins(&self) -> usize {
+        match self {
+            Pool::StableSwapV0 { balances, .. }
+            | Pool::StableSwapV1 { balances, .. }
+            | Pool::StableSwapV2 { balances, .. }
+            | Pool::StableSwapALend { balances, .. }
+            | Pool::StableSwapNG { balances, .. }
+            | Pool::StableSwapMeta { balances, .. } => balances.len(),
+            Pool::TwoCryptoV1 { .. } | Pool::TwoCryptoNG { .. } | Pool::TwoCryptoStable { .. } => 2,
+            Pool::TriCryptoV1 { .. } | Pool::TriCryptoNG { .. } => 3,
+        }
+    }
+
+    /// Token balances in native units (wei).
+    pub fn balances(&self) -> &[U256] {
+        match self {
+            Pool::StableSwapV0 { balances, .. }
+            | Pool::StableSwapV1 { balances, .. }
+            | Pool::StableSwapV2 { balances, .. }
+            | Pool::StableSwapALend { balances, .. }
+            | Pool::StableSwapNG { balances, .. }
+            | Pool::StableSwapMeta { balances, .. } => balances,
+            Pool::TwoCryptoV1 { balances, .. }
+            | Pool::TwoCryptoNG { balances, .. }
+            | Pool::TwoCryptoStable { balances, .. } => balances,
+            Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => balances,
+        }
+    }
+
     /// Compute output amount for swapping `dx` of coin `i` into coin `j`.
     ///
     /// Returns `None` if the swap would fail (zero input, out of range, etc.).
@@ -748,6 +779,97 @@ impl Pool {
                 i,
                 j,
             ),
+        }
+    }
+
+    /// Update balances in place. For StableSwap variants only.
+    ///
+    /// Use this for per-block state updates instead of rebuilding the entire Pool.
+    /// Panics if `new_balances` length doesn't match the pool's coin count.
+    pub fn set_balances(&mut self, new_balances: &[U256]) {
+        match self {
+            Pool::StableSwapV0 { balances, .. }
+            | Pool::StableSwapV1 { balances, .. }
+            | Pool::StableSwapV2 { balances, .. }
+            | Pool::StableSwapALend { balances, .. }
+            | Pool::StableSwapNG { balances, .. }
+            | Pool::StableSwapMeta { balances, .. } => {
+                assert_eq!(balances.len(), new_balances.len(), "balance count mismatch");
+                balances.copy_from_slice(new_balances);
+            }
+            Pool::TwoCryptoV1 { balances, .. }
+            | Pool::TwoCryptoNG { balances, .. }
+            | Pool::TwoCryptoStable { balances, .. } => {
+                assert_eq!(2, new_balances.len(), "expected 2 balances for TwoCrypto");
+                *balances = [new_balances[0], new_balances[1]];
+            }
+            Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => {
+                assert_eq!(3, new_balances.len(), "expected 3 balances for TriCrypto");
+                *balances = [new_balances[0], new_balances[1], new_balances[2]];
+            }
+        }
+    }
+
+    /// Update per-block dynamic state for CryptoSwap variants.
+    ///
+    /// CryptoSwap pools have `balances`, `d`, and `price_scale` that change every block.
+    /// Use this instead of rebuilding the entire Pool.
+    pub fn set_crypto_state(
+        &mut self,
+        new_balances: &[U256],
+        new_d: U256,
+        new_price_scale: &[U256],
+    ) {
+        match self {
+            Pool::TwoCryptoV1 {
+                balances,
+                d,
+                price_scale,
+                ..
+            }
+            | Pool::TwoCryptoNG {
+                balances,
+                d,
+                price_scale,
+                ..
+            } => {
+                assert_eq!(2, new_balances.len());
+                assert_eq!(1, new_price_scale.len());
+                *balances = [new_balances[0], new_balances[1]];
+                *d = new_d;
+                *price_scale = new_price_scale[0];
+            }
+            Pool::TwoCryptoStable {
+                balances,
+                d,
+                price_scale,
+                ..
+            } => {
+                assert_eq!(2, new_balances.len());
+                assert_eq!(1, new_price_scale.len());
+                *balances = [new_balances[0], new_balances[1]];
+                *d = new_d;
+                *price_scale = new_price_scale[0];
+            }
+            Pool::TriCryptoV1 {
+                balances,
+                d,
+                price_scale,
+                ..
+            }
+            | Pool::TriCryptoNG {
+                balances,
+                d,
+                price_scale,
+                ..
+            } => {
+                assert_eq!(3, new_balances.len());
+                assert_eq!(2, new_price_scale.len());
+                *balances = [new_balances[0], new_balances[1], new_balances[2]];
+                *d = new_d;
+                *price_scale = [new_price_scale[0], new_price_scale[1]];
+            }
+            _ => panic!("set_crypto_state called on StableSwap variant — use set_balances"),
         }
     }
 }
