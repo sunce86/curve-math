@@ -62,17 +62,23 @@ fn ethereum_config() -> ChainConfig {
     let mut math_to_variant = HashMap::new();
     // v2.0.0 — CryptoSwap with gamma
     math_to_variant.insert(
-        "0x2005995a71243be9FB995DaB4742327dc76564Df".parse().unwrap(),
+        "0x2005995a71243be9FB995DaB4742327dc76564Df"
+            .parse()
+            .unwrap(),
         CurveVariant::TwoCryptoNG,
     );
     // v2.1.0 — CryptoSwap with gamma (same math, different compiler)
     math_to_variant.insert(
-        "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1".parse().unwrap(),
+        "0x1Fd8Af16DC4BEBd950521308D55d0543b6cDF4A1"
+            .parse()
+            .unwrap(),
         CurveVariant::TwoCryptoNG,
     );
     // v0.1.0 — StableSwap (gamma ignored)
     math_to_variant.insert(
-        "0x79839c2D74531A8222C0F555865aAc1834e82e51".parse().unwrap(),
+        "0x79839c2D74531A8222C0F555865aAc1834e82e51"
+            .parse()
+            .unwrap(),
         CurveVariant::TwoCryptoStable,
     );
 
@@ -80,7 +86,9 @@ fn ethereum_config() -> ChainConfig {
         factories: vec![
             // ── NG factories ────────────────────────────────────────────
             Factory {
-                address: "0x6A8cbed756804B16E05E741eDaBd5cB544AE21bf".parse().unwrap(),
+                address: "0x6A8cbed756804B16E05E741eDaBd5cB544AE21bf"
+                    .parse()
+                    .unwrap(),
                 default_variant: CurveVariant::StableSwapNG,
                 deploy_events: vec![
                     (DeployEvent::PlainPoolDeployed, CurveVariant::StableSwapNG),
@@ -88,29 +96,37 @@ fn ethereum_config() -> ChainConfig {
                 ],
             },
             Factory {
-                address: "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F".parse().unwrap(),
+                address: "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F"
+                    .parse()
+                    .unwrap(),
                 default_variant: CurveVariant::TwoCryptoNG, // resolved by MATH lookup
-                deploy_events: vec![
-                    (DeployEvent::TwocryptoPoolDeployed, CurveVariant::TwoCryptoNG),
-                ],
+                deploy_events: vec![(
+                    DeployEvent::TwocryptoPoolDeployed,
+                    CurveVariant::TwoCryptoNG,
+                )],
             },
             Factory {
-                address: "0x0c0e5f2fF0ff18a3be9b835635039256dC4B4963".parse().unwrap(),
+                address: "0x0c0e5f2fF0ff18a3be9b835635039256dC4B4963"
+                    .parse()
+                    .unwrap(),
                 default_variant: CurveVariant::TriCryptoNG,
-                deploy_events: vec![
-                    (DeployEvent::TricryptoPoolDeployed, CurveVariant::TriCryptoNG),
-                ],
+                deploy_events: vec![(
+                    DeployEvent::TricryptoPoolDeployed,
+                    CurveVariant::TriCryptoNG,
+                )],
             },
             // ── Legacy factories ────────────────────────────────────────
             Factory {
-                address: "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99".parse().unwrap(),
+                address: "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99"
+                    .parse()
+                    .unwrap(),
                 default_variant: CurveVariant::TwoCryptoV1,
-                deploy_events: vec![
-                    (DeployEvent::CryptoPoolDeployed, CurveVariant::TwoCryptoV1),
-                ],
+                deploy_events: vec![(DeployEvent::CryptoPoolDeployed, CurveVariant::TwoCryptoV1)],
             },
             Factory {
-                address: "0xB9fC157394Af804a3578134A6585C0dc9cc990d4".parse().unwrap(),
+                address: "0xB9fC157394Af804a3578134A6585C0dc9cc990d4"
+                    .parse()
+                    .unwrap(),
                 default_variant: CurveVariant::StableSwapV2,
                 deploy_events: vec![
                     (DeployEvent::PlainPoolDeployed, CurveVariant::StableSwapV2),
@@ -118,11 +134,11 @@ fn ethereum_config() -> ChainConfig {
                 ],
             },
             Factory {
-                address: "0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d".parse().unwrap(),
+                address: "0x4F8846Ae9380B90d2E71D5e3D042dff3E7ebb40d"
+                    .parse()
+                    .unwrap(),
                 default_variant: CurveVariant::StableSwapV2,
-                deploy_events: vec![
-                    (DeployEvent::PlainPoolDeployed, CurveVariant::StableSwapV2),
-                ],
+                deploy_events: vec![(DeployEvent::PlainPoolDeployed, CurveVariant::StableSwapV2)],
             },
         ],
         math_to_variant,
@@ -143,8 +159,12 @@ mod tests {
     #[test]
     fn ethereum_math_lookup() {
         let config = factories(Chain::Ethereum);
-        let v200: Address = "0x2005995a71243be9FB995DaB4742327dc76564Df".parse().unwrap();
-        let v010: Address = "0x79839c2D74531A8222C0F555865aAc1834e82e51".parse().unwrap();
+        let v200: Address = "0x2005995a71243be9FB995DaB4742327dc76564Df"
+            .parse()
+            .unwrap();
+        let v010: Address = "0x79839c2D74531A8222C0F555865aAc1834e82e51"
+            .parse()
+            .unwrap();
         assert_eq!(config.math_to_variant[&v200], CurveVariant::TwoCryptoNG);
         assert_eq!(config.math_to_variant[&v010], CurveVariant::TwoCryptoStable);
     }

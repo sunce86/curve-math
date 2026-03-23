@@ -82,10 +82,7 @@ pub fn parse_twocrypto_ng_deploy(
 /// # Arguments
 /// * `pool_address` — the deployed pool address
 /// * `coins` — 3-element coin array
-pub fn parse_tricrypto_ng_deploy(
-    pool_address: Address,
-    coins: &[Address; 3],
-) -> PoolInfo {
+pub fn parse_tricrypto_ng_deploy(pool_address: Address, coins: &[Address; 3]) -> PoolInfo {
     PoolInfo {
         address: pool_address,
         variant: CurveVariant::TriCryptoNG,
@@ -101,10 +98,16 @@ mod tests {
 
     #[test]
     fn stableswap_ng_filters_zero_coins() {
-        let pool: Address = "0x1111111111111111111111111111111111111111".parse().unwrap();
+        let pool: Address = "0x1111111111111111111111111111111111111111"
+            .parse()
+            .unwrap();
         let coins = [
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48".parse().unwrap(),
-            "0xdAC17F958D2ee523a2206206994597C13D831ec7".parse().unwrap(),
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+                .parse()
+                .unwrap(),
+            "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+                .parse()
+                .unwrap(),
             Address::ZERO,
             Address::ZERO,
         ];
@@ -115,12 +118,20 @@ mod tests {
 
     #[test]
     fn twocrypto_detects_stable_variant() {
-        let pool: Address = "0x2222222222222222222222222222222222222222".parse().unwrap();
+        let pool: Address = "0x2222222222222222222222222222222222222222"
+            .parse()
+            .unwrap();
         let coins: [Address; 2] = [
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48".parse().unwrap(),
-            "0xdAC17F958D2ee523a2206206994597C13D831ec7".parse().unwrap(),
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+                .parse()
+                .unwrap(),
+            "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+                .parse()
+                .unwrap(),
         ];
-        let math_stable: Address = "0x79839c2D74531A8222C0F555865aAc1834e82e51".parse().unwrap();
+        let math_stable: Address = "0x79839c2D74531A8222C0F555865aAc1834e82e51"
+            .parse()
+            .unwrap();
 
         let info = parse_twocrypto_ng_deploy(pool, &coins, math_stable, |addr| {
             if addr == math_stable {

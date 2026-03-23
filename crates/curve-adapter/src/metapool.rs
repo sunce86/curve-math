@@ -19,16 +19,34 @@ pub fn resolve_base_pool_lp_token(chain: Chain, base_pool: Address) -> Address {
 fn resolve_ethereum(base_pool: Address) -> Address {
     match base_pool {
         // 3pool → 3CRV
-        addr if addr == "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7".parse::<Address>().unwrap() => {
-            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490".parse().unwrap()
+        addr if addr
+            == "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"
+                .parse::<Address>()
+                .unwrap() =>
+        {
+            "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+                .parse()
+                .unwrap()
         }
         // FRAX/USDC → crvFRAX
-        addr if addr == "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2".parse::<Address>().unwrap() => {
-            "0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC".parse().unwrap()
+        addr if addr
+            == "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
+                .parse::<Address>()
+                .unwrap() =>
+        {
+            "0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC"
+                .parse()
+                .unwrap()
         }
         // renBTC/wBTC/sBTC → crvRenWSBTC
-        addr if addr == "0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714".parse::<Address>().unwrap() => {
-            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3".parse().unwrap()
+        addr if addr
+            == "0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714"
+                .parse::<Address>()
+                .unwrap() =>
+        {
+            "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+                .parse()
+                .unwrap()
         }
         // NG pools are their own LP token — base_pool address IS the LP token
         _ => base_pool,
@@ -41,15 +59,21 @@ mod tests {
 
     #[test]
     fn three_pool_lp_token() {
-        let base: Address = "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7".parse().unwrap();
+        let base: Address = "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"
+            .parse()
+            .unwrap();
         let lp = resolve_base_pool_lp_token(Chain::Ethereum, base);
-        let expected: Address = "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490".parse().unwrap();
+        let expected: Address = "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+            .parse()
+            .unwrap();
         assert_eq!(lp, expected);
     }
 
     #[test]
     fn ng_pool_is_own_lp_token() {
-        let ng_pool: Address = "0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d".parse().unwrap();
+        let ng_pool: Address = "0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d"
+            .parse()
+            .unwrap();
         let lp = resolve_base_pool_lp_token(Chain::Ethereum, ng_pool);
         assert_eq!(lp, ng_pool); // fallback: pool == LP token
     }

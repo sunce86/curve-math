@@ -27,22 +27,24 @@
 //! let reqs = state_requirements(CurveVariant::TwoCryptoNG);
 //! ```
 
-mod variant;
-mod factories;
 mod discovery;
+mod factories;
 mod legacy;
 mod metapool;
 mod state;
+mod variant;
 
 #[cfg(feature = "build")]
 mod build;
 
-pub use variant::CurveVariant;
-pub use factories::{Chain, ChainConfig, DeployEvent, Factory, factories};
-pub use discovery::{PoolInfo, parse_stableswap_ng_deploy, parse_twocrypto_ng_deploy, parse_tricrypto_ng_deploy};
-pub use legacy::{LegacyPool, legacy_pools};
+pub use discovery::{
+    parse_stableswap_ng_deploy, parse_tricrypto_ng_deploy, parse_twocrypto_ng_deploy, PoolInfo,
+};
+pub use factories::{factories, Chain, ChainConfig, DeployEvent, Factory};
+pub use legacy::{legacy_pools, LegacyPool};
 pub use metapool::resolve_base_pool_lp_token;
-pub use state::{StateRequirements, UpdateFrequency, state_requirements};
+pub use state::{state_requirements, StateRequirements, UpdateFrequency};
+pub use variant::CurveVariant;
 
 #[cfg(feature = "build")]
-pub use build::{BuildError, RawPoolState, build_pool, interpolate_a};
+pub use build::{build_pool, interpolate_a, BuildError, RawPoolState};

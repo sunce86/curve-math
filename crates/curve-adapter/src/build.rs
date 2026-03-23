@@ -51,21 +51,14 @@ pub enum BuildError {
         decimals_len: usize,
     },
     /// Token decimals exceed the maximum (18 for CryptoSwap, 36 for StableSwap).
-    DecimalsTooLarge {
-        index: usize,
-        decimals: u8,
-        max: u8,
-    },
+    DecimalsTooLarge { index: usize, decimals: u8, max: u8 },
     /// Dynamic rates length doesn't match balances length.
     DynamicRatesMismatch {
         balances_len: usize,
         rates_len: usize,
     },
     /// Price scale has wrong number of elements.
-    PriceScaleWrongLen {
-        expected: usize,
-        actual: usize,
-    },
+    PriceScaleWrongLen { expected: usize, actual: usize },
     /// StableSwapMeta requires `dynamic_rates` with an explicit rate for
     /// the base pool LP token (last coin). Without it, rates[N-1] defaults
     /// to `10^(36-decimals)` which is incorrect — it must be
@@ -109,10 +102,9 @@ impl std::fmt::Display for BuildError {
                 f,
                 "dynamic_rates length ({rates_len}) != balances length ({balances_len})"
             ),
-            Self::PriceScaleWrongLen { expected, actual } => write!(
-                f,
-                "price_scale: expected {expected} elements, got {actual}"
-            ),
+            Self::PriceScaleWrongLen { expected, actual } => {
+                write!(f, "price_scale: expected {expected} elements, got {actual}")
+            }
             Self::MetaMissingVirtualPrice => write!(
                 f,
                 "StableSwapMeta: dynamic_rates must provide an explicit rate for the last coin \
@@ -176,7 +168,6 @@ pub struct RawPoolState {
     pub amp: U256,
 
     // ── Fees ──────────────────────────────────────────────────────────────
-
     /// StableSwap fee (V0/V1/V2/Meta/NG/ALend). Required for all StableSwap variants.
     pub fee: Option<U256>,
 
@@ -193,7 +184,6 @@ pub struct RawPoolState {
     pub offpeg_fee_multiplier: Option<U256>,
 
     // ── CryptoSwap specific ──────────────────────────────────────────────
-
     /// Price scale(s). TwoCrypto: 1 element, TriCrypto: 2 elements.
     /// Required for all CryptoSwap variants.
     pub price_scale: Option<Vec<U256>>,
@@ -206,7 +196,6 @@ pub struct RawPoolState {
     pub gamma: Option<U256>,
 
     // ── Dynamic rates ────────────────────────────────────────────────────
-
     /// Per-token dynamic rates for StableSwap variants.
     ///
     /// If `None`, rates are computed from `token_decimals` as `10^(36 - decimals)`.
@@ -388,11 +377,10 @@ pub fn build_pool(state: &RawPoolState) -> Result<Pool, BuildError> {
         | CurveVariant::StableSwapMeta => build_stableswap_plain(state),
         CurveVariant::StableSwapNG => build_stableswap_ng(state),
         CurveVariant::StableSwapALend => build_stableswap_alend(state),
-        CurveVariant::TwoCryptoV1
-        | CurveVariant::TwoCryptoNG
-        | CurveVariant::TwoCryptoStable => build_twocrypto(state),
-        CurveVariant::TriCryptoV1
-        | CurveVariant::TriCryptoNG => build_tricrypto(state),
+        CurveVariant::TwoCryptoV1 | CurveVariant::TwoCryptoNG | CurveVariant::TwoCryptoStable => {
+            build_twocrypto(state)
+        }
+        CurveVariant::TriCryptoV1 | CurveVariant::TriCryptoNG => build_tricrypto(state),
     }
 }
 
@@ -433,10 +421,30 @@ fn build_stableswap_plain(state: &RawPoolState) -> Result<Pool, BuildError> {
     let amp = state.amp;
 
     Ok(match state.variant {
-        CurveVariant::StableSwapV0 => Pool::StableSwapV0 { balances, rates, amp, fee },
-        CurveVariant::StableSwapV1 => Pool::StableSwapV1 { balances, rates, amp, fee },
-        CurveVariant::StableSwapV2 => Pool::StableSwapV2 { balances, rates, amp, fee },
-        CurveVariant::StableSwapMeta => Pool::StableSwapMeta { balances, rates, amp, fee },
+        CurveVariant::StableSwapV0 => Pool::StableSwapV0 {
+            balances,
+            rates,
+            amp,
+            fee,
+        },
+        CurveVariant::StableSwapV1 => Pool::StableSwapV1 {
+            balances,
+            rates,
+            amp,
+            fee,
+        },
+        CurveVariant::StableSwapV2 => Pool::StableSwapV2 {
+            balances,
+            rates,
+            amp,
+            fee,
+        },
+        CurveVariant::StableSwapMeta => Pool::StableSwapMeta {
+            balances,
+            rates,
+            amp,
+            fee,
+        },
         _ => unreachable!(),
     })
 }
@@ -717,13 +725,7 @@ mod tests {
     fn interpolate_a_ramp_up_quarter() {
         // Ramp from 10000 to 50000 over [0, 1000]. At t=250:
         // 10000 + (50000-10000) * 250 / 1000 = 10000 + 10000 = 20000
-        let result = interpolate_a(
-            U256::from(10_000u64),
-            U256::from(50_000u64),
-            0,
-            1000,
-            250,
-        );
+        let result = interpolate_a(U256::from(10_000u64), U256::from(50_000u64), 0, 1000, 250);
         assert_eq!(result, U256::from(20_000u64));
     }
 
@@ -745,13 +747,7 @@ mod tests {
         // Verify integer division matches Vyper behavior (truncates, not rounds).
         // Ramp from 10000 to 10003 over [0, 1000]. At t=1:
         // 10000 + 3 * 1 / 1000 = 10000 + 0 = 10000 (truncated)
-        let result = interpolate_a(
-            U256::from(10_000u64),
-            U256::from(10_003u64),
-            0,
-            1000,
-            1,
-        );
+        let result = interpolate_a(U256::from(10_000u64), U256::from(10_003u64), 0, 1000, 1);
         assert_eq!(result, U256::from(10_000u64));
     }
 
@@ -819,8 +815,8 @@ mod tests {
             fee: Some(U256::from(4_000_000u64)),
             offpeg_fee_multiplier: Some(U256::from(20_000_000_000u128)),
             dynamic_rates: Some(vec![
-                None,               // computed from decimals
-                Some(oracle_rate),  // oracle rate
+                None,              // computed from decimals
+                Some(oracle_rate), // oracle rate
             ]),
             ..Default::default()
         };
@@ -867,15 +863,15 @@ mod tests {
         let state = RawPoolState {
             variant: CurveVariant::StableSwapMeta,
             balances: vec![
-                U256::from(1_000_000_000u128),                  // GUSD (2 dec)
-                U256::from(1_000_000_000_000_000_000_000u128),  // 3CRV LP
+                U256::from(1_000_000_000u128),                 // GUSD (2 dec)
+                U256::from(1_000_000_000_000_000_000_000u128), // 3CRV LP
             ],
             token_decimals: vec![2, 18],
             amp: U256::from(150_000u64),
             fee: Some(U256::from(4_000_000u64)),
             dynamic_rates: Some(vec![
-                None,                   // 10^(36-2) = 10^34
-                Some(virtual_price),    // virtual_price from base pool
+                None,                // 10^(36-2) = 10^34
+                Some(virtual_price), // virtual_price from base pool
             ]),
             ..Default::default()
         };
@@ -913,7 +909,9 @@ mod tests {
 
         let pool = build_pool(&state).unwrap();
         match &pool {
-            Pool::TwoCryptoNG { precisions, ann, .. } => {
+            Pool::TwoCryptoNG {
+                precisions, ann, ..
+            } => {
                 assert_eq!(precisions[0], U256::from(1u64)); // 10^(18-18)
                 assert_eq!(precisions[1], U256::from(1u64));
                 assert_eq!(*ann, state.amp);
@@ -926,10 +924,7 @@ mod tests {
     fn build_twocrypto_stable_no_gamma() {
         let state = RawPoolState {
             variant: CurveVariant::TwoCryptoStable,
-            balances: vec![
-                U256::from(1_000_000_000u128),
-                U256::from(1_000_000_000u128),
-            ],
+            balances: vec![U256::from(1_000_000_000u128), U256::from(1_000_000_000u128)],
             token_decimals: vec![6, 6],
             amp: U256::from(540_000u64 * 10_000u64),
             mid_fee: Some(U256::from(3_000_000u64)),
@@ -956,9 +951,9 @@ mod tests {
         let state = RawPoolState {
             variant: CurveVariant::TriCryptoNG,
             balances: vec![
-                U256::from(1_000_000_000u128),                  // USDC (6 dec)
-                U256::from(50_000_000u128),                     // WBTC (8 dec)
-                U256::from(500_000_000_000_000_000_000u128),    // WETH (18 dec)
+                U256::from(1_000_000_000u128),               // USDC (6 dec)
+                U256::from(50_000_000u128),                  // WBTC (8 dec)
+                U256::from(500_000_000_000_000_000_000u128), // WETH (18 dec)
             ],
             token_decimals: vec![6, 8, 18],
             amp: U256::from(1_707_629u64 * 10_000u64),
@@ -968,18 +963,22 @@ mod tests {
             d: Some(U256::from(3_000_000_000_000_000_000_000u128)),
             gamma: Some(U256::from(11_809_167_828_997u128)),
             price_scale: Some(vec![
-                U256::from(60_000_000_000_000_000_000_000u128),  // BTC price
-                U256::from(3_000_000_000_000_000_000_000u128),   // ETH price
+                U256::from(60_000_000_000_000_000_000_000u128), // BTC price
+                U256::from(3_000_000_000_000_000_000_000u128),  // ETH price
             ]),
             ..Default::default()
         };
 
         let pool = build_pool(&state).unwrap();
         match &pool {
-            Pool::TriCryptoNG { precisions, price_scale, .. } => {
+            Pool::TriCryptoNG {
+                precisions,
+                price_scale,
+                ..
+            } => {
                 assert_eq!(precisions[0], U256::from(10u64).pow(U256::from(12u64))); // 10^(18-6)
                 assert_eq!(precisions[1], U256::from(10u64).pow(U256::from(10u64))); // 10^(18-8)
-                assert_eq!(precisions[2], U256::from(1u64));                          // 10^(18-18)
+                assert_eq!(precisions[2], U256::from(1u64)); // 10^(18-18)
                 assert_eq!(price_scale.len(), 2);
             }
             _ => panic!("wrong variant"),
@@ -1191,7 +1190,7 @@ mod tests {
         let precs = super::compute_crypto_precisions(&[6, 8, 18]);
         assert_eq!(precs[0], U256::from(10u64).pow(U256::from(12u64))); // USDC
         assert_eq!(precs[1], U256::from(10u64).pow(U256::from(10u64))); // WBTC
-        assert_eq!(precs[2], U256::from(1u64));                          // WETH
+        assert_eq!(precs[2], U256::from(1u64)); // WETH
     }
 
     #[test]
@@ -1217,7 +1216,11 @@ mod tests {
         };
 
         // V0, V1, V2
-        for v in [CurveVariant::StableSwapV0, CurveVariant::StableSwapV1, CurveVariant::StableSwapV2] {
+        for v in [
+            CurveVariant::StableSwapV0,
+            CurveVariant::StableSwapV1,
+            CurveVariant::StableSwapV2,
+        ] {
             assert!(build_pool(&stableswap_base(v)).is_ok(), "failed for {v}");
         }
 
@@ -1305,7 +1308,9 @@ mod tests {
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
-        let dy = pool.get_amount_out(0, 1, u("19198480220822556994")).unwrap();
+        let dy = pool
+            .get_amount_out(0, 1, u("19198480220822556994"))
+            .unwrap();
         assert_eq!(dy, U256::from(19_009_291u64));
     }
 
@@ -1325,7 +1330,9 @@ mod tests {
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
-        let dy = pool.get_amount_out(0, 1, u("451028351772803825801384")).unwrap();
+        let dy = pool
+            .get_amount_out(0, 1, u("451028351772803825801384"))
+            .unwrap();
         assert_eq!(dy, u("450961663745"));
     }
 
@@ -1334,17 +1341,16 @@ mod tests {
         // FRAX/USDC: FRAX(18)/USDC(6), A=1500*100=150000
         let state = RawPoolState {
             variant: CurveVariant::StableSwapV2,
-            balances: vec![
-                u("6722234569994793202271485"),
-                u("714493991383"),
-            ],
+            balances: vec![u("6722234569994793202271485"), u("714493991383")],
             token_decimals: vec![18, 6],
             amp: U256::from(150_000u64),
             fee: Some(U256::from(1_000_000u64)),
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
-        let dy = pool.get_amount_out(0, 1, u("67222345699947932022714")).unwrap();
+        let dy = pool
+            .get_amount_out(0, 1, u("67222345699947932022714"))
+            .unwrap();
         assert_eq!(dy, u("66561674655"));
     }
 
@@ -1365,7 +1371,9 @@ mod tests {
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
-        let dy = pool.get_amount_out(0, 1, u("9689910991629935510773")).unwrap();
+        let dy = pool
+            .get_amount_out(0, 1, u("9689910991629935510773"))
+            .unwrap();
         assert_eq!(dy, u("9686201099"));
     }
 
@@ -1374,10 +1382,7 @@ mod tests {
         // USDe/DAI NG: USDe(18)/DAI(18), A=400*100=40000
         let state = RawPoolState {
             variant: CurveVariant::StableSwapNG,
-            balances: vec![
-                u("124403796536542495997070"),
-                u("95031311223261676260348"),
-            ],
+            balances: vec![u("124403796536542495997070"), u("95031311223261676260348")],
             token_decimals: vec![18, 18],
             amp: U256::from(40_000u64),
             fee: Some(U256::from(4_000_000u64)),
@@ -1389,7 +1394,9 @@ mod tests {
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
-        let dy = pool.get_amount_out(0, 1, u("1244037965365424959970")).unwrap();
+        let dy = pool
+            .get_amount_out(0, 1, u("1244037965365424959970"))
+            .unwrap();
         assert_eq!(dy, u("1242635841481792448583"));
     }
 
@@ -1398,15 +1405,12 @@ mod tests {
         // GUSD/3CRV: GUSD(2)/3CRV(18), A=1000*100=100000, virtual_price from 3pool
         let state = RawPoolState {
             variant: CurveVariant::StableSwapMeta,
-            balances: vec![
-                u("59814423"),
-                u("1210422553896217308280639"),
-            ],
+            balances: vec![u("59814423"), u("1210422553896217308280639")],
             token_decimals: vec![2, 18],
             amp: U256::from(100_000u64),
             fee: Some(U256::from(4_000_000u64)),
             dynamic_rates: Some(vec![
-                None, // coin 0: 10^(36-2) = 10^34
+                None,                           // coin 0: 10^(36-2) = 10^34
                 Some(u("1039823717145796146")), // virtual_price
             ]),
             ..Default::default()
@@ -1421,10 +1425,7 @@ mod tests {
         // CRV/ETH: CRV(18)/WETH(18)
         let state = RawPoolState {
             variant: CurveVariant::TwoCryptoV1,
-            balances: vec![
-                u("33389428640766852909"),
-                u("1538654846121127403001612563"),
-            ],
+            balances: vec![u("33389428640766852909"), u("1538654846121127403001612563")],
             token_decimals: vec![18, 18],
             amp: U256::from(400_000u64),
             d: Some(u("3338917956478824050009")),
@@ -1445,10 +1446,7 @@ mod tests {
         // crvUSD/FXN: crvUSD(18)/FXN(18)
         let state = RawPoolState {
             variant: CurveVariant::TwoCryptoNG,
-            balances: vec![
-                u("575304877931995002539"),
-                u("1286854862507061937737"),
-            ],
+            balances: vec![u("575304877931995002539"), u("1286854862507061937737")],
             token_decimals: vec![18, 18],
             amp: U256::from(400_000u64),
             d: Some(u("1309807915207365083258")),
@@ -1483,7 +1481,9 @@ mod tests {
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
-        let dy = pool.get_amount_out(0, 1, u("170877557830419292821854")).unwrap();
+        let dy = pool
+            .get_amount_out(0, 1, u("170877557830419292821854"))
+            .unwrap();
         assert_eq!(dy, u("77522288630419592645"));
     }
 

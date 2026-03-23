@@ -68,10 +68,6 @@ impl CurveVariant {
                 | Self::TriCryptoNG
         )
     }
-
-
-
-
 }
 
 impl std::fmt::Display for CurveVariant {
