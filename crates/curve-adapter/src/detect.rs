@@ -169,7 +169,11 @@ fn detect_stableswap(chain: Chain, probing: &ProbingResults) -> CurveVariant {
 // ── Known address sets ───────────────────────────────────────────────────────
 //
 // These pools cannot be reliably distinguished on-chain and require
-// address-based lookup. Sourced from curve-contract/contracts/pools/.
+// address-based lookup. These are COMPLETE lists — no new pools of these
+// types can be created because no factory exists for them. All pre-factory
+// pools are deployed manually and the set is fixed.
+//
+// Verified against legacy_ethereum.toml: V0=8, V1=2, TriCryptoV1=2.
 
 fn is_known_tricrypto_v1(_chain: Chain, addr: Address) -> bool {
     let addr_lower = format!("{:?}", addr).to_lowercase();
