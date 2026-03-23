@@ -64,3 +64,57 @@ impl std::fmt::Display for CurveVariant {
         f.write_str(self.as_str())
     }
 }
+
+impl std::str::FromStr for CurveVariant {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "StableSwapV0" => Ok(Self::StableSwapV0),
+            "StableSwapV1" => Ok(Self::StableSwapV1),
+            "StableSwapV2" => Ok(Self::StableSwapV2),
+            "StableSwapALend" => Ok(Self::StableSwapALend),
+            "StableSwapNG" => Ok(Self::StableSwapNG),
+            "StableSwapMeta" => Ok(Self::StableSwapMeta),
+            "TwoCryptoV1" => Ok(Self::TwoCryptoV1),
+            "TwoCryptoNG" => Ok(Self::TwoCryptoNG),
+            "TwoCryptoStable" => Ok(Self::TwoCryptoStable),
+            "TriCryptoV1" => Ok(Self::TriCryptoV1),
+            "TriCryptoNG" => Ok(Self::TriCryptoNG),
+            _ => Err(format!("unknown CurveVariant: {s}")),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_str_roundtrip() {
+        let variants = [
+            CurveVariant::StableSwapV0,
+            CurveVariant::StableSwapV1,
+            CurveVariant::StableSwapV2,
+            CurveVariant::StableSwapALend,
+            CurveVariant::StableSwapNG,
+            CurveVariant::StableSwapMeta,
+            CurveVariant::TwoCryptoV1,
+            CurveVariant::TwoCryptoNG,
+            CurveVariant::TwoCryptoStable,
+            CurveVariant::TriCryptoV1,
+            CurveVariant::TriCryptoNG,
+        ];
+        for v in variants {
+            let s = v.as_str();
+            let parsed: CurveVariant = s.parse().unwrap();
+            assert_eq!(parsed, v);
+        }
+    }
+
+    #[test]
+    fn from_str_unknown() {
+        let result: Result<CurveVariant, _> = "FooBar".parse();
+        assert!(result.is_err());
+    }
+}
