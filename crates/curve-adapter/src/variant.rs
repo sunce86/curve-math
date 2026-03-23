@@ -57,18 +57,6 @@ impl CurveVariant {
             Self::TriCryptoNG => "TriCryptoNG",
         }
     }
-
-    /// Whether this variant uses CryptoSwap math (price_scale, D, gamma).
-    pub fn is_cryptoswap(&self) -> bool {
-        matches!(
-            self,
-            Self::TwoCryptoV1
-                | Self::TwoCryptoNG
-                | Self::TwoCryptoStable
-                | Self::TriCryptoV1
-                | Self::TriCryptoNG
-        )
-    }
 }
 
 impl std::fmt::Display for CurveVariant {
