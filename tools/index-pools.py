@@ -49,7 +49,7 @@ FACTORIES = {
         # ── Legacy factories ────────────────────────────────────────────
         {
             "address": "0xB9fC157394Af804a3578134A6585C0dc9cc990d4",
-            "variant": "auto",
+            "variant": "meta_factory",
             "label": "MetaPool Factory (legacy)",
         },
         {
@@ -67,7 +67,7 @@ FACTORIES = {
 
 # ── Minimal ABIs ─────────────────────────────────────────────────────────────
 
-FACTORY_ABI = json.loads('[{"name":"pool_count","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"pool_list","outputs":[{"type":"address"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}]')
+FACTORY_ABI = json.loads('[{"name":"pool_count","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"pool_list","outputs":[{"type":"address"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"is_meta","outputs":[{"type":"bool"}],"inputs":[{"type":"address"}],"stateMutability":"view","type":"function"},{"name":"get_base_pool","outputs":[{"type":"address"}],"inputs":[{"type":"address"}],"stateMutability":"view","type":"function"}]')
 
 POOL_ABI = json.loads('[{"name":"coins","outputs":[{"type":"address"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"balances","outputs":[{"type":"uint256"}],"inputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},{"name":"A","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"},{"name":"fee","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 
@@ -295,6 +295,17 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
             math_ver = math_versions.get(addr, "v2.0.0")
             if math_ver == "v0.1.0":
                 variant = "TwoCryptoStable"
+        # MetaPool Factory: ask factory is_meta() to distinguish meta vs plain
+        elif variant == "meta_factory":
+            try:
+                fc = w3.eth.contract(
+                    address=Web3.to_checksum_address(factory_cfg["address"]),
+                    abi=FACTORY_ABI,
+                )
+                is_meta = fc.functions.is_meta(Web3.to_checksum_address(addr)).call(block_identifier=block)
+                variant = "StableSwapMeta" if is_meta else "StableSwapV2"
+            except Exception:
+                variant = detect_variant_onchain(w3, addr, block)
         # Auto-detect variant by probing on-chain functions
         elif variant == "auto":
             variant = detect_variant_onchain(w3, addr, block)
