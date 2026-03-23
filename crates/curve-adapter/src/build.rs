@@ -126,8 +126,19 @@ pub struct RawPoolState {
     /// Which Curve variant this pool is.
     pub variant: CurveVariant,
 
-    /// Token balances in native token units (wei).
+    /// Token balances in native token units (wei). **Updates every block.**
+    ///
     /// Length determines coin count (2, 3, or 4+).
+    ///
+    /// # Gotchas
+    ///
+    /// **StableSwapNG:** `balances(i)` on-chain returns `balanceOf(pool) - admin_balances[i]`,
+    /// excluding uncollected admin fees. An indexer tracking ERC20 Transfer events sees
+    /// `balanceOf` changes, not `balances()`. The difference is small but causes wei-level
+    /// mismatches. Use the `balances()` getter, not `balanceOf`.
+    ///
+    /// **Rebase tokens (e.g. stETH):** balances change without Transfer events — the token
+    /// rebases in-place. Requires calling `balanceOf(pool)` on the rebase token each block.
     pub balances: Vec<U256>,
 
     /// Token decimals for each coin (e.g. `[18, 6]` for ETH/USDC).
@@ -135,6 +146,7 @@ pub struct RawPoolState {
     pub token_decimals: Vec<u8>,
 
     /// Amplification parameter — already interpolated for the target block.
+    /// **Semi-static:** only changes during A ramping (rare admin events, days apart).
     ///
     /// This value must match what the on-chain `_A()` internal function returns
     /// at the target block's timestamp. It includes the variant's precision
@@ -149,9 +161,15 @@ pub struct RawPoolState {
     /// ```text
     /// let amp = pool_contract.A().block(block_number).call().await?;
     /// ```
-    /// Note: for V2+ StableSwap, `A()` returns `initial_A / A_PRECISION`,
-    /// losing the remainder. For exact precision, read `initial_A()` +
-    /// `future_A()` + timestamps and use [`interpolate_a`] instead.
+    /// **Warning:** for V2+ StableSwap, `A()` returns `initial_A / A_PRECISION`
+    /// via integer division, losing the remainder:
+    /// ```text
+    /// initial_A = 79258
+    /// A() = 79258 / 100 = 792      (truncated)
+    /// A() * 100 = 79200 ≠ 79258    (lost 58)
+    /// ```
+    /// For exact precision, read `initial_A()` + `future_A()` + timestamps
+    /// and use [`interpolate_a`] instead.
     ///
     /// **Substreams / storage-based consumer:**
     /// Read `initial_A`, `future_A`, `initial_A_time`, `future_A_time` from
@@ -168,30 +186,32 @@ pub struct RawPoolState {
     pub amp: U256,
 
     // ── Fees ──────────────────────────────────────────────────────────────
-    /// StableSwap fee (V0/V1/V2/Meta/NG/ALend). Required for all StableSwap variants.
+    /// StableSwap fee. **Static** (set at pool creation).
+    /// Required for all StableSwap variants.
     pub fee: Option<U256>,
 
-    /// CryptoSwap mid fee. Required for all CryptoSwap variants.
+    /// CryptoSwap mid fee. **Static.** Required for all CryptoSwap variants.
     pub mid_fee: Option<U256>,
 
-    /// CryptoSwap out fee. Required for all CryptoSwap variants.
+    /// CryptoSwap out fee. **Static.** Required for all CryptoSwap variants.
     pub out_fee: Option<U256>,
 
-    /// CryptoSwap fee gamma. Required for all CryptoSwap variants.
+    /// CryptoSwap fee gamma. **Static.** Required for all CryptoSwap variants.
     pub fee_gamma: Option<U256>,
 
-    /// Dynamic fee multiplier. Required for StableSwapNG and StableSwapALend.
+    /// Dynamic fee multiplier. **Static.** Required for StableSwapNG and StableSwapALend.
     pub offpeg_fee_multiplier: Option<U256>,
 
-    // ── CryptoSwap specific ──────────────────────────────────────────────
-    /// Price scale(s). TwoCrypto: 1 element, TriCrypto: 2 elements.
+    /// Price scale(s). **Updates every block.**
+    /// TwoCrypto: 1 element, TriCrypto: 2 elements.
     /// Required for all CryptoSwap variants.
     pub price_scale: Option<Vec<U256>>,
 
-    /// Pool invariant D. Required for all CryptoSwap variants.
+    /// Pool invariant D. **Updates every block.** Required for all CryptoSwap variants.
     pub d: Option<U256>,
 
-    /// Gamma parameter. Required for TwoCryptoV1, TwoCryptoNG, TriCryptoV1, TriCryptoNG.
+    /// Gamma parameter. **Semi-static** (only changes during admin ramp).
+    /// Required for TwoCryptoV1, TwoCryptoNG, TriCryptoV1, TriCryptoNG.
     /// NOT required for TwoCryptoStable (gamma is ignored).
     pub gamma: Option<U256>,
 

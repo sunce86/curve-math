@@ -10,11 +10,8 @@
 //! - [`detect`] — `detect_variant(probing_results) → CurveVariant`. Probe a pool's
 //!   on-chain functions (gamma, offpeg, MATH version, etc.) and classify it.
 //!
-//! **Supporting data (you need these to populate `RawPoolState`):**
+//! **Supporting:**
 //! - [`variant`] — `CurveVariant` enum: which of the 11 pool types is this?
-//! - [`state`] — what on-chain fields does each variant need, and how often do they change?
-//! - [`factories`] — factory contract addresses per chain, MATH→variant lookup
-//! - [`metapool`] — resolve base pool address → LP token address
 //!
 //! # Quick start
 //!
@@ -37,18 +34,12 @@
 //! ```
 
 mod detect;
-mod factories;
-mod metapool;
-mod state;
 mod variant;
 
 #[cfg(feature = "build")]
 mod build;
 
 pub use detect::{detect_variant, DetectError, ProbingResults};
-pub use factories::{factories, Chain, ChainConfig, DeployEvent, Factory};
-pub use metapool::resolve_base_pool_lp_token;
-pub use state::{state_requirements, StateRequirements, UpdateFrequency};
 pub use variant::CurveVariant;
 
 #[cfg(feature = "build")]
