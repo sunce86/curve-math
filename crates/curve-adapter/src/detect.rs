@@ -92,8 +92,7 @@ impl std::error::Error for DetectError {}
 /// Detect pool variant from probing results.
 ///
 /// This is a pure function — no RPC calls. The consumer probes the pool
-/// and passes results. The decision tree matches `detect_variant.py` from
-/// curve-math.
+/// and passes results.
 ///
 /// # Errors
 ///
