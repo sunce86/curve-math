@@ -4,8 +4,8 @@ Curve pool indexer — discovers pools from on-chain factories, verifies with fu
 
 Usage:
     pip install web3 toml
-    python tools/index-pools.py --chain-id 1 --min-tvl 5000000 --max-new 10
-    python tools/index-pools.py --chain-id 1 --min-tvl 5000000 --dry-run
+    python tools/index-pools.py --chain-id 1 --max-new 20
+    python tools/index-pools.py --chain-id 1 --max-new 20 --dry-run
 """
 
 import argparse
@@ -183,7 +183,7 @@ def detect_variant_onchain(w3, addr, block):
     return "StableSwapV2"
 
 
-def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
+def discover_pools(w3, factory_cfg, existing_addrs, max_new, block):
     """Discover new pools from a factory contract."""
     factory = w3.eth.contract(
         address=Web3.to_checksum_address(factory_cfg["address"]),
@@ -345,7 +345,7 @@ def discover_pools(w3, factory_cfg, existing_addrs, min_tvl, max_new, block):
             variant = detect_variant_onchain(w3, addr, block)
 
         name = "/".join(symbols)
-        print(f"    {addr} {name} ({len(coins)}-coin, ~${tvl:,}, {variant})")
+        print(f"    {addr} {name} ({len(coins)}-coin, {variant})")
         candidates.append({
             "address": addr,
             "variant": variant,
@@ -391,8 +391,7 @@ def verify_pool_quick(w3, pool_entry, block) -> tuple[bool, str]:
 def main():
     parser = argparse.ArgumentParser(description="Curve pool indexer")
     parser.add_argument("--chain-id", type=int, default=1)
-    parser.add_argument("--min-tvl", type=int, default=1_000_000, help="Minimum TVL in USD (rough estimate)")
-    parser.add_argument("--max-new", type=int, default=10, help="Max new pools to analyze per run")
+    parser.add_argument("--max-new", type=int, default=20, help="Max new pools to add per run")
     parser.add_argument("--dry-run", action="store_true", help="Don't write registry file")
     args = parser.parse_args()
 
@@ -417,13 +416,13 @@ def main():
         remaining = args.max_new - len(all_candidates)
         if remaining <= 0:
             break
-        candidates = discover_pools(w3, factory, existing, args.min_tvl, remaining, block)
+        candidates = discover_pools(w3, factory, existing, remaining, block)
         all_candidates.extend(candidates)
         # Count total pools in factory
         fc = w3.eth.contract(address=Web3.to_checksum_address(factory["address"]), abi=FACTORY_ABI)
         total_factory_pools += fc.functions.pool_count().call(block_identifier=block)
 
-    print(f"\n{len(all_candidates)} new candidates above ${args.min_tvl:,} TVL")
+    print(f"\n{len(all_candidates)} new live candidates")
 
     if not all_candidates:
         print("No new pools to add.")
