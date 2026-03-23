@@ -79,6 +79,12 @@ FACTORIES = {
             "variant": "TriCryptoNG",
             "label": "TriCrypto-NG",
         },
+        # ── Legacy factories ──────────────────────────────────────────
+        {
+            "address": "0x5EF72230578b3e399E6C6F4F6360edF95e83BBfd",
+            "variant": "TwoCryptoV1",
+            "label": "CryptoSwap Factory (legacy)",
+        },
     ],
 }
 
