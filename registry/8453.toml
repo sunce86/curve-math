@@ -6,7 +6,7 @@
 # against on-chain get_dy with random swap amounts.
 
 last_updated = "2026-03-23"
-total_factory_pools = 676
+total_factory_pools = 347
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
@@ -56,4 +56,54 @@ name = "PUSSY/PUSSY"
 address = "0x02b97435458f1d7E159c0b4c2890E21ea6d65cFF"
 variant = "StableSwapNG"
 name = "PUSSY/PUSSY"
+
+[[pools]]
+address = "0x82811A248ccf4F84bDeA3DAAEC1Bf2d77BEee72B"
+variant = "StableSwapNG"
+name = "cbETH18/ETH9"
+
+[[pools]]
+address = "0xe0bae796de3d502Da63915a8920b1aE09D254f9b"
+variant = "StableSwapNG"
+name = "cbETH/cbETH18/ETH9"
+
+[[pools]]
+address = "0x8177AEcEea79097F1BB38866d6f3c90E9B73026f"
+variant = "StableSwapNG"
+name = "USDA+/USDC"
+
+[[pools]]
+address = "0xD91dcc4F4574e7C2B56dd569b55102fA8a1a6440"
+variant = "StableSwapNG"
+name = "USDC/AZND"
+
+[[pools]]
+address = "0xfac15A759d0F887Bc7F5ab874491258CF6EC8acE"
+variant = "StableSwapNG"
+name = "cbBTC/tBTC/WBTC"
+
+[[pools]]
+address = "0x7a0c3371F288Ae50880c9F0aa919DCe85DEedfBA"
+variant = "StableSwapNG"
+name = "NTL/USDT"
+
+[[pools]]
+address = "0x8bb3d81Aabb1361Bf639bB07c53abe1C7fE53f2D"
+variant = "StableSwapNG"
+name = "frxUSD/USDC"
+
+[[pools]]
+address = "0x01C2c9f2C271ECEF81287B44FA6F813a1605F5Eb"
+variant = "StableSwapNG"
+name = "USDC_T/USD_T1/USD_T2"
+
+[[pools]]
+address = "0xe709c9E5A97DF61F7eEcb57aCf59306DC9450fAf"
+variant = "StableSwapNG"
+name = "USDC_T/USD_T1"
+
+[[pools]]
+address = "0x915DCef92Cf0c5fba056b57a7B6cEd217378ACB7"
+variant = "StableSwapNG"
+name = "USDC/GHO/USDS/crvUSD/USDbC/aBasUSDC/aBasUSDbC/aBasGHO"
 
