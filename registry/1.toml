@@ -1468,3 +1468,103 @@ address = "0xbB8538B6c15D38De610F831C89FbA33BdEf854cD"
 variant = "StableSwapNG"
 name = "WBSPANK-gauge/CSPANK-gauge/UUG-gauge/USDC"
 
+[[pools]]
+address = "0x138f59A485A058d4FC449CEA7a3A080F9Af467F1"
+variant = "StableSwapNG"
+name = "USDC/liUSD-8w"
+
+[[pools]]
+address = "0x46f27BD3eC8f8D602F7ce85D312F4387FBdA7b16"
+variant = "StableSwapNG"
+name = "USDC/liUSD-1w"
+
+[[pools]]
+address = "0x16cAEDAD77253Fd1020f423bb7B9712a7592Ed7B"
+variant = "StableSwapNG"
+name = "pBTC/pBTC/WBTC/eBTC"
+
+[[pools]]
+address = "0xb1461B2E4C0F48DcEB1198E42A6Da2faA6a861C5"
+variant = "StableSwapNG"
+name = "pBTC/pBTC"
+
+[[pools]]
+address = "0x95591348FE9718bE8bfa3afcC9b017D9Ec18A7fa"
+variant = "StableSwapNG"
+name = "USDaf/crv2pool"
+
+[[pools]]
+address = "0x6d92b33e7E1CadAE729488404E15e58305CaE98c"
+variant = "StableSwapNG"
+name = "WUSDN/crvUSD"
+
+[[pools]]
+address = "0x675EfEBFcf76D569c56F6021b12e9418932a602f"
+variant = "StableSwapNG"
+name = "USDT/USDC/USDT/USDT"
+
+[[pools]]
+address = "0x0AD87033C94be2421D39a9d6E1ca6d7d5663Ce01"
+variant = "StableSwapNG"
+name = "BABY/eBABY"
+
+[[pools]]
+address = "0xd89760b5b188D77dA878Ab09fF475569883A5B96"
+variant = "StableSwapNG"
+name = "slvlUSD/lvlUSD"
+
+[[pools]]
+address = "0x6A0c68Bc96658A2B97201d94986Bf7753000f2cF"
+variant = "StableSwapNG"
+name = "USDC/jUSD"
+
+[[pools]]
+address = "0xFfF8634dE89271b6075C55FA89B4E9A087Fdb9FE"
+variant = "StableSwapNG"
+name = "tacBTC/cbBTC/FBTC"
+
+[[pools]]
+address = "0x51F5466690978173f45270f57e06e25b0c888261"
+variant = "StableSwapNG"
+name = "USDT/tacUSD"
+
+[[pools]]
+address = "0x4cB813861d34eD66B6D9Aa83712919db01a36521"
+variant = "StableSwapNG"
+name = "yUSD/sDOLA"
+
+[[pools]]
+address = "0x4E32d84b25E56df669a978db635B9Acf1312Bb29"
+variant = "StableSwapNG"
+name = "yUSD/USR"
+
+[[pools]]
+address = "0x81301848168bAe6Add206aA50052E247Cb366d3A"
+variant = "StableSwapNG"
+name = "yUSD/USDC"
+
+[[pools]]
+address = "0x2F190Bfb187B177E4B5CCe1936Fe8650D4B91E21"
+variant = "StableSwapNG"
+name = "YFI/dYFI/SPANK"
+
+[[pools]]
+address = "0xc73B0328Bd40Ea35Aad34d0fDC1dBE64C4f9c59F"
+variant = "StableSwapNG"
+name = "WETH/tacETH"
+
+[[pools]]
+address = "0x0Acfc0D9afdD8E794Eb1C3E3C675c89664fC0f1E"
+variant = "StableSwapNG"
+name = "GRD/USDT"
+
+[[pools]]
+address = "0x91C4884Fa0E2b51637a3368e8eca372DeeEBE1D2"
+variant = "StableSwapNG"
+name = "WBTC/SPANK"
+
+[[pools]]
+address = "0x182f23b4E9BA5cA858ab49E14cF5493C7F039e93"
+variant = "StableSwapNG"
+name = "pBTC/SPANK"
+
