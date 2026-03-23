@@ -1568,3 +1568,103 @@ address = "0x182f23b4E9BA5cA858ab49E14cF5493C7F039e93"
 variant = "StableSwapNG"
 name = "pBTC/SPANK"
 
+[[pools]]
+address = "0xD3c93BC3C4735558365b21106DE425c87545047e"
+variant = "StableSwapNG"
+name = "WETH/SPANK"
+
+[[pools]]
+address = "0x07558Dc7df9A162C0a74db6aAe4e110D8EB7FA2f"
+variant = "StableSwapNG"
+name = "crvUSD/USDC/SPANK"
+
+[[pools]]
+address = "0x81f17E97B1Cea46301fe6728D5619e9Db2e7FB2c"
+variant = "StableSwapNG"
+name = "crvUSD/USDT"
+
+[[pools]]
+address = "0x712C6EFCDB10024997191A7020e783Cd3b8D48eb"
+variant = "StableSwapNG"
+name = "USDR/USDT"
+
+[[pools]]
+address = "0x7B707fE05B490b5F334432e345f1c23c72d3f464"
+variant = "StableSwapNG"
+name = "crvUSD/QUINTA/GTEC/GRD"
+
+[[pools]]
+address = "0x2ac53aC4d9Cf45E108383fE47fFD9513942d4ceb"
+variant = "StableSwapNG"
+name = "USDT/USDC/NIGGER"
+
+[[pools]]
+address = "0x08603801aa981b0F6b5cfbc645D1CBb5b4a090e6"
+variant = "StableSwapNG"
+name = "yUSD/xUSD"
+
+[[pools]]
+address = "0xD552716F3BBA4224a19D7eB37A31650d7Ae10144"
+variant = "StableSwapNG"
+name = "yUSD/USR"
+
+[[pools]]
+address = "0xC48A38499A90E3b883c509ca08eC1b540CDF15EE"
+variant = "StableSwapNG"
+name = "XAUt/PAXG"
+
+[[pools]]
+address = "0x7d10A8734d985dBB3aD91Fce9c48CcC78b9F8B94"
+variant = "StableSwapNG"
+name = "DOLA/crv2pool"
+
+[[pools]]
+address = "0x72310DAAed61321b02B08A547150c07522c6a976"
+variant = "StableSwapNG"
+name = "USDC/USDf"
+
+[[pools]]
+address = "0xB5b93dde9D87563184d31F3b7f85dd58404E2ee0"
+variant = "StableSwapNG"
+name = "msETH/OETH"
+
+[[pools]]
+address = "0x8005516831b4DC21aCdc34d5a413F189FC850948"
+variant = "StableSwapNG"
+name = "rsTAO/wTAO"
+
+[[pools]]
+address = "0xE97b3271F812ff43522312705dbe58C8C6077B5f"
+variant = "StableSwapNG"
+name = "USDA/USDC"
+
+[[pools]]
+address = "0x5B03CcCAb7BA3010fA5CAd23746cbf0794938e96"
+variant = "StableSwapNG"
+name = "USDT/USDe"
+
+[[pools]]
+address = "0xeB83B63B9F943A2fE15A72Dfac1a9e35858884D4"
+variant = "StableSwapNG"
+name = "ROME/USDT"
+
+[[pools]]
+address = "0xd3bcD417AeE942fd4611b8fe6FFCa500019045Cf"
+variant = "StableSwapNG"
+name = "mUSD/USDT"
+
+[[pools]]
+address = "0x8Dc3c6e22Cd5baAA5e6B9cF2E3083Cf1C41b4523"
+variant = "StableSwapNG"
+name = "wM/Bold"
+
+[[pools]]
+address = "0x9353976A6B6E7A9e1E9B1F2aaaBA629aD310947f"
+variant = "StableSwapNG"
+name = "yUSD/sDOLA"
+
+[[pools]]
+address = "0xCF908d925b21594f9a92b264167A85B0649051a8"
+variant = "StableSwapNG"
+name = "YUSD/USDT"
+
