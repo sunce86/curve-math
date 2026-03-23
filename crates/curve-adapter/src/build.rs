@@ -220,7 +220,7 @@ pub struct RawPoolState {
     pub gamma: Option<U256>,
 
     // ── Dynamic rates ────────────────────────────────────────────────────
-    /// Per-token dynamic rates for StableSwap variants.
+    /// Per-token dynamic rates for StableSwap variants. **Depends on token type.**
     ///
     /// If `None`, rates are computed from `token_decimals` as `10^(36 - decimals)`.
     ///
@@ -228,7 +228,23 @@ pub struct RawPoolState {
     /// - `Some(rate)` — use this dynamic rate (oracle, ERC4626, etc.)
     /// - `None` — compute from decimals as `10^(36 - decimals)`
     ///
-    /// For MetaPools: `rates[1]` must be set to `base_pool.get_virtual_price()`.
+    /// # When to provide dynamic rates
+    ///
+    /// **StableSwapNG with oracle tokens:** Call `stored_rates()` on the pool
+    /// contract each block. Plain tokens return static rates, but ERC4626/oracle
+    /// tokens return rates that change per-block.
+    ///
+    /// **MetaPools:** `rates[last]` must be `base_pool.get_virtual_price()`.
+    ///
+    /// # Gotchas
+    ///
+    /// **Fee-on-transfer tokens:** actual received amount differs from the
+    /// transfer parameter. Curve pools generally do not support these tokens,
+    /// but if encountered, balances will be incorrect.
+    ///
+    /// **Tokens with 0 decimals:** rate becomes `10^36` — valid but rounding
+    /// impact is outsized. Every wei of such a token is worth `10^36` in
+    /// normalized space.
     pub dynamic_rates: Option<Vec<Option<U256>>>,
 }
 
