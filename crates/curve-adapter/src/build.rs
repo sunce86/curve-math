@@ -183,6 +183,11 @@ pub struct RawPoolState {
     /// ```
     /// For V0/V1 pools that store a single `A` value (no ramping),
     /// pass that value directly.
+    ///
+    /// **Caution with factory deploy events:** `PlainPoolDeployed` and
+    /// `MetaPoolDeployed` events emit A as the user-provided value (e.g. 400),
+    /// NOT the raw on-chain value (e.g. 40000). Multiply by A_PRECISION
+    /// (100 for V2/NG/Meta/ALend) before passing here.
     pub amp: U256,
 
     /// StableSwap fee. **Static** (set at pool creation).
@@ -336,9 +341,6 @@ fn compute_crypto_precisions(token_decimals: &[u8]) -> Vec<U256> {
         .collect()
 }
 
-
-// ── build_pool ───────────────────────────────────────────────────────────────
-
 /// Helper to extract a required Option field or return a BuildError.
 macro_rules! require {
     ($state:expr, $field:ident) => {
@@ -389,8 +391,6 @@ pub fn build_pool(state: &RawPoolState) -> Result<Pool, BuildError> {
         CurveVariant::TriCryptoV1 | CurveVariant::TriCryptoNG => build_tricrypto(state),
     }
 }
-
-// ── Per-variant builders ─────────────────────────────────────────────────────
 
 /// Build StableSwapV0, V1, V2, or Meta — all share the same field layout:
 /// `{ balances, rates, amp, fee }`.
@@ -657,8 +657,6 @@ fn build_tricrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
         _ => unreachable!("build_tricrypto called for non-tricrypto variant"),
     }
 }
-
-// ── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
