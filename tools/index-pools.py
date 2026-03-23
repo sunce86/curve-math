@@ -443,13 +443,10 @@ def main():
         fc = w3.eth.contract(address=Web3.to_checksum_address(factory["address"]), abi=FACTORY_ABI)
         total_factory_pools += fc.functions.pool_count().call(block_identifier=block)
 
-    # Discover
+    # Discover — take up to max_new from EACH factory for even coverage
     all_candidates = []
     for factory in FACTORIES[args.chain_id]:
-        remaining = args.max_new - len(all_candidates)
-        if remaining <= 0:
-            break
-        candidates = discover_pools(w3, factory, existing, remaining, block)
+        candidates = discover_pools(w3, factory, existing, args.max_new, block)
         all_candidates.extend(candidates)
 
     print(f"\n{len(all_candidates)} new live candidates")

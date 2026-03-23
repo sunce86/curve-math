@@ -7,7 +7,6 @@
 
 last_updated = "2026-03-23"
 total_factory_pools = 676
-
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
@@ -207,4 +206,154 @@ name = "USR/RLP"
 address = "0xA0f6c3135D7B0734C51E7a96481054A5Db6362e6"
 variant = "StableSwapNG"
 name = "RLP/USDC"
+
+[[pools]]
+address = "0x71F8d420B92e4276Dd2C29d7662348590B32d501"
+variant = "StableSwapNG"
+name = "USR/USDC"
+
+[[pools]]
+address = "0xc376585D8Bfbf92015d3feEbf3e51f8c8B844718"
+variant = "StableSwapNG"
+name = "USDC/USDbC"
+
+[[pools]]
+address = "0x5cc02F8a00ec1208F326E1a674528dceDda17B80"
+variant = "StableSwapNG"
+name = "OFYUSDT/USDC"
+
+[[pools]]
+address = "0x4C86d266e969E186A2F197d859DF2D91e5eA1eD2"
+variant = "StableSwapNG"
+name = "WETH/aBasWETH"
+
+[[pools]]
+address = "0xEF975bB55c6bc6767963b37Dd150EE7048bd8B71"
+variant = "StableSwapNG"
+name = "WETH/aBasWETH"
+
+[[pools]]
+address = "0x5aB01ee6208596f2204B85bDFA39d34c2aDD98F6"
+variant = "StableSwapNG"
+name = "USDC/scrvUSD"
+
+[[pools]]
+address = "0x68446D5F287C5DfAaBfF932EFbEcDA2DD7e7861b"
+variant = "StableSwapNG"
+name = "crvUSD/MONEY"
+
+[[pools]]
+address = "0xbedD35F23Ea055C6af039f9c6a6fC8bdEe4d7a13"
+variant = "StableSwapNG"
+name = "DAI/MONEY"
+
+[[pools]]
+address = "0x5eCFA6940a33A2dAd5c473896452f018c6c04577"
+variant = "StableSwapNG"
+name = "USDbC/MONEY"
+
+[[pools]]
+address = "0x70d410b739Da81303a76169CDD406A746BDE8b34"
+variant = "StableSwapNG"
+name = "USDC/MONEY"
+
+[[pools]]
+address = "0xd58D6F2195C2954b3CE24Daa33177a6924A738aC"
+variant = "TwoCryptoStable"
+name = "GALLO/USDC"
+
+[[pools]]
+address = "0x678253F6e26fBEeFcc51B6c406A9A17385217854"
+variant = "TwoCryptoStable"
+name = "USDC/GALLO"
+
+[[pools]]
+address = "0x571815Bf910147BA02C4C5cb71689f98ba44B45a"
+variant = "TwoCryptoNG"
+name = "PUSSY/cbBTC"
+
+[[pools]]
+address = "0xbc2c6645431F7C4A96748f2c9f290B909F8A1113"
+variant = "TwoCryptoStable"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0xb387837E3E9Ff063bF407632f18ff9232dC66ea7"
+variant = "TwoCryptoStable"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0xf96A0eC41AE502d2Bc58B7D5838ED39A33Ae1d9f"
+variant = "TwoCryptoStable"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0x1090a57182746d1b4Dad650459d474fe8a023cec"
+variant = "TwoCryptoStable"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0xF2EcC3A2dEFB4ECC1Ac510CBbc405a539A990BE4"
+variant = "TwoCryptoStable"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0x6A586a7c52da4cb42D57b850A5fD9CE9705a7219"
+variant = "TwoCryptoNG"
+name = "USDq/YLP"
+
+[[pools]]
+address = "0x1C53971800C111a32B7889177C56E3488cfe0BE0"
+variant = "TwoCryptoStable"
+name = "USDC/EURC"
+
+[[pools]]
+address = "0xd48949347efe6029A9F7bb8F97E78C423F88486E"
+variant = "TriCryptoNG"
+name = "Marketcap > Retirement/Gazelle and Lion/ZIN"
+
+[[pools]]
+address = "0x843430499C896EF012A3DC92C6CF7Bf1B5A340Ff"
+variant = "TriCryptoNG"
+name = "Synthetic Soul/cbETH/Frontier Mindset"
+
+[[pools]]
+address = "0xD24dc0F23A455f35385209569b520A964C99B925"
+variant = "TriCryptoNG"
+name = "Gazelle and Lion/cbETH/LIONZ"
+
+[[pools]]
+address = "0x272CaC5B7986106f973e1B1c47339a483f1C9021"
+variant = "TriCryptoNG"
+name = "zinalsite/cbETH/ZIN"
+
+[[pools]]
+address = "0xeB4e091D468D65F0DC02a9684eB774A8bF2760F5"
+variant = "TriCryptoNG"
+name = "Gazelle and Lion/cbETH/Marketcap > Retirement"
+
+[[pools]]
+address = "0x0EfcA661eEB68b6D4d620b8d30e8dCB66237AedF"
+variant = "TriCryptoNG"
+name = "ZIN/WETH/zinalsite"
+
+[[pools]]
+address = "0x40c1c3566Bd868e7308eB4B27e521A9B98bBBD82"
+variant = "TriCryptoNG"
+name = "Marketcap > Retirement/cbBTC/Gazelle and Lion"
+
+[[pools]]
+address = "0xf9b716F4E3aFb3631c4763CDf7BaF6b77E5aE5b5"
+variant = "TriCryptoNG"
+name = "Marketcap > Retirement/WETH/Gazelle and Lion"
+
+[[pools]]
+address = "0xD531763e6E80988fba5F77f8Cc222b8A6B30EaCC"
+variant = "TriCryptoNG"
+name = "EZ/TOP/BRM"
+
+[[pools]]
+address = "0x5A38a92b8a23E07A88a92c2d8ac0691cF95be590"
+variant = "TriCryptoNG"
+name = "crvUSD/SNL/TOP"
 
