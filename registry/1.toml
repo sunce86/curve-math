@@ -1268,3 +1268,103 @@ address = "0xb09A96129d113845F466215DFe8dFEe261eA7D17"
 variant = "StableSwapNG"
 name = "tGBP/USDC"
 
+[[pools]]
+address = "0x5a8C7623FEe10542614e492c670a67e3DfE922F8"
+variant = "StableSwapNG"
+name = "USDQ/USDT"
+
+[[pools]]
+address = "0x6C5Ff8DCe52BE77b4eCE6B51996018f0C1713bA9"
+variant = "StableSwapNG"
+name = "USDC/USDU"
+
+[[pools]]
+address = "0x54f81E313eb47236C5AB781f680bB91e58Ac6dB7"
+variant = "StableSwapNG"
+name = "ynUSDx/ynRWAx"
+
+[[pools]]
+address = "0x77145b34807D04fd35D85796CBC81fe65365704A"
+variant = "StableSwapNG"
+name = "ynUSDx/fxUSD"
+
+[[pools]]
+address = "0x55dB32b79DE03b2B3093063407581C98F51D37D1"
+variant = "StableSwapNG"
+name = "USST/USDC"
+
+[[pools]]
+address = "0x52293DE177c3B1f5cE3a66ab739f7ad49607a239"
+variant = "StableSwapNG"
+name = "WBTC/dBTC"
+
+[[pools]]
+address = "0x4eeB03b2b8f55159f47B3548fAaFE3efaFF43eb9"
+variant = "StableSwapNG"
+name = "frxUSD/deUSD"
+
+[[pools]]
+address = "0x466eBB6eEeC7a3fd0628f6b05E53E848f9F3451F"
+variant = "StableSwapNG"
+name = "WBTC/DBIT"
+
+[[pools]]
+address = "0x32E616F4f17d43f9A5cd9Be0e294727187064cb3"
+variant = "StableSwapNG"
+name = "USDC/DUSD"
+
+[[pools]]
+address = "0x7D8b8344f2Acc6C1Edba0dA1B5313AF1e30C3369"
+variant = "StableSwapNG"
+name = "WETH/DETH"
+
+[[pools]]
+address = "0xb85d5B8886b42550A97a933bA28c4A58063022c6"
+variant = "StableSwapNG"
+name = "ynETH/wstETH"
+
+[[pools]]
+address = "0xB64AEaa56D6aa47C21Ca9c829058ff9754C90A8a"
+variant = "StableSwapNG"
+name = "USDX/USDC"
+
+[[pools]]
+address = "0x2b854e225d7282854819327D0CA5b8D8AA8CAaED"
+variant = "StableSwapNG"
+name = "DOLA/fxSAVE"
+
+[[pools]]
+address = "0xd6A9aD1cA9A5239889118c3B7Bc59f90a0e65e15"
+variant = "StableSwapNG"
+name = "USDC/USD69"
+
+[[pools]]
+address = "0x54628EA95D7e748c3783b855f4583DA96FB21895"
+variant = "StableSwapNG"
+name = "USDFI/USDaf/ebUSD/BOLD"
+
+[[pools]]
+address = "0xc061caa073f3d95F80f8e5428d32D2d76F5e1622"
+variant = "StableSwapNG"
+name = "USDG/USDC"
+
+[[pools]]
+address = "0xe8CFa3d4Ef1Ccbd86D40263adcF8789DC500DE2c"
+variant = "StableSwapNG"
+name = "litUSD/sUSDS"
+
+[[pools]]
+address = "0x375349f7704dE4ACEcdba864920E77B0BB5cE1e8"
+variant = "StableSwapNG"
+name = "USDC/Makina Test USD"
+
+[[pools]]
+address = "0x8c5AE8C58Fd17D50Fc87349F5BCB6BDfE5929305"
+variant = "StableSwapNG"
+name = "strBTC/cbBTC/LBTC"
+
+[[pools]]
+address = "0xf38faFD8f396831999434c2863f9EC715eBB2e9C"
+variant = "StableSwapNG"
+name = "USDC/AIDaUSDC"
+
