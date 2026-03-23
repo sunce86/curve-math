@@ -1,30 +1,37 @@
-//! Curve Finance pool discovery, variant detection, state requirements, and pool construction.
+//! Adapts raw on-chain Curve pool data into [`curve_math::Pool`] instances.
 //!
-//! This crate knows **what** Curve pools exist, **how** to identify them, and **how** to
-//! construct `curve_math::Pool` instances from raw on-chain state for swap computation.
+//! # Modules
 //!
-//! # What this crate provides
+//! **Start here:**
+//! - [`build`] — `build_pool(RawPoolState) → Pool`. The main entry point.
+//!   Takes raw balances, decimals, amp, fees and constructs a ready-to-use Pool.
 //!
-//! - **Variant detection** — classify any Curve pool into one of 11 variants
-//! - **Factory event parsing** — extract pool info from NG factory deployment events
-//! - **Legacy pool registry** — complete static list of pre-factory pools per chain
-//! - **State requirements** — which on-chain parameters each variant needs and how often they change
-//! - **Factory addresses** — per-chain factory contract addresses and MATH lookup tables
-//! - **Pool construction** (`build` feature) — convert raw state into `curve_math::Pool`
+//! **Supporting data (you need these to populate `RawPoolState`):**
+//! - [`variant`] — `CurveVariant` enum: which of the 11 pool types is this?
+//! - [`state`] — what on-chain fields does each variant need, and how often do they change?
+//! - [`factories`] — factory contract addresses per chain, MATH→variant lookup
+//! - [`discovery`] — parse factory deploy events into `PoolInfo`
+//! - [`legacy`] — 868 pre-factory Ethereum pools (embedded registry)
+//! - [`metapool`] — resolve base pool address → LP token address
 //!
-//! # Example
+//! # Quick start
 //!
 //! ```rust
-//! use curve_adapter::{CurveVariant, Chain, legacy_pools, factories, state_requirements};
+//! use curve_adapter::{CurveVariant, RawPoolState, build_pool};
+//! use alloy_primitives::U256;
 //!
-//! // Get all legacy pools on Ethereum
-//! let legacy = legacy_pools(Chain::Ethereum);
+//! let state = RawPoolState {
+//!     variant: CurveVariant::StableSwapV2,
+//!     balances: vec![U256::from(1_000_000_000_000_000_000_000u128),
+//!                    U256::from(1_000_000_000_000u128)],
+//!     token_decimals: vec![18, 6],
+//!     amp: U256::from(40_000u64), // A=400 * A_PRECISION=100
+//!     fee: Some(U256::from(4_000_000u64)),
+//!     ..Default::default()
+//! };
 //!
-//! // Get factory addresses for Ethereum
-//! let chain_factories = factories(Chain::Ethereum);
-//!
-//! // What state does a TwoCryptoNG pool need?
-//! let reqs = state_requirements(CurveVariant::TwoCryptoNG);
+//! let pool = build_pool(&state).unwrap();
+//! let dy = pool.get_amount_out(0, 1, U256::from(1_000_000_000_000_000_000u128));
 //! ```
 
 mod discovery;
