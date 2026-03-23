@@ -6,6 +6,10 @@
 //! - [`build`] — `build_pool(RawPoolState) → Pool`. The main entry point.
 //!   Takes raw balances, decimals, amp, fees and constructs a ready-to-use Pool.
 //!
+//! **Don't know the variant? Detect it:**
+//! - [`detect`] — `detect_variant(probing_results) → CurveVariant`. Probe a pool's
+//!   on-chain functions (gamma, offpeg, MATH version, etc.) and classify it.
+//!
 //! **Supporting data (you need these to populate `RawPoolState`):**
 //! - [`variant`] — `CurveVariant` enum: which of the 11 pool types is this?
 //! - [`state`] — what on-chain fields does each variant need, and how often do they change?
@@ -34,6 +38,7 @@
 //! let dy = pool.get_amount_out(0, 1, U256::from(1_000_000_000_000_000_000u128));
 //! ```
 
+mod detect;
 mod discovery;
 mod factories;
 mod legacy;
@@ -44,6 +49,7 @@ mod variant;
 #[cfg(feature = "build")]
 mod build;
 
+pub use detect::{detect_variant, DetectError, ProbingResults};
 pub use discovery::{
     parse_stableswap_ng_deploy, parse_tricrypto_ng_deploy, parse_twocrypto_ng_deploy, PoolInfo,
 };
