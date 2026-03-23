@@ -39,7 +39,7 @@ Compared against [revm](https://github.com/bluealloy/revm) executing the same po
 | TwoCryptoNG Cardano cubic (crvUSD/FXN) | 6.4 µs | 313 µs | **49x** |
 | TriCryptoNG 3-coin hybrid (crvUSD/WETH/CRV) | 4.5 µs | 358 µs | **80x** |
 
-<sub>MacBook M2, Rust 1.82, revm 36. Reproduce: `cd benches/revm-comparison && cargo bench`</sub>
+<sub>MacBook M2, Rust 1.82, revm 36. Reproduce: `cd crates/curve-math/benches/revm-comparison && cargo bench`</sub>
 
 ## Coverage
 
@@ -59,49 +59,65 @@ All 11 Curve pool variants:
 | `TriCryptoV1` | CryptoSwap | Newton | tricrypto2 (USDT/WBTC/WETH) | [CurveCryptoMath3.vy](https://github.com/curvefi/curve-crypto-contract/blob/master/contracts/tricrypto/CurveCryptoMath3.vy) |
 | `TriCryptoNG` | CryptoSwap | Hybrid cubic+Newton | tricrypto-ng (USDC/WBTC/WETH) | [CurveTricryptoOptimized.vy](https://github.com/curvefi/tricrypto-ng/blob/main/contracts/main/CurveTricryptoOptimized.vy) |
 
+## Crates
+
+| Crate | Description |
+|-------|-------------|
+| [`curve-math`](crates/curve-math) | Pure math — Newton solvers, Cardano cubic, fee formulas, `Pool` enum. Only depends on `alloy-primitives`. |
+| [`curve-adapter`](crates/curve-adapter) | Pool discovery, variant detection, and `build_pool()` — adapts raw on-chain data into `curve-math::Pool`. |
+
 ## Usage
 
 ```toml
 [dependencies]
-curve-math = { git = "https://github.com/sunce86/curve-math" }                    # core math only
-curve-math = { git = "https://github.com/sunce86/curve-math", features = ["swap"] }  # + Pool enum
+# Swap computation only (construct Pool manually)
+curve-math = { git = "https://github.com/sunce86/curve-math", features = ["swap"] }
+
+# Full pipeline: raw on-chain data → Pool (includes curve-math)
+curve-adapter = { git = "https://github.com/sunce86/curve-math" }
 ```
 
+**With curve-adapter** (recommended — handles rates, precisions, validation):
+```rust
+use curve_adapter::{CurveVariant, RawPoolState, build_pool};
+
+let state = RawPoolState {
+    variant: CurveVariant::StableSwapV2,
+    balances: vec![bal0, bal1],
+    token_decimals: vec![18, 6],
+    amp,
+    fee: Some(fee),
+    ..Default::default()
+};
+let pool = build_pool(&state)?;
+let dy = pool.get_amount_out(0, 1, dx);
+```
+
+**With curve-math directly** (when you already have rates/precisions):
 ```rust
 use curve_math::Pool;
 
-let pool = Pool::StableSwapV2 {
-    balances: vec![bal0, bal1],
-    rates: vec![rate0, rate1],
-    amp,
-    fee,
-};
-
-let amount_out = pool.get_amount_out(0, 1, dx)?;
-let amount_in = pool.get_amount_in(0, 1, desired_dy)?;
-let (price_num, price_den) = pool.spot_price(0, 1)?;
+let pool = Pool::StableSwapV2 { balances, rates, amp, fee };
+let dy = pool.get_amount_out(0, 1, dx);
 ```
 
 ## Structure
 
 ```
-src/
-  core/           # Pure math — Newton solvers, Cardano cubic, fee functions
-  swap/           # get_amount_out/in, spot_price per variant (feature-gated)
-  pool.rs         # Pool enum — unified API over all variants (feature-gated)
-registry/
-  1.toml          # Verified pools on Ethereum mainnet (chain ID 1)
-docs/
-  integration.md  # How to integrate with an indexer or solver
+crates/
+  curve-math/         # Pure math, Pool enum, fuzz tests, benchmarks
+    src/core/          # Stateless math ported line-by-line from Vyper
+    src/swap/          # get_amount_out/in, spot_price (feature "swap")
+    src/pool.rs        # Pool enum (feature "swap")
+    tests/             # Differential fuzz tests (RPC-based)
+    registry/          # Verified pool lists per chain
+  curve-adapter/       # Discovery + construction
+    src/build.rs       # RawPoolState → Pool, interpolate_a()
+    src/variant.rs     # CurveVariant enum (11 variants)
+    src/factories.rs   # Factory addresses, MATH lookup
+    src/state.rs       # State requirements per variant
+    data/              # Legacy pool registry (868 Ethereum pools)
 ```
-
-- **`core`** (always available): Stateless math functions ported line-by-line from Vyper. Each variant file links to the exact Vyper source it was verified against.
-- **`swap`** + **`Pool`** (behind `swap` feature): Pool simulation with normalization, fees, and denormalization.
-- **[`docs/integration.md`](docs/integration.md)**: Variant detection, state tracking, A parameter scaling, and streaming integration guide.
-
-## Dependencies
-
-Only [`alloy-primitives`](https://crates.io/crates/alloy-primitives) (U256/I256). Zero runtime dependencies beyond that.
 
 ## License
 
