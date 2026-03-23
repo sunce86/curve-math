@@ -4,14 +4,14 @@ on:
   push:
     branches: [master]
     paths-ignore:
-      - 'registry/**'
-      - 'tools/**'
+      - 'crates/curve-math/registry/**'
+      - 'crates/curve-math/tools/**'
       - '*.md'
   pull_request:
     branches: [master]
     paths-ignore:
-      - 'registry/**'
-      - 'tools/**'
+      - 'crates/curve-math/registry/**'
+      - 'crates/curve-math/tools/**'
       - '*.md'
 
 env:
@@ -34,4 +34,4 @@ jobs:
             echo "::warning::RPC_URL_1 not set, skipping fuzz"
             exit 0
           fi
-          cargo test --features swap --test fuzz_registry -- fuzz_1 --ignored --nocapture --test-threads=1
+          cargo test -p curve-math --features swap --test fuzz_registry -- fuzz_1 --ignored --nocapture --test-threads=1
