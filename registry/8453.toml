@@ -157,3 +157,53 @@ address = "0x9557c4F528A1b5ACF3Fd99a34EDF7cBaCA9c8b93"
 variant = "StableSwapNG"
 name = "USDC/WETH"
 
+[[pools]]
+address = "0xF259232c063e1575f557D4becAe2711ca9DE378E"
+variant = "StableSwapNG"
+name = "USDC/crvUSD"
+
+[[pools]]
+address = "0x18cA31b8FE14aFe363310b89188d85282Db7FbA8"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0xe3527c1A21C75798d2b3f30a143daA870a350355"
+variant = "StableSwapNG"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0x302A94E3C28c290EAF2a4605FC52e11Eb915f378"
+variant = "StableSwapNG"
+name = "WETH/superOETHb"
+
+[[pools]]
+address = "0x3376Ce7D46007C85EB7964dC1F371A9425B167ea"
+variant = "StableSwapNG"
+name = "cbBTC/coSATS"
+
+[[pools]]
+address = "0x8eBF9db6895a153deE7824e288B1C447C6B6002A"
+variant = "StableSwapNG"
+name = "WorthlessToken/USDC/mwUSDC/crvUSD/scrvUSD"
+
+[[pools]]
+address = "0x456DbD78ccAc27501fF841a67D67C560bb3C3eb3"
+variant = "StableSwapNG"
+name = "USR/USDC"
+
+[[pools]]
+address = "0x2198589373681E1B000BF8059b75687D70F8578F"
+variant = "StableSwapNG"
+name = "DAI/USDC"
+
+[[pools]]
+address = "0xed8159592cA4d517a1940b2900CbBC7C3Cd21187"
+variant = "StableSwapNG"
+name = "USR/RLP"
+
+[[pools]]
+address = "0xA0f6c3135D7B0734C51E7a96481054A5Db6362e6"
+variant = "StableSwapNG"
+name = "RLP/USDC"
+
