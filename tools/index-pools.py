@@ -437,18 +437,20 @@ def main():
     existing = {p["address"].lower() for p in registry["pools"]}
     print(f"  {len(existing)} existing pools")
 
+    # Count total factory pools across all factories
+    total_factory_pools = 0
+    for factory in FACTORIES[args.chain_id]:
+        fc = w3.eth.contract(address=Web3.to_checksum_address(factory["address"]), abi=FACTORY_ABI)
+        total_factory_pools += fc.functions.pool_count().call(block_identifier=block)
+
     # Discover
     all_candidates = []
-    total_factory_pools = 0
     for factory in FACTORIES[args.chain_id]:
         remaining = args.max_new - len(all_candidates)
         if remaining <= 0:
             break
         candidates = discover_pools(w3, factory, existing, remaining, block)
         all_candidates.extend(candidates)
-        # Count total pools in factory
-        fc = w3.eth.contract(address=Web3.to_checksum_address(factory["address"]), abi=FACTORY_ABI)
-        total_factory_pools += fc.functions.pool_count().call(block_identifier=block)
 
     print(f"\n{len(all_candidates)} new live candidates")
 
