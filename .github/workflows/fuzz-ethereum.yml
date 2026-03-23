@@ -4,13 +4,13 @@ on:
   push:
     branches: [master]
     paths-ignore:
-      - 'crates/curve-math/registry/**'
+      - 'crates/curve-math/tests/registry/**'
       - 'crates/curve-math/tools/**'
       - '*.md'
   pull_request:
     branches: [master]
     paths-ignore:
-      - 'crates/curve-math/registry/**'
+      - 'crates/curve-math/tests/registry/**'
       - 'crates/curve-math/tools/**'
       - '*.md'
 

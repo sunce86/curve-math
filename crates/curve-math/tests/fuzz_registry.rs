@@ -831,7 +831,7 @@ fn load_registry(path: &str) -> Vec<PoolEntry> {
 #[tokio::test]
 #[ignore = "requires RPC_URL_1 or RPC_URL"]
 async fn fuzz_1() {
-    let pools = load_registry("registry/1.toml");
+    let pools = load_registry("tests/registry/1.toml");
     fuzz_pools("chain 1", &pools).await;
 }
 
@@ -839,7 +839,7 @@ async fn fuzz_1() {
 #[tokio::test]
 #[ignore = "requires RPC_URL_1 or RPC_URL"]
 async fn fuzz_1_pending() {
-    let path = "registry/1_pending.toml";
+    let path = "tests/registry/1_pending.toml";
     if !std::path::Path::new(path).exists() {
         println!("No pending pools at {path}");
         return;
@@ -856,7 +856,7 @@ async fn fuzz_1_pending() {
 #[tokio::test]
 #[ignore = "requires RPC_URL_8453"]
 async fn fuzz_8453() {
-    let pools = load_registry("registry/8453.toml");
+    let pools = load_registry("tests/registry/8453.toml");
     fuzz_pools("chain 8453", &pools).await;
 }
 
@@ -864,7 +864,7 @@ async fn fuzz_8453() {
 #[tokio::test]
 #[ignore = "requires RPC_URL_8453"]
 async fn fuzz_8453_pending() {
-    let path = "registry/8453_pending.toml";
+    let path = "tests/registry/8453_pending.toml";
     if !std::path::Path::new(path).exists() {
         println!("No pending pools at {path}");
         return;

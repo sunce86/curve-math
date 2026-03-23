@@ -448,7 +448,7 @@ def main():
     block = latest - 5  # use a settled block to avoid inconsistent state
     print(f"Chain {args.chain_id}: block {block} (latest {latest})")
 
-    registry_path = Path(f"registry/{args.chain_id}.toml")
+    registry_path = Path(f"tests/registry/{args.chain_id}.toml")
     registry = read_registry(registry_path)
     existing = {p["address"].lower() for p in registry["pools"]}
     print(f"  {len(existing)} existing pools")
@@ -511,7 +511,7 @@ def main():
     else:
         # Write new pools to pending file (not main registry)
         # CI will fuzz only these, then merge if passed
-        pending_path = Path(f"registry/{args.chain_id}_pending.toml")
+        pending_path = Path(f"tests/registry/{args.chain_id}_pending.toml")
         pending_registry = {"pools": [p for p in registry["pools"] if p not in original_pools]}
         write_registry(pending_path, pending_registry)
         print(f"Pending pools written to {pending_path}")

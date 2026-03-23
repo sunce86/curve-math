@@ -110,7 +110,7 @@ crates/
     src/swap/          # get_amount_out/in, spot_price (feature "swap")
     src/pool.rs        # Pool enum (feature "swap")
     tests/             # Differential fuzz tests (RPC-based)
-    registry/          # Verified pool lists per chain
+      registry/        # Verified pool lists per chain
   curve-adapter/       # Discovery + construction
     src/build.rs       # RawPoolState → Pool, interpolate_a()
     src/variant.rs     # CurveVariant enum (11 variants)
