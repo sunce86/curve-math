@@ -29,23 +29,22 @@ jobs:
       - name: Discover new pools
         env:
           RPC_URL_1: ${{ secrets.RPC_URL_1 }}
+        working-directory: crates/curve-adapter
         run: |
           if [ -z "$RPC_URL_1" ]; then
             echo "::warning::RPC_URL_1 not set, skipping"
             exit 0
           fi
-          cd crates/curve-math && python tools/index-pools.py --chain-id 1 --min-tvl 1000000 --max-new 10
+          python ../curve-math/tools/index-pools.py --chain-id 1 --min-tvl 1000000 --max-new 10
 
       - name: Fuzz new pools only
-        if: hashFiles('crates/curve-math/tests/registry/1_pending.toml') != ''
-        working-directory: crates/curve-math
+        if: hashFiles('crates/curve-adapter/tests/registry/1_pending.toml') != ''
         env:
           RPC_URL_1: ${{ secrets.RPC_URL_1 }}
           FUZZ_ITERATIONS: "100"
         run: |
-          cargo test -p curve-math --features swap --test fuzz_registry -- fuzz_1_pending --ignored --nocapture
-          # If fuzz passes, remove pending file (pools already in main registry)
-          rm -f tests/registry/1_pending.toml
+          cargo test -p curve-adapter --test fuzz_registry -- fuzz_1_pending --ignored --nocapture
+          rm -f crates/curve-adapter/tests/registry/1_pending.toml
 
       - name: Read PR summary
         id: summary

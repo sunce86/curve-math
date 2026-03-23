@@ -18,3 +18,9 @@ serde = ["dep:serde", "alloy-primitives/serde"]
 alloy-primitives = "1"
 curve-math = { path = "../curve-math", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros"] }
+alloy = { version = "1.7", features = ["provider-http", "contract", "sol-types"] }
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }

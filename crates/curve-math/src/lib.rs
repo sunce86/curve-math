@@ -12,8 +12,8 @@
 //!
 //! # Quick start
 //!
-//! ```rust
-//! use curve_math::Pool;
+//! ```rust,ignore
+//! use curve_math::Pool; // requires feature "swap"
 //! use alloy_primitives::U256;
 //!
 //! let pool = Pool::StableSwapV2 {
