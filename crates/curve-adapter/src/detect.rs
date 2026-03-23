@@ -22,7 +22,7 @@
 
 use alloy_primitives::Address;
 
-use crate::{Chain, CurveVariant};
+use crate::CurveVariant;
 
 /// Results of on-chain function probing.
 ///
@@ -98,18 +98,18 @@ impl std::error::Error for DetectError {}
 ///
 /// Returns `DetectError` if the pool has `gamma()` but an unsupported
 /// coin count (not 2 or 3).
-pub fn detect_variant(chain: Chain, probing: &ProbingResults) -> Result<CurveVariant, DetectError> {
+pub fn detect_variant(probing: &ProbingResults) -> Result<CurveVariant, DetectError> {
     if probing.has_gamma {
-        detect_cryptoswap(chain, probing)
+        detect_cryptoswap(probing)
     } else {
-        Ok(detect_stableswap(chain, probing))
+        Ok(detect_stableswap(probing))
     }
 }
 
-fn detect_cryptoswap(chain: Chain, probing: &ProbingResults) -> Result<CurveVariant, DetectError> {
+fn detect_cryptoswap(probing: &ProbingResults) -> Result<CurveVariant, DetectError> {
     match probing.n_coins {
         3 => {
-            if is_known_tricrypto_v1(chain, probing.pool_address) {
+            if is_known_tricrypto_v1(probing.pool_address) {
                 Ok(CurveVariant::TriCryptoV1)
             } else {
                 Ok(CurveVariant::TriCryptoNG)
@@ -134,7 +134,7 @@ fn detect_cryptoswap(chain: Chain, probing: &ProbingResults) -> Result<CurveVari
     }
 }
 
-fn detect_stableswap(chain: Chain, probing: &ProbingResults) -> CurveVariant {
+fn detect_stableswap(probing: &ProbingResults) -> CurveVariant {
     // offpeg_fee_multiplier → NG or ALend
     if probing.has_offpeg_fee_multiplier {
         if probing.has_stored_rates {
@@ -156,9 +156,9 @@ fn detect_stableswap(chain: Chain, probing: &ProbingResults) -> CurveVariant {
 
     // Fallback: known addresses for V0/V1, else V2
     let addr_lower = format!("{:?}", probing.pool_address).to_lowercase();
-    if is_known_v0(chain, &addr_lower) {
+    if is_known_v0(&addr_lower) {
         CurveVariant::StableSwapV0
-    } else if is_known_v1(chain, &addr_lower) {
+    } else if is_known_v1(&addr_lower) {
         CurveVariant::StableSwapV1
     } else {
         CurveVariant::StableSwapV2
@@ -174,7 +174,7 @@ fn detect_stableswap(chain: Chain, probing: &ProbingResults) -> CurveVariant {
 //
 // Verified against legacy_ethereum.toml: V0=8, V1=2, TriCryptoV1=2.
 
-fn is_known_tricrypto_v1(_chain: Chain, addr: Address) -> bool {
+fn is_known_tricrypto_v1(addr: Address) -> bool {
     let addr_lower = format!("{:?}", addr).to_lowercase();
     matches!(
         addr_lower.as_str(),
@@ -185,7 +185,7 @@ fn is_known_tricrypto_v1(_chain: Chain, addr: Address) -> bool {
     )
 }
 
-fn is_known_v0(_chain: Chain, addr_lower: &str) -> bool {
+fn is_known_v0(addr_lower: &str) -> bool {
     matches!(
         addr_lower,
         "0xa5407eae9ba41422680e2e00537571bcc53efbfd"  // sUSD
@@ -199,7 +199,7 @@ fn is_known_v0(_chain: Chain, addr_lower: &str) -> bool {
     )
 }
 
-fn is_known_v1(_chain: Chain, addr_lower: &str) -> bool {
+fn is_known_v1(addr_lower: &str) -> bool {
     matches!(
         addr_lower,
         "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"  // 3pool
@@ -230,10 +230,7 @@ mod tests {
             has_int128_balances: false,
             pool_address: addr("0xD51a44d3FaE010294C616388b506AcdA1bfAAE46"),
         };
-        assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
-            CurveVariant::TriCryptoV1
-        );
+        assert_eq!(detect_variant(&probing).unwrap(), CurveVariant::TriCryptoV1);
     }
 
     #[test]
@@ -249,10 +246,7 @@ mod tests {
             has_int128_balances: false,
             pool_address: addr("0x7F86Bf177Dd4F3494b841a37e810A34dD56c829B"),
         };
-        assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
-            CurveVariant::TriCryptoNG
-        );
+        assert_eq!(detect_variant(&probing).unwrap(), CurveVariant::TriCryptoNG);
     }
 
     #[test]
@@ -268,10 +262,7 @@ mod tests {
             has_int128_balances: false,
             pool_address: addr("0xfb8b95Fb2296a0Ad4b6b1419fdAA5AA5F13e4009"),
         };
-        assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
-            CurveVariant::TwoCryptoNG
-        );
+        assert_eq!(detect_variant(&probing).unwrap(), CurveVariant::TwoCryptoNG);
     }
 
     #[test]
@@ -287,10 +278,7 @@ mod tests {
             has_int128_balances: false,
             pool_address: Address::ZERO,
         };
-        assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
-            CurveVariant::TwoCryptoNG
-        );
+        assert_eq!(detect_variant(&probing).unwrap(), CurveVariant::TwoCryptoNG);
     }
 
     #[test]
@@ -307,7 +295,7 @@ mod tests {
             pool_address: addr("0x6e5492F8ea2370844EE098A56DD88e1717e4A9C2"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::TwoCryptoStable
         );
     }
@@ -325,10 +313,7 @@ mod tests {
             has_int128_balances: false,
             pool_address: addr("0x8301AE4fc9c624d1D396cbDAa1ed877821D7C511"),
         };
-        assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
-            CurveVariant::TwoCryptoV1
-        );
+        assert_eq!(detect_variant(&probing).unwrap(), CurveVariant::TwoCryptoV1);
     }
 
     #[test]
@@ -345,10 +330,7 @@ mod tests {
             pool_address: Address::ZERO,
         };
         // Unknown version defaults to TwoCryptoNG
-        assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
-            CurveVariant::TwoCryptoNG
-        );
+        assert_eq!(detect_variant(&probing).unwrap(), CurveVariant::TwoCryptoNG);
     }
 
     #[test]
@@ -364,7 +346,7 @@ mod tests {
             has_int128_balances: false,
             pool_address: Address::ZERO,
         };
-        assert!(detect_variant(Chain::Ethereum, &probing).is_err());
+        assert!(detect_variant(&probing).is_err());
     }
 
     // ── StableSwap detection ─────────────────────────────────────────────
@@ -383,7 +365,7 @@ mod tests {
             pool_address: addr("0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapNG
         );
     }
@@ -402,7 +384,7 @@ mod tests {
             pool_address: addr("0xDeBF20617708857ebe4F679508E7b7863a8A8EeE"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapALend
         );
     }
@@ -421,7 +403,7 @@ mod tests {
             pool_address: addr("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapMeta
         );
     }
@@ -440,7 +422,7 @@ mod tests {
             pool_address: addr("0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapV0
         );
     }
@@ -460,7 +442,7 @@ mod tests {
             pool_address: addr("0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapV0
         );
     }
@@ -479,7 +461,7 @@ mod tests {
             pool_address: addr("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapV1
         );
     }
@@ -498,7 +480,7 @@ mod tests {
             pool_address: addr("0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"),
         };
         assert_eq!(
-            detect_variant(Chain::Ethereum, &probing).unwrap(),
+            detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapV2
         );
     }
