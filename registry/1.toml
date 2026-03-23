@@ -1668,3 +1668,103 @@ address = "0xCF908d925b21594f9a92b264167A85B0649051a8"
 variant = "StableSwapNG"
 name = "YUSD/USDT"
 
+[[pools]]
+address = "0x5BCAA8A1216D8120A59489F7Df4585E834C90eAF"
+variant = "StableSwapNG"
+name = "mUSDrec/USDT"
+
+[[pools]]
+address = "0x4f493B7dE8aAC7d55F71853688b1F7C8F0243C85"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0xf01627C39b427654DC984571b3Ae32e4136813Ec"
+variant = "StableSwapNG"
+name = "USDT/USDN"
+
+[[pools]]
+address = "0x29A760138FA530d51a100171cB5CE4DDf506aF2E"
+variant = "StableSwapNG"
+name = "Bold/LUSD"
+
+[[pools]]
+address = "0xaDb6851875B7496E3D565B754d8a79508480a203"
+variant = "StableSwapNG"
+name = "Bold/USDC"
+
+[[pools]]
+address = "0x82202CAEC5E6d85014eADC68D4912F3C90093e7C"
+variant = "StableSwapNG"
+name = "DOLA/sdeUSD"
+
+[[pools]]
+address = "0x6691DBb44154A9f23f8357C56FC9ff5548A8bdc4"
+variant = "StableSwapNG"
+name = "DOLA/deUSD"
+
+[[pools]]
+address = "0xf2F05c3DFbFbf47Ec5b01436D679c17d885F7C0F"
+variant = "StableSwapNG"
+name = "sUSDb/USDb"
+
+[[pools]]
+address = "0x59a06b97b2d566B9Dee2a368EaC8787Cfa57f95D"
+variant = "StableSwapNG"
+name = "sUSD/USDe"
+
+[[pools]]
+address = "0x3BD1017929b43c1414bE2Aca39892590fBa4d6e2"
+variant = "StableSwapNG"
+name = "sfrxUSD/sUSDe"
+
+[[pools]]
+address = "0x15e4ff94B70a8F146b4e4aFD069014d126035752"
+variant = "StableSwapNG"
+name = "sfrxUSD/scrvUSD"
+
+[[pools]]
+address = "0x4d968a5Db8dA0822A2F08840f553De4129aAe5F3"
+variant = "StableSwapNG"
+name = "frxUSD/scrvUSD"
+
+[[pools]]
+address = "0x81A2612F6dEA269a6Dd1F6DeAb45C5424EE2c4b7"
+variant = "StableSwapNG"
+name = "frxUSD/sUSDS"
+
+[[pools]]
+address = "0x4628f13651eaD6793F8d838B34B8f8522Fb0cc52"
+variant = "StableSwapNG"
+name = "GHO/USR"
+
+[[pools]]
+address = "0x38De22a3175708D45E7c7c64CD78479C8B56f76E"
+variant = "StableSwapNG"
+name = "DOLA/USR"
+
+[[pools]]
+address = "0xdBb1d219d84eaCEFb850ee04caCf2f1830934580"
+variant = "StableSwapNG"
+name = "frxUSD/USDe"
+
+[[pools]]
+address = "0x90455bd11Ce8a67C57d467e634Dc142b8e4105Aa"
+variant = "StableSwapNG"
+name = "cUSDO/USDC"
+
+[[pools]]
+address = "0x1f59cC10c6360DA918B0235c98E58008452816EB"
+variant = "StableSwapNG"
+name = "ynETH/ynLSDe"
+
+[[pools]]
+address = "0xF1dbA688F6055d8a9cA2521c8e5324cedFB50e3B"
+variant = "StableSwapNG"
+name = "ShezETH/WETH"
+
+[[pools]]
+address = "0x36a5BDda5cc5230b9189944Cf4C8C8D58a5747d0"
+variant = "StableSwapNG"
+name = "ShezUSD/USDC"
+
