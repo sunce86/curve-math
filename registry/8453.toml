@@ -6,7 +6,7 @@
 # against on-chain get_dy with random swap amounts.
 
 last_updated = "2026-03-23"
-total_factory_pools = 347
+total_factory_pools = 676
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
