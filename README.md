@@ -116,7 +116,6 @@ crates/
     src/variant.rs     # CurveVariant enum (11 variants)
     src/factories.rs   # Factory addresses, MATH lookup
     src/state.rs       # State requirements per variant
-    data/              # Legacy pool registry (868 Ethereum pools)
 ```
 
 ## License

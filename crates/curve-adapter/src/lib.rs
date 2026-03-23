@@ -15,7 +15,6 @@
 //! - [`state`] — what on-chain fields does each variant need, and how often do they change?
 //! - [`factories`] — factory contract addresses per chain, MATH→variant lookup
 //! - [`discovery`] — parse factory deploy events into `PoolInfo`
-//! - [`legacy`] — 868 pre-factory Ethereum pools (embedded registry)
 //! - [`metapool`] — resolve base pool address → LP token address
 //!
 //! # Quick start
@@ -41,7 +40,6 @@
 mod detect;
 mod discovery;
 mod factories;
-mod legacy;
 mod metapool;
 mod state;
 mod variant;
@@ -54,7 +52,6 @@ pub use discovery::{
     parse_stableswap_ng_deploy, parse_tricrypto_ng_deploy, parse_twocrypto_ng_deploy, PoolInfo,
 };
 pub use factories::{factories, Chain, ChainConfig, DeployEvent, Factory};
-pub use legacy::{legacy_pools, LegacyPool};
 pub use metapool::resolve_base_pool_lp_token;
 pub use state::{state_requirements, StateRequirements, UpdateFrequency};
 pub use variant::CurveVariant;
