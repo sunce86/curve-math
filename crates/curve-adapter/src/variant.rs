@@ -2,7 +2,8 @@
 ///
 /// Each variant uses a different on-chain smart contract implementation with
 /// different invariant math, fee formulas, and state layouts.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum CurveVariant {
     /// Earliest StableSwap (2020): sUSD, Compound, BUSD, y, USDT, Pax, Ren, sBTC.
     /// A_PRECISION=1, no `-1` offset on dy.

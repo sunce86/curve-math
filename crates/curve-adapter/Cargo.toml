@@ -12,8 +12,9 @@ categories = ["cryptography::cryptocurrencies"]
 [features]
 default = ["build"]
 build = ["curve-math/swap"]
+serde = ["dep:serde", "alloy-primitives/serde"]
 
 [dependencies]
-alloy-primitives = { version = "1", features = ["serde"] }
+alloy-primitives = "1"
 curve-math = { path = "../curve-math", optional = true }
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1", features = ["derive"], optional = true }
