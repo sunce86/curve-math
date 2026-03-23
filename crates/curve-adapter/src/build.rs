@@ -247,8 +247,6 @@ impl Default for RawPoolState {
     }
 }
 
-// ── interpolate_a ────────────────────────────────────────────────────────────
-
 /// Interpolate the amplification parameter for a given block timestamp.
 ///
 /// This is a 1:1 port of the Vyper `_A()` internal function from Curve
@@ -297,8 +295,6 @@ pub fn interpolate_a(
     }
 }
 
-// ── Rate computation ─────────────────────────────────────────────────────────
-
 /// Compute StableSwap rates from token decimals and optional dynamic rates.
 ///
 /// For each token:
@@ -340,15 +336,6 @@ fn compute_crypto_precisions(token_decimals: &[u8]) -> Vec<U256> {
         .collect()
 }
 
-/// Compute ALend precision_mul from token decimals.
-///
-/// For each token: `10^(18 - decimals)`.
-///
-/// Same formula as CryptoSwap precisions — ALend uses `precision_mul` instead
-/// of `rates` to normalize balances.
-fn compute_precision_mul(token_decimals: &[u8]) -> Vec<U256> {
-    compute_crypto_precisions(token_decimals)
-}
 
 // ── build_pool ───────────────────────────────────────────────────────────────
 
@@ -507,7 +494,7 @@ fn build_stableswap_alend(state: &RawPoolState) -> Result<Pool, BuildError> {
         }
     }
 
-    let precision_mul = compute_precision_mul(&state.token_decimals);
+    let precision_mul = compute_crypto_precisions(&state.token_decimals);
 
     Ok(Pool::StableSwapALend {
         balances: state.balances.clone(),
@@ -1215,7 +1202,7 @@ mod tests {
     #[test]
     fn precision_mul_matches_fuzz_registry() {
         // ALend: precision_mul = 10^(18 - decimals)
-        let pm = super::compute_precision_mul(&[18, 6]);
+        let pm = super::compute_crypto_precisions(&[18, 6]);
         assert_eq!(pm[0], U256::from(1u64));
         assert_eq!(pm[1], U256::from(10u64).pow(U256::from(12u64)));
     }
