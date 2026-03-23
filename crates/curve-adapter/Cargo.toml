@@ -1,0 +1,20 @@
+[package]
+name = "curve-adapter"
+version = "0.1.0-alpha.1"
+edition = "2021"
+rust-version = "1.80"
+description = "Curve Finance pool discovery, variant detection, state requirements, and pool construction. Adapts raw on-chain data into curve-math Pool instances."
+license = "MIT"
+repository = "https://github.com/sunce86/curve-math"
+keywords = ["curve", "amm", "defi", "indexer", "pools"]
+categories = ["cryptography::cryptocurrencies"]
+
+[features]
+default = ["build"]
+build = ["curve-math/swap"]
+
+[dependencies]
+alloy-primitives = { version = "1", features = ["serde"] }
+curve-math = { path = "../..", optional = true }
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"

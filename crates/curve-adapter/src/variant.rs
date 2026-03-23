@@ -1,0 +1,81 @@
+/// All 11 Curve pool math variants.
+///
+/// Each variant uses a different on-chain smart contract implementation with
+/// different invariant math, fee formulas, and state layouts.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
+pub enum CurveVariant {
+    /// Earliest StableSwap (2020): sUSD, Compound, BUSD, y, USDT, Pax, Ren, sBTC.
+    /// A_PRECISION=1, no `-1` offset on dy.
+    StableSwapV0,
+    /// 3pool era (2021): 3pool, hBTC.
+    /// A_PRECISION=1, `-1` offset on dy.
+    StableSwapV1,
+    /// Base/plain template: factory plain pools, stETH, FRAX/USDC.
+    /// A_PRECISION=100, `-1` offset, fee before denormalize.
+    StableSwapV2,
+    /// Aave lending template: aave, sAAVE, IB pools.
+    /// A_PRECISION=100, dynamic fee via `offpeg_fee_multiplier`.
+    StableSwapALend,
+    /// StableSwap-NG factory pools.
+    /// A_PRECISION=100, dynamic fee, supports oracle rates (ERC4626).
+    StableSwapNG,
+    /// Meta pool template: pools paired with a base pool LP token (e.g. GUSD/3CRV).
+    /// A_PRECISION=100, `rates[1]` = base pool `virtual_price`.
+    StableSwapMeta,
+    /// Legacy 2-coin CryptoSwap (CRV/ETH era).
+    /// Newton solver for y, inline math (no external MATH contract).
+    TwoCryptoV1,
+    /// TwoCrypto-NG factory pools with CryptoSwap math.
+    /// Cardano cubic solver. MATH contract version v2.0.0 or v2.1.0.
+    TwoCryptoNG,
+    /// TwoCrypto-NG factory pools with StableSwap math.
+    /// Newton solver, gamma parameter ignored. MATH contract version v0.1.0.
+    TwoCryptoStable,
+    /// Legacy 3-coin CryptoSwap (tricrypto2: USDT/WBTC/WETH).
+    /// Newton solver for y.
+    TriCryptoV1,
+    /// TriCrypto-NG factory pools.
+    /// Hybrid cubic + Newton solver.
+    TriCryptoNG,
+}
+
+impl CurveVariant {
+    /// Returns the variant name as used in curve-math's `Pool` enum.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::StableSwapV0 => "StableSwapV0",
+            Self::StableSwapV1 => "StableSwapV1",
+            Self::StableSwapV2 => "StableSwapV2",
+            Self::StableSwapALend => "StableSwapALend",
+            Self::StableSwapNG => "StableSwapNG",
+            Self::StableSwapMeta => "StableSwapMeta",
+            Self::TwoCryptoV1 => "TwoCryptoV1",
+            Self::TwoCryptoNG => "TwoCryptoNG",
+            Self::TwoCryptoStable => "TwoCryptoStable",
+            Self::TriCryptoV1 => "TriCryptoV1",
+            Self::TriCryptoNG => "TriCryptoNG",
+        }
+    }
+
+    /// Whether this variant uses CryptoSwap math (price_scale, D, gamma).
+    pub fn is_cryptoswap(&self) -> bool {
+        matches!(
+            self,
+            Self::TwoCryptoV1
+                | Self::TwoCryptoNG
+                | Self::TwoCryptoStable
+                | Self::TriCryptoV1
+                | Self::TriCryptoNG
+        )
+    }
+
+
+
+
+}
+
+impl std::fmt::Display for CurveVariant {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}

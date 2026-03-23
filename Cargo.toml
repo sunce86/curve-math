@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "benches/revm-comparison"]
+members = [".", "crates/curve-adapter", "benches/revm-comparison"]
 
 [package]
 name = "curve-math"
