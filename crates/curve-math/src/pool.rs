@@ -768,7 +768,6 @@ impl Pool {
         }
     }
 
-
     /// Amplification parameter (`amp` for StableSwap, `ann` for CryptoSwap).
     pub fn amp(&self) -> U256 {
         match self {
@@ -868,6 +867,42 @@ impl Pool {
         }
     }
 
+    /// Precision multipliers for ALend. Returns `None` for all other variants.
+    pub fn precision_mul(&self) -> Option<&[U256]> {
+        match self {
+            Pool::StableSwapALend { precision_mul, .. } => Some(precision_mul),
+            _ => None,
+        }
+    }
+
+    /// Precisions for CryptoSwap variants. Returns `None` for StableSwap.
+    pub fn precisions(&self) -> Option<&[U256]> {
+        match self {
+            Pool::TwoCryptoV1 { precisions, .. }
+            | Pool::TwoCryptoNG { precisions, .. }
+            | Pool::TwoCryptoStable { precisions, .. } => Some(precisions),
+            Pool::TriCryptoV1 { precisions, .. } | Pool::TriCryptoNG { precisions, .. } => {
+                Some(precisions)
+            }
+            _ => None,
+        }
+    }
+
+    /// Offpeg fee multiplier. Returns `None` for variants without dynamic fee.
+    pub fn offpeg_fee_multiplier(&self) -> Option<U256> {
+        match self {
+            Pool::StableSwapNG {
+                offpeg_fee_multiplier,
+                ..
+            }
+            | Pool::StableSwapALend {
+                offpeg_fee_multiplier,
+                ..
+            } => Some(*offpeg_fee_multiplier),
+            _ => None,
+        }
+    }
+
     /// Price scale(s). Returns `None` for StableSwap.
     pub fn price_scale(&self) -> Option<&[U256]> {
         match self {
@@ -880,7 +915,6 @@ impl Pool {
             _ => None,
         }
     }
-
 
     /// Set balance for coin at `index`. **Per-block update.**
     ///
