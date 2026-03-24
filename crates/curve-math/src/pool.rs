@@ -26,6 +26,26 @@ use alloy_primitives::U256;
 
 use crate::swap;
 
+/// Error returned by Pool setter methods.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PoolError {
+    /// Field does not exist on this pool variant.
+    NotApplicable,
+    /// Index exceeds the number of coins or price scales.
+    IndexOutOfRange,
+}
+
+impl std::fmt::Display for PoolError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NotApplicable => f.write_str("field not applicable to this pool variant"),
+            Self::IndexOutOfRange => f.write_str("index out of range"),
+        }
+    }
+}
+
+impl std::error::Error for PoolError {}
+
 /// All known Curve pool variants with their parameters.
 ///
 /// # State update frequency for indexer/adapter implementations
@@ -917,9 +937,7 @@ impl Pool {
     }
 
     /// Set balance for coin at `index`. **Per-block update.**
-    ///
-    /// Returns `Err` if `index` is out of range for this pool's coin count.
-    pub fn set_balance(&mut self, index: usize, value: U256) -> Result<(), &'static str> {
+    pub fn set_balance(&mut self, index: usize, value: U256) -> Result<(), PoolError> {
         let bal = match self {
             Pool::StableSwapV0 { balances, .. }
             | Pool::StableSwapV1 { balances, .. }
@@ -934,32 +952,29 @@ impl Pool {
                 balances.get_mut(index)
             }
         };
-        *bal.ok_or("balance index out of range")? = value;
+        *bal.ok_or(PoolError::IndexOutOfRange)? = value;
         Ok(())
     }
 
     /// Set rate for coin at `index`. **Per-block for oracle tokens, static otherwise.**
     ///
     /// Applies to StableSwap variants with rates (V0/V1/V2/NG/Meta).
-    /// Returns `Err` for ALend (uses precision_mul) and CryptoSwap (uses precisions).
-    pub fn set_rate(&mut self, index: usize, value: U256) -> Result<(), &'static str> {
+    pub fn set_rate(&mut self, index: usize, value: U256) -> Result<(), PoolError> {
         match self {
             Pool::StableSwapV0 { rates, .. }
             | Pool::StableSwapV1 { rates, .. }
             | Pool::StableSwapV2 { rates, .. }
             | Pool::StableSwapNG { rates, .. }
             | Pool::StableSwapMeta { rates, .. } => {
-                *rates.get_mut(index).ok_or("rate index out of range")? = value;
+                *rates.get_mut(index).ok_or(PoolError::IndexOutOfRange)? = value;
                 Ok(())
             }
-            _ => Err("set_rate not applicable to this variant"),
+            _ => Err(PoolError::NotApplicable),
         }
     }
 
     /// Set pool invariant D. **Per-block update for CryptoSwap.**
-    ///
-    /// Returns `Err` for StableSwap variants (D is computed, not stored).
-    pub fn set_d(&mut self, value: U256) -> Result<(), &'static str> {
+    pub fn set_d(&mut self, value: U256) -> Result<(), PoolError> {
         match self {
             Pool::TwoCryptoV1 { d, .. }
             | Pool::TwoCryptoNG { d, .. }
@@ -971,20 +986,18 @@ impl Pool {
                 *d = value;
                 Ok(())
             }
-            _ => Err("set_d not applicable to StableSwap variants"),
+            _ => Err(PoolError::NotApplicable),
         }
     }
 
     /// Set price_scale at `index`. **Per-block update for CryptoSwap.**
-    ///
-    /// Returns `Err` for StableSwap variants or if index is out of range.
-    pub fn set_price_scale(&mut self, index: usize, value: U256) -> Result<(), &'static str> {
+    pub fn set_price_scale(&mut self, index: usize, value: U256) -> Result<(), PoolError> {
         match self {
             Pool::TwoCryptoV1 { price_scale, .. }
             | Pool::TwoCryptoNG { price_scale, .. }
             | Pool::TwoCryptoStable { price_scale, .. } => {
                 if index != 0 {
-                    return Err("TwoCrypto has single price_scale (index must be 0)");
+                    return Err(PoolError::IndexOutOfRange);
                 }
                 *price_scale = value;
                 Ok(())
@@ -992,10 +1005,10 @@ impl Pool {
             Pool::TriCryptoV1 { price_scale, .. } | Pool::TriCryptoNG { price_scale, .. } => {
                 *price_scale
                     .get_mut(index)
-                    .ok_or("price_scale index out of range")? = value;
+                    .ok_or(PoolError::IndexOutOfRange)? = value;
                 Ok(())
             }
-            _ => Err("set_price_scale not applicable to StableSwap variants"),
+            _ => Err(PoolError::NotApplicable),
         }
     }
 
@@ -1020,7 +1033,7 @@ impl Pool {
     /// Set gamma parameter. **Semi-static (changes during gamma ramping).**
     ///
     /// Returns `Err` for StableSwap and TwoCryptoStable variants.
-    pub fn set_gamma(&mut self, value: U256) -> Result<(), &'static str> {
+    pub fn set_gamma(&mut self, value: U256) -> Result<(), PoolError> {
         match self {
             Pool::TwoCryptoV1 { gamma, .. } | Pool::TwoCryptoNG { gamma, .. } => {
                 *gamma = value;
@@ -1030,7 +1043,7 @@ impl Pool {
                 *gamma = value;
                 Ok(())
             }
-            _ => Err("set_gamma not applicable to this variant"),
+            _ => Err(PoolError::NotApplicable),
         }
     }
 }

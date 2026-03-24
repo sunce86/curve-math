@@ -46,4 +46,4 @@ pub mod swap;
 #[cfg(feature = "swap")]
 mod pool;
 #[cfg(feature = "swap")]
-pub use pool::Pool;
+pub use pool::{Pool, PoolError};
