@@ -165,7 +165,6 @@ fn detect_stableswap(probing: &ProbingResults) -> CurveVariant {
     }
 }
 
-// ── Known address sets ───────────────────────────────────────────────────────
 //
 // These pools cannot be reliably distinguished on-chain and require
 // address-based lookup. These are COMPLETE lists — no new pools of these
@@ -201,7 +200,6 @@ mod tests {
         s.parse().unwrap()
     }
 
-    // ── CryptoSwap detection ─────────────────────────────────────────────
 
     #[test]
     fn detect_tricrypto_v1_by_address() {
@@ -335,7 +333,6 @@ mod tests {
         assert!(detect_variant(&probing).is_err());
     }
 
-    // ── StableSwap detection ─────────────────────────────────────────────
 
     #[test]
     fn detect_stableswap_ng() {

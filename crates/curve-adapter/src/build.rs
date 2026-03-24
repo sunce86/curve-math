@@ -220,7 +220,6 @@ pub struct RawPoolState {
     /// NOT required for TwoCryptoStable (gamma is ignored).
     pub gamma: Option<U256>,
 
-    // ── Dynamic rates ────────────────────────────────────────────────────
     /// Per-token dynamic rates for StableSwap variants. **Depends on token type.**
     ///
     /// If `None`, rates are computed from `token_decimals` as `10^(36 - decimals)`.
@@ -679,7 +678,6 @@ fn build_tricrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
 mod tests {
     use super::*;
 
-    // ── interpolate_a tests ──────────────────────────────────────────────
 
     #[test]
     fn interpolate_a_no_ramp() {
@@ -772,7 +770,6 @@ mod tests {
         assert_eq!(result, U256::from(10_000u64));
     }
 
-    // ── build_pool StableSwap tests ──────────────────────────────────────
 
     #[test]
     fn build_stableswap_v0_basic() {
@@ -907,7 +904,6 @@ mod tests {
         }
     }
 
-    // ── build_pool CryptoSwap tests ──────────────────────────────────────
 
     #[test]
     fn build_twocrypto_ng_basic() {
@@ -1006,7 +1002,6 @@ mod tests {
         }
     }
 
-    // ── Error cases ──────────────────────────────────────────────────────
 
     #[test]
     fn build_missing_fee_returns_error() {
@@ -1175,7 +1170,6 @@ mod tests {
         assert!(matches!(err, BuildError::MetaMissingVirtualPrice));
     }
 
-    // ── Known real-world value tests ─────────────────────────────────────
 
     #[test]
     fn rates_match_fuzz_registry_18_dec() {
@@ -1297,7 +1291,6 @@ mod tests {
         }
     }
 
-    // ── Integration tests: real on-chain data (block 24722544) ───────────
     //
     // These tests use hardcoded state from Ethereum mainnet at block 24722544.
     // For each pool variant:
