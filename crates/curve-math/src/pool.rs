@@ -782,94 +782,221 @@ impl Pool {
         }
     }
 
-    /// Update balances in place. For StableSwap variants only.
+    // ── Per-field getters ───────────────────────────────────────────────
+
+    /// Amplification parameter (`amp` for StableSwap, `ann` for CryptoSwap).
+    pub fn amp(&self) -> U256 {
+        match self {
+            Pool::StableSwapV0 { amp, .. }
+            | Pool::StableSwapV1 { amp, .. }
+            | Pool::StableSwapV2 { amp, .. }
+            | Pool::StableSwapALend { amp, .. }
+            | Pool::StableSwapNG { amp, .. }
+            | Pool::StableSwapMeta { amp, .. } => *amp,
+            Pool::TwoCryptoV1 { ann, .. }
+            | Pool::TwoCryptoNG { ann, .. }
+            | Pool::TwoCryptoStable { ann, .. } => *ann,
+            Pool::TriCryptoV1 { ann, .. } | Pool::TriCryptoNG { ann, .. } => *ann,
+        }
+    }
+
+    /// Fee for StableSwap variants. Returns `None` for CryptoSwap.
+    pub fn fee(&self) -> Option<U256> {
+        match self {
+            Pool::StableSwapV0 { fee, .. }
+            | Pool::StableSwapV1 { fee, .. }
+            | Pool::StableSwapV2 { fee, .. }
+            | Pool::StableSwapALend { fee, .. }
+            | Pool::StableSwapNG { fee, .. }
+            | Pool::StableSwapMeta { fee, .. } => Some(*fee),
+            _ => None,
+        }
+    }
+
+    /// CryptoSwap fee parameters. Returns `None` for StableSwap.
+    pub fn crypto_fees(&self) -> Option<(U256, U256, U256)> {
+        match self {
+            Pool::TwoCryptoV1 {
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                ..
+            }
+            | Pool::TwoCryptoNG {
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                ..
+            }
+            | Pool::TwoCryptoStable {
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                ..
+            }
+            | Pool::TriCryptoV1 {
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                ..
+            }
+            | Pool::TriCryptoNG {
+                mid_fee,
+                out_fee,
+                fee_gamma,
+                ..
+            } => Some((*mid_fee, *out_fee, *fee_gamma)),
+            _ => None,
+        }
+    }
+
+    /// Rates for StableSwap variants (V0/V1/V2/NG/Meta).
+    /// Returns `None` for ALend (uses precision_mul) and CryptoSwap.
+    pub fn rates(&self) -> Option<&[U256]> {
+        match self {
+            Pool::StableSwapV0 { rates, .. }
+            | Pool::StableSwapV1 { rates, .. }
+            | Pool::StableSwapV2 { rates, .. }
+            | Pool::StableSwapNG { rates, .. }
+            | Pool::StableSwapMeta { rates, .. } => Some(rates),
+            _ => None,
+        }
+    }
+
+    /// Pool invariant D. Returns `None` for StableSwap (D is computed, not stored).
+    pub fn d(&self) -> Option<U256> {
+        match self {
+            Pool::TwoCryptoV1 { d, .. }
+            | Pool::TwoCryptoNG { d, .. }
+            | Pool::TwoCryptoStable { d, .. } => Some(*d),
+            Pool::TriCryptoV1 { d, .. } | Pool::TriCryptoNG { d, .. } => Some(*d),
+            _ => None,
+        }
+    }
+
+    /// Gamma parameter. Returns `None` for StableSwap and TwoCryptoStable.
+    pub fn gamma(&self) -> Option<U256> {
+        match self {
+            Pool::TwoCryptoV1 { gamma, .. } | Pool::TwoCryptoNG { gamma, .. } => Some(*gamma),
+            Pool::TriCryptoV1 { gamma, .. } | Pool::TriCryptoNG { gamma, .. } => Some(*gamma),
+            _ => None,
+        }
+    }
+
+    /// Price scale(s). Returns `None` for StableSwap.
+    pub fn price_scale(&self) -> Option<&[U256]> {
+        match self {
+            Pool::TwoCryptoV1 { price_scale, .. }
+            | Pool::TwoCryptoNG { price_scale, .. }
+            | Pool::TwoCryptoStable { price_scale, .. } => std::slice::from_ref(price_scale).into(),
+            Pool::TriCryptoV1 { price_scale, .. } | Pool::TriCryptoNG { price_scale, .. } => {
+                Some(price_scale)
+            }
+            _ => None,
+        }
+    }
+
+    // ── Per-field setters (non-static fields) ────────────────────────────
+
+    /// Set balance for coin at `index`. **Per-block update.**
     ///
-    /// Use this for per-block state updates instead of rebuilding the entire Pool.
-    /// Panics if `new_balances` length doesn't match the pool's coin count.
-    pub fn set_balances(&mut self, new_balances: &[U256]) {
+    /// # Panics
+    /// Panics if `index` is out of range for this pool's coin count.
+    pub fn set_balance(&mut self, index: usize, value: U256) {
         match self {
             Pool::StableSwapV0 { balances, .. }
             | Pool::StableSwapV1 { balances, .. }
             | Pool::StableSwapV2 { balances, .. }
             | Pool::StableSwapALend { balances, .. }
             | Pool::StableSwapNG { balances, .. }
-            | Pool::StableSwapMeta { balances, .. } => {
-                assert_eq!(balances.len(), new_balances.len(), "balance count mismatch");
-                balances.copy_from_slice(new_balances);
-            }
+            | Pool::StableSwapMeta { balances, .. } => balances[index] = value,
             Pool::TwoCryptoV1 { balances, .. }
             | Pool::TwoCryptoNG { balances, .. }
-            | Pool::TwoCryptoStable { balances, .. } => {
-                assert_eq!(2, new_balances.len(), "expected 2 balances for TwoCrypto");
-                *balances = [new_balances[0], new_balances[1]];
-            }
+            | Pool::TwoCryptoStable { balances, .. } => balances[index] = value,
             Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => {
-                assert_eq!(3, new_balances.len(), "expected 3 balances for TriCrypto");
-                *balances = [new_balances[0], new_balances[1], new_balances[2]];
+                balances[index] = value
             }
         }
     }
 
-    /// Update per-block dynamic state for CryptoSwap variants.
+    /// Set rate for coin at `index`. **Per-block for oracle tokens, static otherwise.**
     ///
-    /// CryptoSwap pools have `balances`, `d`, and `price_scale` that change every block.
-    /// Use this instead of rebuilding the entire Pool.
-    pub fn set_crypto_state(
-        &mut self,
-        new_balances: &[U256],
-        new_d: U256,
-        new_price_scale: &[U256],
-    ) {
+    /// Applies to StableSwap variants with rates (V0/V1/V2/NG/Meta).
+    /// For ALend (precision_mul) and CryptoSwap (precisions), this is not applicable.
+    ///
+    /// # Panics
+    /// Panics if called on ALend or CryptoSwap variant, or if index is out of range.
+    pub fn set_rate(&mut self, index: usize, value: U256) {
         match self {
-            Pool::TwoCryptoV1 {
-                balances,
-                d,
-                price_scale,
-                ..
+            Pool::StableSwapV0 { rates, .. }
+            | Pool::StableSwapV1 { rates, .. }
+            | Pool::StableSwapV2 { rates, .. }
+            | Pool::StableSwapNG { rates, .. }
+            | Pool::StableSwapMeta { rates, .. } => rates[index] = value,
+            _ => panic!("set_rate not applicable to this variant"),
+        }
+    }
+
+    /// Set pool invariant D. **Per-block update for CryptoSwap.**
+    ///
+    /// # Panics
+    /// Panics if called on StableSwap variant.
+    pub fn set_d(&mut self, value: U256) {
+        match self {
+            Pool::TwoCryptoV1 { d, .. }
+            | Pool::TwoCryptoNG { d, .. }
+            | Pool::TwoCryptoStable { d, .. } => *d = value,
+            Pool::TriCryptoV1 { d, .. } | Pool::TriCryptoNG { d, .. } => *d = value,
+            _ => panic!("set_d not applicable to StableSwap variants"),
+        }
+    }
+
+    /// Set price_scale at `index`. **Per-block update for CryptoSwap.**
+    ///
+    /// TwoCrypto: index must be 0. TriCrypto: index must be 0 or 1.
+    ///
+    /// # Panics
+    /// Panics if called on StableSwap variant or index is out of range.
+    pub fn set_price_scale(&mut self, index: usize, value: U256) {
+        match self {
+            Pool::TwoCryptoV1 { price_scale, .. }
+            | Pool::TwoCryptoNG { price_scale, .. }
+            | Pool::TwoCryptoStable { price_scale, .. } => {
+                assert_eq!(index, 0, "TwoCrypto has single price_scale");
+                *price_scale = value;
             }
-            | Pool::TwoCryptoNG {
-                balances,
-                d,
-                price_scale,
-                ..
-            } => {
-                assert_eq!(2, new_balances.len());
-                assert_eq!(1, new_price_scale.len());
-                *balances = [new_balances[0], new_balances[1]];
-                *d = new_d;
-                *price_scale = new_price_scale[0];
+            Pool::TriCryptoV1 { price_scale, .. } | Pool::TriCryptoNG { price_scale, .. } => {
+                price_scale[index] = value
             }
-            Pool::TwoCryptoStable {
-                balances,
-                d,
-                price_scale,
-                ..
-            } => {
-                assert_eq!(2, new_balances.len());
-                assert_eq!(1, new_price_scale.len());
-                *balances = [new_balances[0], new_balances[1]];
-                *d = new_d;
-                *price_scale = new_price_scale[0];
-            }
-            Pool::TriCryptoV1 {
-                balances,
-                d,
-                price_scale,
-                ..
-            }
-            | Pool::TriCryptoNG {
-                balances,
-                d,
-                price_scale,
-                ..
-            } => {
-                assert_eq!(3, new_balances.len());
-                assert_eq!(2, new_price_scale.len());
-                *balances = [new_balances[0], new_balances[1], new_balances[2]];
-                *d = new_d;
-                *price_scale = [new_price_scale[0], new_price_scale[1]];
-            }
-            _ => panic!("set_crypto_state called on StableSwap variant — use set_balances"),
+            _ => panic!("set_price_scale not applicable to StableSwap variants"),
+        }
+    }
+
+    /// Set amplification parameter. **Semi-static (changes during A ramping).**
+    pub fn set_amp(&mut self, value: U256) {
+        match self {
+            Pool::StableSwapV0 { amp, .. }
+            | Pool::StableSwapV1 { amp, .. }
+            | Pool::StableSwapV2 { amp, .. }
+            | Pool::StableSwapALend { amp, .. }
+            | Pool::StableSwapNG { amp, .. }
+            | Pool::StableSwapMeta { amp, .. } => *amp = value,
+            Pool::TwoCryptoV1 { ann, .. }
+            | Pool::TwoCryptoNG { ann, .. }
+            | Pool::TwoCryptoStable { ann, .. } => *ann = value,
+            Pool::TriCryptoV1 { ann, .. } | Pool::TriCryptoNG { ann, .. } => *ann = value,
+        }
+    }
+
+    /// Set gamma parameter. **Semi-static (changes during gamma ramping).**
+    ///
+    /// # Panics
+    /// Panics if called on StableSwap or TwoCryptoStable variant.
+    pub fn set_gamma(&mut self, value: U256) {
+        match self {
+            Pool::TwoCryptoV1 { gamma, .. } | Pool::TwoCryptoNG { gamma, .. } => *gamma = value,
+            Pool::TriCryptoV1 { gamma, .. } | Pool::TriCryptoNG { gamma, .. } => *gamma = value,
+            _ => panic!("set_gamma not applicable to this variant"),
         }
     }
 }
