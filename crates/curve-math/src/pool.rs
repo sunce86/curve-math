@@ -886,23 +886,24 @@ impl Pool {
 
     /// Set balance for coin at `index`. **Per-block update.**
     ///
-    /// # Panics
-    /// Panics if `index` is out of range for this pool's coin count.
-    pub fn set_balance(&mut self, index: usize, value: U256) {
-        match self {
+    /// Returns `Err` if `index` is out of range for this pool's coin count.
+    pub fn set_balance(&mut self, index: usize, value: U256) -> Result<(), &'static str> {
+        let bal = match self {
             Pool::StableSwapV0 { balances, .. }
             | Pool::StableSwapV1 { balances, .. }
             | Pool::StableSwapV2 { balances, .. }
             | Pool::StableSwapALend { balances, .. }
             | Pool::StableSwapNG { balances, .. }
-            | Pool::StableSwapMeta { balances, .. } => balances[index] = value,
+            | Pool::StableSwapMeta { balances, .. } => balances.get_mut(index),
             Pool::TwoCryptoV1 { balances, .. }
             | Pool::TwoCryptoNG { balances, .. }
-            | Pool::TwoCryptoStable { balances, .. } => balances[index] = value,
+            | Pool::TwoCryptoStable { balances, .. } => balances.get_mut(index),
             Pool::TriCryptoV1 { balances, .. } | Pool::TriCryptoNG { balances, .. } => {
-                balances[index] = value
+                balances.get_mut(index)
             }
-        }
+        };
+        *bal.ok_or("balance index out of range")? = value;
+        Ok(())
     }
 
     /// Set rate for coin at `index`. **Per-block for oracle tokens, static otherwise.**
