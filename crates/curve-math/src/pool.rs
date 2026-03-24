@@ -173,20 +173,6 @@ pub enum Pool {
 }
 
 impl Pool {
-    /// Number of coins in this pool.
-    pub fn n_coins(&self) -> usize {
-        match self {
-            Pool::StableSwapV0 { balances, .. }
-            | Pool::StableSwapV1 { balances, .. }
-            | Pool::StableSwapV2 { balances, .. }
-            | Pool::StableSwapALend { balances, .. }
-            | Pool::StableSwapNG { balances, .. }
-            | Pool::StableSwapMeta { balances, .. } => balances.len(),
-            Pool::TwoCryptoV1 { .. } | Pool::TwoCryptoNG { .. } | Pool::TwoCryptoStable { .. } => 2,
-            Pool::TriCryptoV1 { .. } | Pool::TriCryptoNG { .. } => 3,
-        }
-    }
-
     /// Token balances in native units (wei).
     pub fn balances(&self) -> &[U256] {
         match self {
