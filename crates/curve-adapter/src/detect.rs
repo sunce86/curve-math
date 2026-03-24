@@ -200,7 +200,6 @@ mod tests {
         s.parse().unwrap()
     }
 
-
     #[test]
     fn detect_tricrypto_v1_by_address() {
         let probing = ProbingResults {
@@ -332,7 +331,6 @@ mod tests {
         };
         assert!(detect_variant(&probing).is_err());
     }
-
 
     #[test]
     fn detect_stableswap_ng() {

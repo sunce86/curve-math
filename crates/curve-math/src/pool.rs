@@ -908,57 +908,67 @@ impl Pool {
     /// Set rate for coin at `index`. **Per-block for oracle tokens, static otherwise.**
     ///
     /// Applies to StableSwap variants with rates (V0/V1/V2/NG/Meta).
-    /// For ALend (precision_mul) and CryptoSwap (precisions), this is not applicable.
-    ///
-    /// # Panics
-    /// Panics if called on ALend or CryptoSwap variant, or if index is out of range.
-    pub fn set_rate(&mut self, index: usize, value: U256) {
+    /// Returns `Err` for ALend (uses precision_mul) and CryptoSwap (uses precisions).
+    pub fn set_rate(&mut self, index: usize, value: U256) -> Result<(), &'static str> {
         match self {
             Pool::StableSwapV0 { rates, .. }
             | Pool::StableSwapV1 { rates, .. }
             | Pool::StableSwapV2 { rates, .. }
             | Pool::StableSwapNG { rates, .. }
-            | Pool::StableSwapMeta { rates, .. } => rates[index] = value,
-            _ => panic!("set_rate not applicable to this variant"),
+            | Pool::StableSwapMeta { rates, .. } => {
+                *rates.get_mut(index).ok_or("rate index out of range")? = value;
+                Ok(())
+            }
+            _ => Err("set_rate not applicable to this variant"),
         }
     }
 
     /// Set pool invariant D. **Per-block update for CryptoSwap.**
     ///
-    /// # Panics
-    /// Panics if called on StableSwap variant.
-    pub fn set_d(&mut self, value: U256) {
+    /// Returns `Err` for StableSwap variants (D is computed, not stored).
+    pub fn set_d(&mut self, value: U256) -> Result<(), &'static str> {
         match self {
             Pool::TwoCryptoV1 { d, .. }
             | Pool::TwoCryptoNG { d, .. }
-            | Pool::TwoCryptoStable { d, .. } => *d = value,
-            Pool::TriCryptoV1 { d, .. } | Pool::TriCryptoNG { d, .. } => *d = value,
-            _ => panic!("set_d not applicable to StableSwap variants"),
+            | Pool::TwoCryptoStable { d, .. } => {
+                *d = value;
+                Ok(())
+            }
+            Pool::TriCryptoV1 { d, .. } | Pool::TriCryptoNG { d, .. } => {
+                *d = value;
+                Ok(())
+            }
+            _ => Err("set_d not applicable to StableSwap variants"),
         }
     }
 
     /// Set price_scale at `index`. **Per-block update for CryptoSwap.**
     ///
-    /// TwoCrypto: index must be 0. TriCrypto: index must be 0 or 1.
-    ///
-    /// # Panics
-    /// Panics if called on StableSwap variant or index is out of range.
-    pub fn set_price_scale(&mut self, index: usize, value: U256) {
+    /// Returns `Err` for StableSwap variants or if index is out of range.
+    pub fn set_price_scale(&mut self, index: usize, value: U256) -> Result<(), &'static str> {
         match self {
             Pool::TwoCryptoV1 { price_scale, .. }
             | Pool::TwoCryptoNG { price_scale, .. }
             | Pool::TwoCryptoStable { price_scale, .. } => {
-                assert_eq!(index, 0, "TwoCrypto has single price_scale");
+                if index != 0 {
+                    return Err("TwoCrypto has single price_scale (index must be 0)");
+                }
                 *price_scale = value;
+                Ok(())
             }
             Pool::TriCryptoV1 { price_scale, .. } | Pool::TriCryptoNG { price_scale, .. } => {
-                price_scale[index] = value
+                *price_scale
+                    .get_mut(index)
+                    .ok_or("price_scale index out of range")? = value;
+                Ok(())
             }
-            _ => panic!("set_price_scale not applicable to StableSwap variants"),
+            _ => Err("set_price_scale not applicable to StableSwap variants"),
         }
     }
 
     /// Set amplification parameter. **Semi-static (changes during A ramping).**
+    ///
+    /// Applicable to all variants.
     pub fn set_amp(&mut self, value: U256) {
         match self {
             Pool::StableSwapV0 { amp, .. }
@@ -976,13 +986,18 @@ impl Pool {
 
     /// Set gamma parameter. **Semi-static (changes during gamma ramping).**
     ///
-    /// # Panics
-    /// Panics if called on StableSwap or TwoCryptoStable variant.
-    pub fn set_gamma(&mut self, value: U256) {
+    /// Returns `Err` for StableSwap and TwoCryptoStable variants.
+    pub fn set_gamma(&mut self, value: U256) -> Result<(), &'static str> {
         match self {
-            Pool::TwoCryptoV1 { gamma, .. } | Pool::TwoCryptoNG { gamma, .. } => *gamma = value,
-            Pool::TriCryptoV1 { gamma, .. } | Pool::TriCryptoNG { gamma, .. } => *gamma = value,
-            _ => panic!("set_gamma not applicable to this variant"),
+            Pool::TwoCryptoV1 { gamma, .. } | Pool::TwoCryptoNG { gamma, .. } => {
+                *gamma = value;
+                Ok(())
+            }
+            Pool::TriCryptoV1 { gamma, .. } | Pool::TriCryptoNG { gamma, .. } => {
+                *gamma = value;
+                Ok(())
+            }
+            _ => Err("set_gamma not applicable to this variant"),
         }
     }
 }

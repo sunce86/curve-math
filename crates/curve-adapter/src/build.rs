@@ -678,7 +678,6 @@ fn build_tricrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
 mod tests {
     use super::*;
 
-
     #[test]
     fn interpolate_a_no_ramp() {
         // initial_A == future_A, any timestamp → returns the value
@@ -769,7 +768,6 @@ mod tests {
         let result = interpolate_a(U256::from(10_000u64), U256::from(10_003u64), 0, 1000, 1);
         assert_eq!(result, U256::from(10_000u64));
     }
-
 
     #[test]
     fn build_stableswap_v0_basic() {
@@ -904,7 +902,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn build_twocrypto_ng_basic() {
         let state = RawPoolState {
@@ -1001,7 +998,6 @@ mod tests {
             _ => panic!("wrong variant"),
         }
     }
-
 
     #[test]
     fn build_missing_fee_returns_error() {
@@ -1169,7 +1165,6 @@ mod tests {
         };
         assert!(matches!(err, BuildError::MetaMissingVirtualPrice));
     }
-
 
     #[test]
     fn rates_match_fuzz_registry_18_dec() {
