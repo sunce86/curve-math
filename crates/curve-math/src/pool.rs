@@ -768,7 +768,6 @@ impl Pool {
         }
     }
 
-    // ── Per-field getters ───────────────────────────────────────────────
 
     /// Amplification parameter (`amp` for StableSwap, `ann` for CryptoSwap).
     pub fn amp(&self) -> U256 {
@@ -882,7 +881,6 @@ impl Pool {
         }
     }
 
-    // ── Per-field setters (non-static fields) ────────────────────────────
 
     /// Set balance for coin at `index`. **Per-block update.**
     ///
