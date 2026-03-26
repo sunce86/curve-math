@@ -18,10 +18,12 @@
 //! 1. `stored_rates()` → **StableSwapNG** (all NG pools, including v5+ crvUSD
 //!    factory pools that lack `offpeg_fee_multiplier()`)
 //! 2. `offpeg_fee_multiplier()` without `stored_rates()` → **StableSwapALend**
-//! 3. `base_pool()` → **StableSwapMeta**
-//! 4. `balances(int128)` → **StableSwapV0**
-//! 5. Known address → **StableSwapV0** / **StableSwapV1**
-//! 6. Fallback → **StableSwapV2**
+//! 3. `version()` → **StableSwapNG** (v6+ crvUSD factory pools that lack both
+//!    `stored_rates()` and `offpeg_fee_multiplier()`)
+//! 4. `base_pool()` → **StableSwapMeta**
+//! 5. `balances(int128)` → **StableSwapV0**
+//! 6. Known address → **StableSwapV0** / **StableSwapV1**
+//! 7. Fallback → **StableSwapV2**
 //!
 //! # Limitations
 //!
