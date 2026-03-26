@@ -183,9 +183,9 @@ def _has_stored_rates(w3, addr, block="latest"):
     success/failure for variant detection, not the actual values.
     """
     try:
-        # selector: keccak256("stored_rates()")[:4] = 0xd3792297
+        # selector: keccak256("stored_rates()")[:4] = 0xfd0684b1
         result = w3.eth.call(
-            {"to": Web3.to_checksum_address(addr), "data": "0xd3792297"},
+            {"to": Web3.to_checksum_address(addr), "data": "0xfd0684b1"},
             block_identifier=block,
         )
         return len(result) >= 64  # at least 2 uint256 values (2-coin pool)
