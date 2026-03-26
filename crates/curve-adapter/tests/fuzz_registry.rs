@@ -440,9 +440,29 @@ async fn read_and_build_pool(
             // v5+ crvUSD factory pools lack offpeg_fee_multiplier;
             // builder defaults to FEE_DENOMINATOR when None.
             let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok();
-            let dynamic_rates = match c.stored_rates().block(block).call().await {
-                Ok(r) if r.len() == n_coins => Some(r.into_iter().map(Some).collect()),
-                _ => None,
+            // Vyper stored_rates() returns a fixed-size uint256[N_COINS] which is
+            // ABI-encoded WITHOUT a length prefix (unlike Solidity's uint256[]).
+            // alloy's sol! macro generates a uint256[] decoder that expects a
+            // length prefix, so decoding silently fails. Use raw eth_call and
+            // manually slice 32-byte chunks instead.
+            let dynamic_rates = {
+                use alloy::providers::Provider;
+                let calldata = alloy::primitives::bytes!("fd0684b1"); // stored_rates()
+                let tx = alloy::rpc::types::TransactionRequest::default()
+                    .to(addr)
+                    .input(calldata.into());
+                match provider.call(tx).block(block.into()).await {
+                    Ok(output) if output.len() >= n_coins * 32 => {
+                        let rates: Vec<Option<U256>> = (0..n_coins)
+                            .map(|i| {
+                                let start = i * 32;
+                                Some(U256::from_be_slice(&output[start..start + 32]))
+                            })
+                            .collect();
+                        Some(rates)
+                    }
+                    _ => None,
+                }
             };
             RawPoolState {
                 variant,
