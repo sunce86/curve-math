@@ -235,6 +235,11 @@ def detect_variant_onchain(w3, addr, block):
     if has_offpeg:
         return "StableSwapALend"
 
+    # version() → NG (v6+ crvUSD factory pools without stored_rates or offpeg)
+    has_version, _ = _probe(w3, addr, VERSION_ABI, "version", block=block)
+    if has_version:
+        return "StableSwapNG"
+
     has_base_pool, _ = _probe(w3, addr, BASE_POOL_ABI, "base_pool", block=block)
     if has_base_pool:
         return "StableSwapMeta"

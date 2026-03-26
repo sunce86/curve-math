@@ -25,6 +25,7 @@
 //!   v6+ returns dynamic `uint256[]` (with offset + length prefix).
 //!   Consumers reading rates on-chain must handle both formats.
 //! - If StableSwap has `offpeg_fee_multiplier()` without `stored_rates()` → ALend
+//! - If StableSwap has `version()` → NG (v6+ crvUSD factory pools without stored_rates or offpeg)
 //! - Check `A_PRECISION` (1 for V0/V1, 100 for V2/Meta/ALend/NG)
 
 use alloy_primitives::U256;
