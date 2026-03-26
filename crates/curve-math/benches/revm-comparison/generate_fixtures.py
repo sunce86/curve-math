@@ -115,12 +115,20 @@ def read_pool_params(w3, addr, variant, block):
         params["rates"] = [str(10 ** (36 - d)) for d in decimals]
         params["A"] = str(A * 100)  # A_PRECISION
     elif variant == "StableSwapNG":
-        co = w3.eth.contract(address=addr, abi=OFFPEG_ABI)
         params["fee"] = str(c.functions.fee().call(block_identifier=block))
-        params["offpeg_fee_multiplier"] = str(co.functions.offpeg_fee_multiplier().call(block_identifier=block))
-        rates = co.functions.stored_rates().call(block_identifier=block)
-        params["rates"] = [str(r) for r in rates]
         params["A"] = str(A * 100)  # A_PRECISION
+        # offpeg_fee_multiplier: v5+ crvUSD factory pools lack this
+        co = w3.eth.contract(address=addr, abi=OFFPEG_ABI)
+        try:
+            params["offpeg_fee_multiplier"] = str(co.functions.offpeg_fee_multiplier().call(block_identifier=block))
+        except Exception:
+            params["offpeg_fee_multiplier"] = str(10_000_000_000)  # FEE_DENOMINATOR default
+        # stored_rates: v6+ crvUSD factory pools lack this, use decimal-based rates
+        try:
+            rates = co.functions.stored_rates().call(block_identifier=block)
+            params["rates"] = [str(r) for r in rates]
+        except Exception:
+            params["rates"] = [str(10 ** (36 - d)) for d in decimals]
     elif variant in ("TwoCryptoNG", "TwoCryptoV1"):
         cc = w3.eth.contract(address=addr, abi=CRYPTO_ABI)
         params["gamma"] = str(cc.functions.gamma().call(block_identifier=block))
