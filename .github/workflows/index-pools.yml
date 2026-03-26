@@ -48,6 +48,7 @@ jobs:
 
       - name: Read PR summary
         id: summary
+        working-directory: crates/curve-adapter
         run: |
           if [ -f .pr-summary.md ]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
