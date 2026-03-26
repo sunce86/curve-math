@@ -13,6 +13,16 @@
 //! (deploy events, protocol metadata, etc.), skip this and pass the
 //! variant directly to [`RawPoolState`](crate::RawPoolState).
 //!
+//! # Detection order (StableSwap)
+//!
+//! 1. `stored_rates()` → **StableSwapNG** (all NG pools, including v5+ crvUSD
+//!    factory pools that lack `offpeg_fee_multiplier()`)
+//! 2. `offpeg_fee_multiplier()` without `stored_rates()` → **StableSwapALend**
+//! 3. `base_pool()` → **StableSwapMeta**
+//! 4. `balances(int128)` → **StableSwapV0**
+//! 5. Known address → **StableSwapV0** / **StableSwapV1**
+//! 6. Fallback → **StableSwapV2**
+//!
 //! # Limitations
 //!
 //! MetaPool Factory proxy pools lack `base_pool()`. Without factory context,
@@ -59,9 +69,13 @@ pub struct ProbingResults {
     pub math_version: Option<String>,
 
     /// Pool has `offpeg_fee_multiplier()` → StableSwapNG or StableSwapALend.
+    /// Note: v5+ crvUSD StableSwap Factory pools may lack this while still
+    /// being NG (detected via `stored_rates()` instead).
     pub has_offpeg_fee_multiplier: bool,
 
-    /// Pool has `stored_rates()` → StableSwapNG (ALend does not have this).
+    /// Pool has `stored_rates()` → StableSwapNG. Present on all NG pools
+    /// including v5+ crvUSD factory pools that lack `offpeg_fee_multiplier()`.
+    /// ALend does not have this.
     pub has_stored_rates: bool,
 
     /// Pool has `base_pool()` → StableSwapMeta.
@@ -135,13 +149,15 @@ fn detect_cryptoswap(probing: &ProbingResults) -> Result<CurveVariant, DetectErr
 }
 
 fn detect_stableswap(probing: &ProbingResults) -> CurveVariant {
-    // offpeg_fee_multiplier → NG or ALend
+    // stored_rates → NG (covers standard NG pools with offpeg_fee_multiplier
+    // AND v5+ crvUSD factory pools that have stored_rates without offpeg)
+    if probing.has_stored_rates {
+        return CurveVariant::StableSwapNG;
+    }
+
+    // offpeg_fee_multiplier without stored_rates → ALend
     if probing.has_offpeg_fee_multiplier {
-        if probing.has_stored_rates {
-            return CurveVariant::StableSwapNG;
-        } else {
-            return CurveVariant::StableSwapALend;
-        }
+        return CurveVariant::StableSwapALend;
     }
 
     // base_pool() → Meta
@@ -344,6 +360,26 @@ mod tests {
             has_base_pool: false,
             has_int128_balances: false,
             pool_address: addr("0xF36a4BA50C603204c3FC6d2dA8b78A7b69CBC67d"),
+        };
+        assert_eq!(
+            detect_variant(&probing).unwrap(),
+            CurveVariant::StableSwapNG
+        );
+    }
+
+    #[test]
+    fn detect_stableswap_ng_without_offpeg() {
+        // v5+ crvUSD factory pool: has stored_rates but no offpeg_fee_multiplier
+        let probing = ProbingResults {
+            has_gamma: false,
+            n_coins: 2,
+            has_math: false,
+            math_version: None,
+            has_offpeg_fee_multiplier: false,
+            has_stored_rates: true,
+            has_base_pool: false,
+            has_int128_balances: false,
+            pool_address: addr("0x1539c2461d7432cc114b0903f1824079BfCA2C92"),
         };
         assert_eq!(
             detect_variant(&probing).unwrap(),

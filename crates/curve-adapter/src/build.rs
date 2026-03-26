@@ -473,7 +473,11 @@ fn build_stableswap_plain(state: &RawPoolState) -> Result<Pool, BuildError> {
 
 fn build_stableswap_ng(state: &RawPoolState) -> Result<Pool, BuildError> {
     let fee = require!(state, fee);
-    let offpeg = require!(state, offpeg_fee_multiplier);
+    // v5+ crvUSD factory pools lack offpeg_fee_multiplier.
+    // FEE_DENOMINATOR makes dynamic_fee() return the static fee unchanged.
+    let offpeg = state
+        .offpeg_fee_multiplier
+        .unwrap_or(U256::from(10_000_000_000u64));
 
     for (i, &d) in state.token_decimals.iter().enumerate() {
         if d > 36 {
@@ -1095,28 +1099,63 @@ mod tests {
     }
 
     #[test]
-    fn build_ng_missing_offpeg_returns_error() {
+    fn build_ng_without_offpeg_defaults_to_fee_denominator() {
+        // v5+ crvUSD factory pools lack offpeg_fee_multiplier
         let state = RawPoolState {
             variant: CurveVariant::StableSwapNG,
             balances: vec![U256::from(1u64), U256::from(1u64)],
             token_decimals: vec![18, 18],
             amp: U256::from(40_000u64),
             fee: Some(U256::from(4_000_000u64)),
-            // offpeg_fee_multiplier intentionally missing
+            // offpeg_fee_multiplier intentionally missing — defaults to FEE_DENOMINATOR
             ..Default::default()
         };
 
-        let err = match build_pool(&state) {
-            Err(e) => e,
-            Ok(_) => panic!("expected error"),
+        let pool = build_pool(&state).expect("should succeed with defaulted offpeg");
+        // FEE_DENOMINATOR = 10_000_000_000
+        assert_eq!(
+            pool.offpeg_fee_multiplier(),
+            Some(U256::from(10_000_000_000u64))
+        );
+    }
+
+    #[test]
+    fn build_ng_crvusd_sdai_matches_on_chain() {
+        // Real on-chain state for pool 0x1539c2461d7432cc114b0903f1824079BfCA2C92
+        // (crvUSD/sDAI, v5.0.0 from crvUSD StableSwap Factory, no offpeg_fee_multiplier)
+        let state = RawPoolState {
+            variant: CurveVariant::StableSwapNG,
+            balances: vec![
+                "3219009600398261994".parse::<U256>().expect("balance 0"),
+                "311156701443769568".parse::<U256>().expect("balance 1"),
+            ],
+            token_decimals: vec![18, 18],
+            amp: U256::from(150_000u64),
+            fee: Some(U256::from(1_000_000u64)),
+            // offpeg_fee_multiplier absent (v5+ pool) — defaults to FEE_DENOMINATOR
+            dynamic_rates: Some(vec![
+                Some("1000000000000000000".parse::<U256>().expect("rate 0")),
+                Some("1173627645818786870".parse::<U256>().expect("rate 1")),
+            ]),
+            ..Default::default()
         };
-        assert!(matches!(
-            err,
-            BuildError::MissingField {
-                field: "offpeg_fee_multiplier",
-                ..
-            }
-        ));
+
+        let pool = build_pool(&state).expect("should build with defaulted offpeg");
+        let dy = pool
+            .get_amount_out(0, 1, U256::from(3_219_009_600_398_261u64))
+            .expect("swap should succeed");
+
+        // On-chain get_dy(0, 1, 3219009600398261) = 2720818166217034
+        let expected = U256::from(2_720_818_166_217_034u64);
+        let diff = if dy > expected {
+            dy - expected
+        } else {
+            expected - dy
+        };
+        assert!(
+            diff <= U256::from(1u64),
+            "mismatch: got {dy}, expected {expected}, diff {diff}"
+        );
     }
 
     #[test]

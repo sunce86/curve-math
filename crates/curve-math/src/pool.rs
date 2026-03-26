@@ -19,7 +19,8 @@
 //! - Pools from a known factory → the factory determines the variant (NG, twocrypto-ng, tricrypto-ng)
 //! - Legacy pools → match by pool address against known deployments
 //! - If the pool has `gamma()` → CryptoSwap; otherwise StableSwap
-//! - If StableSwap has `offpeg_fee_multiplier()` → ALend or NG
+//! - If StableSwap has `stored_rates()` → NG (including v5+ crvUSD factory pools without offpeg)
+//! - If StableSwap has `offpeg_fee_multiplier()` without `stored_rates()` → ALend
 //! - Check `A_PRECISION` (1 for V0/V1, 100 for V2/Meta/ALend/NG)
 
 use alloy_primitives::U256;

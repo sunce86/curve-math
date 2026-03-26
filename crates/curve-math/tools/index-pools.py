@@ -173,6 +173,26 @@ def _probe(w3, addr, abi, fn_name, args=None, block="latest"):
         return False, None
 
 
+def _has_stored_rates(w3, addr, block="latest"):
+    """Check if pool has stored_rates() using raw eth_call.
+
+    Vyper's stored_rates() returns a fixed-size uint256[N_COINS] which encodes
+    differently from Solidity's uint256[] (no length prefix). web3.py cannot
+    decode the fixed-size encoding with a uint256[] ABI. Using raw eth_call
+    with just the function selector avoids the decode issue — we only need
+    success/failure for variant detection, not the actual values.
+    """
+    try:
+        # selector: keccak256("stored_rates()")[:4] = 0xd3792297
+        result = w3.eth.call(
+            {"to": Web3.to_checksum_address(addr), "data": "0xd3792297"},
+            block_identifier=block,
+        )
+        return len(result) >= 64  # at least 2 uint256 values (2-coin pool)
+    except Exception:
+        return False
+
+
 def detect_variant_onchain(w3, addr, block):
     """Detect pool variant by probing on-chain functions.
 
@@ -202,11 +222,17 @@ def detect_variant_onchain(w3, addr, block):
             return "TwoCryptoV1"
         return "TwoCryptoNG"
 
+    # stored_rates → NG (covers standard NG pools AND v5+ crvUSD factory pools
+    # that have stored_rates without offpeg_fee_multiplier).
+    # Use raw eth_call with selector because Vyper returns fixed-size uint256[N_COINS]
+    # which web3.py cannot decode with the uint256[] ABI.
+    has_stored_rates = _has_stored_rates(w3, addr, block=block)
+    if has_stored_rates:
+        return "StableSwapNG"
+
+    # offpeg_fee_multiplier without stored_rates → ALend
     has_offpeg, _ = _probe(w3, addr, OFFPEG_ABI, "offpeg_fee_multiplier", block=block)
     if has_offpeg:
-        has_stored_rates, _ = _probe(w3, addr, STORED_RATES_ABI, "stored_rates", block=block)
-        if has_stored_rates:
-            return "StableSwapNG"
         return "StableSwapALend"
 
     has_base_pool, _ = _probe(w3, addr, BASE_POOL_ABI, "base_pool", block=block)

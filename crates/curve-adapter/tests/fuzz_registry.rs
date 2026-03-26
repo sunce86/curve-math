@@ -437,7 +437,9 @@ async fn read_and_build_pool(
                 _ => c.A().block(block).call().await.ok()? * a_prec_100,
             };
             let fee = c.fee().block(block).call().await.ok()?;
-            let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok()?;
+            // v5+ crvUSD factory pools lack offpeg_fee_multiplier;
+            // builder defaults to FEE_DENOMINATOR when None.
+            let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok();
             let dynamic_rates = match c.stored_rates().block(block).call().await {
                 Ok(r) if r.len() == n_coins => Some(r.into_iter().map(Some).collect()),
                 _ => None,
@@ -448,7 +450,7 @@ async fn read_and_build_pool(
                 token_decimals: decimals,
                 amp,
                 fee: Some(fee),
-                offpeg_fee_multiplier: Some(offpeg),
+                offpeg_fee_multiplier: offpeg,
                 dynamic_rates,
                 ..Default::default()
             }
