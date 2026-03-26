@@ -223,6 +223,8 @@ pub struct RawPoolState {
     /// Per-token dynamic rates for StableSwap variants. **Depends on token type.**
     ///
     /// If `None`, rates are computed from `token_decimals` as `10^(36 - decimals)`.
+    /// This is correct for v6+ crvUSD factory pools (balances variant) which
+    /// use static decimal-based rates and have no `stored_rates()` getter.
     ///
     /// If `Some`, must have the same length as `balances`. Each element:
     /// - `Some(rate)` — use this dynamic rate (oracle, ERC4626, etc.)
@@ -473,8 +475,10 @@ fn build_stableswap_plain(state: &RawPoolState) -> Result<Pool, BuildError> {
 
 fn build_stableswap_ng(state: &RawPoolState) -> Result<Pool, BuildError> {
     let fee = require!(state, fee);
-    // v5+ crvUSD factory pools lack offpeg_fee_multiplier.
+    // crvUSD factory pools (v5 and v6) lack offpeg_fee_multiplier.
     // FEE_DENOMINATOR makes dynamic_fee() return the static fee unchanged.
+    // Consumers reading from substreams or other indexers should pass
+    // offpeg_fee_multiplier: None for these pools — this default handles it.
     let offpeg = state
         .offpeg_fee_multiplier
         .unwrap_or(U256::from(10_000_000_000u64));
