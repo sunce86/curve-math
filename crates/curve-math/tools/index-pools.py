@@ -584,7 +584,11 @@ CHAIN_FUZZ_BADGES = {
 
 def update_readme_badge(chain_id: int, count: int, last_updated: str, total: int = 0):
     """Update the chain status table row for the given chain in README.md."""
-    readme = Path("README.md")
+    git_root = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    readme = Path(git_root) / "README.md"
     if not readme.exists():
         return
     content = readme.read_text()
