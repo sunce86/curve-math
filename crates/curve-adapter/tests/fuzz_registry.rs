@@ -440,9 +440,41 @@ async fn read_and_build_pool(
             // v5+ crvUSD factory pools lack offpeg_fee_multiplier;
             // builder defaults to FEE_DENOMINATOR when None.
             let offpeg = c.offpeg_fee_multiplier().block(block).call().await.ok();
-            let dynamic_rates = match c.stored_rates().block(block).call().await {
-                Ok(r) if r.len() == n_coins => Some(r.into_iter().map(Some).collect()),
-                _ => None,
+            // stored_rates() encoding varies by pool version:
+            // - Older NG (v5+): fixed-size uint256[N_COINS], no length prefix
+            // - Newer NG (v6+): dynamic uint256[], with offset + length prefix
+            // Detect by checking if first word is a small offset (dynamic) or
+            // a large rate value (fixed). Use raw eth_call for both.
+            let dynamic_rates = {
+                use alloy::providers::Provider;
+                let calldata = alloy::primitives::bytes!("fd0684b1"); // stored_rates()
+                let tx = alloy::rpc::types::TransactionRequest::default()
+                    .to(addr)
+                    .input(calldata.into());
+                match provider.call(tx).block(block.into()).await {
+                    Ok(output) if output.len() >= n_coins * 32 => {
+                        // Heuristic: if first word <= 256, it's an ABI offset
+                        // (dynamic encoding), not a rate (rates are >= 10^18).
+                        let first_word = U256::from_be_slice(&output[..32]);
+                        let data_offset = if first_word <= U256::from(256u64)
+                            && output.len() >= (n_coins + 2) * 32
+                        {
+                            // Dynamic: skip offset word + length word
+                            64
+                        } else {
+                            // Fixed: rates start at byte 0
+                            0
+                        };
+                        let rates: Vec<Option<U256>> = (0..n_coins)
+                            .map(|i| {
+                                let start = data_offset + i * 32;
+                                Some(U256::from_be_slice(&output[start..start + 32]))
+                            })
+                            .collect();
+                        Some(rates)
+                    }
+                    _ => None,
+                }
             };
             RawPoolState {
                 variant,

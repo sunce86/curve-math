@@ -20,6 +20,10 @@
 //! - Legacy pools → match by pool address against known deployments
 //! - If the pool has `gamma()` → CryptoSwap; otherwise StableSwap
 //! - If StableSwap has `stored_rates()` → NG (including v5+ crvUSD factory pools without offpeg)
+//!   **Note:** `stored_rates()` return encoding varies by pool version:
+//!   v5+ returns fixed-size `uint256[N_COINS]` (no ABI length prefix),
+//!   v6+ returns dynamic `uint256[]` (with offset + length prefix).
+//!   Consumers reading rates on-chain must handle both formats.
 //! - If StableSwap has `offpeg_fee_multiplier()` without `stored_rates()` → ALend
 //! - Check `A_PRECISION` (1 for V0/V1, 100 for V2/Meta/ALend/NG)
 
