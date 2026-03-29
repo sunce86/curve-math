@@ -35,7 +35,7 @@ jobs:
             echo "::warning::RPC_URL_1 not set, skipping"
             exit 0
           fi
-          python ../curve-math/tools/index-pools.py --chain-id 1 --max-new 30
+          python ../curve-math/tools/index-pools.py --chain-id 1 --max-new 10
 
       - name: Fuzz new pools only
         if: hashFiles('crates/curve-adapter/tests/registry/1_pending.toml') != ''
@@ -55,7 +55,7 @@ jobs:
             echo "::warning::RPC_URL_8453 not set, skipping"
             exit 0
           fi
-          python ../curve-math/tools/index-pools.py --chain-id 8453 --max-new 30
+          python ../curve-math/tools/index-pools.py --chain-id 8453 --max-new 10
 
       - name: Fuzz new pools only (Base)
         if: hashFiles('crates/curve-adapter/tests/registry/8453_pending.toml') != ''
@@ -75,7 +75,7 @@ jobs:
             echo "::warning::RPC_URL_42161 not set, skipping"
             exit 0
           fi
-          python ../curve-math/tools/index-pools.py --chain-id 42161 --max-new 30
+          python ../curve-math/tools/index-pools.py --chain-id 42161 --max-new 10
 
       - name: Fuzz new pools only (Arbitrum)
         if: hashFiles('crates/curve-adapter/tests/registry/42161_pending.toml') != ''
