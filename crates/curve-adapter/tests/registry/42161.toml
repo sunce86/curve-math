@@ -5,3 +5,27 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
+[[pools]]
+address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
+variant = "StableSwapV2"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb"
+variant = "StableSwapV2"
+name = "WBTC/renBTC"
+
+[[pools]]
+address = "0xC9B8a3FDECB9D5b218d02555a8Baf332E5B740d5"
+variant = "StableSwapV2"
+name = "FRAX/USDC"
+
+[[pools]]
+address = "0x960ea3e3C7FB317332d990873d354E18d7645590"
+variant = "TriCryptoV1"
+name = "USDT/WBTC/WETH"
+
+[[pools]]
+address = "0xA827a652Ead76c6B0b3D19dba05452E06e25c27e"
+variant = "TwoCryptoV1"
+name = "EURS/2CRV"
