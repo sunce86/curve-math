@@ -235,6 +235,9 @@ pub struct RawPoolState {
     /// tokens return rates that change per-block.
     ///
     /// **MetaPools:** `rates[last]` must be `base_pool.get_virtual_price()`.
+    /// To find the base pool address: try `pool.base_pool()` first. MetaPool
+    /// Factory proxy pools lack this getter — use `factory.get_base_pool(pool)`
+    /// instead. Do not assume the base pool is 3pool; BTC meta pools use sBTC.
     ///
     /// # Gotchas
     ///
