@@ -4908,3 +4908,153 @@ address = "0xFE3C78D947b329160496E192b4Cf417bB86272Ed"
 variant = "StableSwapNG"
 name = "mwstETH-WPUNKS:20/wstETH"
 
+[[pools]]
+address = "0xef484de8C07B6e2d732A92B5F78e81B38f99f95E"
+variant = "StableSwapNG"
+name = "DOLA/FRAXPYUSD"
+
+[[pools]]
+address = "0xBeCDF453a9d69aa67d27fd391E81FD96A8b9Ade5"
+variant = "StableSwapNG"
+name = "senUSD/USDC"
+
+[[pools]]
+address = "0x9e10f9Fb6F0D32B350CEe2618662243d4f24C64a"
+variant = "StableSwapNG"
+name = "mkUSD/PYUSDUSDC"
+
+[[pools]]
+address = "0x2022d9AF896eCF0F1f5B48cdDaB9e74b5aAbCf00"
+variant = "StableSwapNG"
+name = "mswETH/swETH"
+
+[[pools]]
+address = "0xC040041088B008EAC1bf5FB886eAc8c1e244B60F"
+variant = "StableSwapNG"
+name = "mstETH/wstETH"
+
+[[pools]]
+address = "0x2482DFb5A65D901d137742AB1095f26374509352"
+variant = "StableSwapNG"
+name = "PUSd/3Crv"
+
+[[pools]]
+address = "0xeAC874aeD7761460dD4c89778Ba6db7d320911a8"
+variant = "StableSwapNG"
+name = "eETH/WETH"
+
+[[pools]]
+address = "0xe4F00da633c6aA958E851469bdF179950502691d"
+variant = "StableSwapNG"
+name = "stZETA/ZETA"
+
+[[pools]]
+address = "0xB3c8Ce1eE157b0DCAa96897C9170aEe6281706c9"
+variant = "StableSwapNG"
+name = "pufETH/wstETH"
+
+[[pools]]
+address = "0x745213A540C932425D9c8cBc2B9BfB796C759e2f"
+variant = "StableSwapNG"
+name = "rsfrxETH/sfrxETH"
+
+[[pools]]
+address = "0xC6628f00F29cc89a87BBeE7554C4725611200fD7"
+variant = "StableSwapNG"
+name = "SDT/cvgSDT"
+
+[[pools]]
+address = "0x278cfB6f06B1EFc09d34fC7127d6060C61d629Db"
+variant = "StableSwapNG"
+name = "weETH/rswETH"
+
+[[pools]]
+address = "0x85dE3ADd465a219EE25E04d22c39aB027cF5C12E"
+variant = "StableSwapNG"
+name = "ezETH/WETH"
+
+[[pools]]
+address = "0xe3E637f8aCC097244A065791142c29fbF5877D18"
+variant = "StableSwapNG"
+name = "crvUSD/cncCRVUSD"
+
+[[pools]]
+address = "0xeE04382c4cA6c450213923fE0f0daB19b0ff3939"
+variant = "StableSwapNG"
+name = "WETH/rswETH"
+
+[[pools]]
+address = "0x3dbdB2656F36A1B19971d798Dd59f19440eDA894"
+variant = "StableSwapNG"
+name = "rstETH/stETH"
+
+[[pools]]
+address = "0xEEBF6E8B2e4bb9A749F64B2799b4Ea4aED09696A"
+variant = "StableSwapNG"
+name = "rosETH/osETH"
+
+[[pools]]
+address = "0xDD4316c777a2295D899ba7ad92E0eFa699865f43"
+variant = "StableSwapNG"
+name = "rmETH/mETH"
+
+[[pools]]
+address = "0x31b46c84e4fb0704dE69DBf4B054b5Cb81Aa3736"
+variant = "StableSwapNG"
+name = "LYU/USDT/USDC/DAI"
+
+[[pools]]
+address = "0x3C91EAeac42DfaEad5F356167c52837e443b9f94"
+variant = "StableSwapNG"
+name = "xETH/pxETH"
+
+[[pools]]
+address = "0x0f2F4D68308dB60d36268a602EF273421A227021"
+variant = "StableSwapNG"
+name = "uniETH/WETH"
+
+[[pools]]
+address = "0x6685fcFCe05e7502bf9f0AA03B36025b09374726"
+variant = "StableSwapNG"
+name = "vETH/WETH"
+
+[[pools]]
+address = "0x1ab3D612EA7df26117554ddDD379764EBcE1A5Ad"
+variant = "StableSwapNG"
+name = "mkUSD/USDe"
+
+[[pools]]
+address = "0x3772ba91B46f456AE487CB0974040c861c045810"
+variant = "StableSwapNG"
+name = "sfrxETH/rsETH"
+
+[[pools]]
+address = "0x91285c4fC766ffF6F3acAfeEC7a0423275257faE"
+variant = "StableSwapNG"
+name = "eUSD/crvUSD"
+
+[[pools]]
+address = "0x67701d67b60a96473BFc4873e7a484035c8609B0"
+variant = "StableSwapNG"
+name = "crvUSD/scrvUSD-CRV"
+
+[[pools]]
+address = "0x4253Ac4046fBfDafcFE125d067B6d89f6923843E"
+variant = "StableSwapNG"
+name = "crvUSD/FraxlendV1 - CRV/FRAX"
+
+[[pools]]
+address = "0xc559f6716d8b1471Fc2DC10aAfEB0faa219fE9df"
+variant = "StableSwapNG"
+name = "sUSDe/sDAI/sFRAX"
+
+[[pools]]
+address = "0xc37c0E88551Ed383c1aBEDc6628a5579071BF56f"
+variant = "StableSwapNG"
+name = "eUSD/mkUSD"
+
+[[pools]]
+address = "0x7264cc03a9126Cc063265365fB043dF9c3479b63"
+variant = "StableSwapNG"
+name = "wstETH/ETHx"
+
