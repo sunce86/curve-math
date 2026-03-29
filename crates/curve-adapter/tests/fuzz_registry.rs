@@ -514,6 +514,8 @@ async fn read_and_build_pool(
                     alloy::sol! {
                         #[sol(rpc)]
                         interface ILPToken { function minter() external view returns (address); }
+                        #[sol(rpc)]
+                        interface IFactory { function get_base_pool(address pool) external view returns (address); }
                     }
                     match ILPToken::new(lp_token, provider)
                         .minter()
@@ -523,8 +525,18 @@ async fn read_and_build_pool(
                     {
                         Ok(a) => a,
                         Err(_) => {
-                            // CurveTokenV2 (3Crv) has no minter() — fallback to 3pool
-                            Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap()
+                            // MetaPool Factory proxy: LP token has no minter().
+                            // Ask the factory for the base pool.
+                            let factory = Address::from_str(
+                                "0xB9fC157394Af804a3578134A6585C0dc9cc990d4",
+                            )
+                            .unwrap();
+                            IFactory::new(factory, provider)
+                                .get_base_pool(addr)
+                                .block(block)
+                                .call()
+                                .await
+                                .ok()?
                         }
                     }
                 }
