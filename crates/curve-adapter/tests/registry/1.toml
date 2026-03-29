@@ -4758,3 +4758,153 @@ address = "0x941Eb6F616114e4Ecaa85377945EA306002612FE"
 variant = "TwoCryptoV1"
 name = "WETH/FXS"
 
+[[pools]]
+address = "0xD7Bf9bb6Bd088317Effd116E2B70ea3A054cBceb"
+variant = "StableSwapNG"
+name = "MIM/fxUSD"
+
+[[pools]]
+address = "0x84B5a3bD6acB304Cb89fFc43117A18BEDE062376"
+variant = "StableSwapNG"
+name = "mswETH/rswETH"
+
+[[pools]]
+address = "0x27cB9629aE3Ee05cb266B99cA4124EC999303c9D"
+variant = "StableSwapNG"
+name = "alUSD/fxUSD"
+
+[[pools]]
+address = "0x2116BFaD62b383043230501f6a124c6EA60CcfA5"
+variant = "StableSwapNG"
+name = "fxUSD/rUSD"
+
+[[pools]]
+address = "0xFD94A5dCB0E52fDD076Bee3eA1Aa16C48081660C"
+variant = "StableSwapNG"
+name = "WBTC/lvBTC"
+
+[[pools]]
+address = "0x15061E372D50792B68a8E400E89a5Da0E4861236"
+variant = "StableSwapNG"
+name = "InsfrxETH/sfrxETH"
+
+[[pools]]
+address = "0x51fd52420ce0c8df1FcF36C9511f01998de73887"
+variant = "StableSwapNG"
+name = "InswETH/swETH"
+
+[[pools]]
+address = "0x5378C23F4cF85FC28FDdea16153cf9213AefE9BE"
+variant = "StableSwapNG"
+name = "InstETH/stETH"
+
+[[pools]]
+address = "0x6fC7eA6CA8Cd2759803eb78159C931a8FF5E0557"
+variant = "StableSwapNG"
+name = "rgUSD/fxUSD"
+
+[[pools]]
+address = "0xDB81ee37b9dd2E636e2B87023029bD7F07c045b3"
+variant = "StableSwapNG"
+name = "rgUSD/crvUSD"
+
+[[pools]]
+address = "0xF5a7906b41B858B66d3A7cBe167dF1fB43FfE977"
+variant = "StableSwapNG"
+name = "rgUSD/alUSD"
+
+[[pools]]
+address = "0x3A65cbaebBFecbeA5D0CB523ab56fDbda7fF9aAA"
+variant = "StableSwapNG"
+name = "zunETH/frxETH"
+
+[[pools]]
+address = "0xdf9015472Ea23e3BeA6fbD6092915F9Ed6980a99"
+variant = "StableSwapNG"
+name = "rgUSD/eUSD/USDC"
+
+[[pools]]
+address = "0x66267c6E24fBcdeBf06AE9104e0ccFb9C8b2AE08"
+variant = "StableSwapNG"
+name = "ShezUSD/USDC"
+
+[[pools]]
+address = "0x635EF0056A597D13863B73825CcA297236578595"
+variant = "StableSwapNG"
+name = "GHO/crvUSD"
+
+[[pools]]
+address = "0xF33aB11E5C4e55DAcB13644f0C0A9d1e199A796F"
+variant = "StableSwapNG"
+name = "ULTRA/fxUSD"
+
+[[pools]]
+address = "0xcA554E2e2948a211D4650Fe0F4E271f01f9cB5F1"
+variant = "StableSwapNG"
+name = "mkUSD/fxUSD"
+
+[[pools]]
+address = "0x16b54e3aC8e3ba088333985035b869847e36E770"
+variant = "StableSwapNG"
+name = "eUSD/fxUSD"
+
+[[pools]]
+address = "0xEEda34A377dD0ca676b9511EE1324974fA8d980D"
+variant = "StableSwapNG"
+name = "pufETH/wstETH"
+
+[[pools]]
+address = "0xC03FEF1c425956A3Cd5762022E511e0d4148B3D6"
+variant = "StableSwapNG"
+name = "ULTRA/USDC"
+
+[[pools]]
+address = "0x74345504Eaea3D9408fC69Ae7EB2d14095643c5b"
+variant = "StableSwapNG"
+name = "GHO/fxUSD"
+
+[[pools]]
+address = "0x1EE81c56e42EC34039D993d12410d437DdeA341E"
+variant = "StableSwapNG"
+name = "FRAX/fxUSD"
+
+[[pools]]
+address = "0x69Cf42F15F9325986154b61A013da6E8feC82CCF"
+variant = "StableSwapNG"
+name = "GRAI/fxUSD"
+
+[[pools]]
+address = "0x189B4e49B5cAf33565095097b4B960F14032C7D0"
+variant = "StableSwapNG"
+name = "DOLA/fxUSD"
+
+[[pools]]
+address = "0xd6982da59F1D26476E259559508f4135135cf9b8"
+variant = "StableSwapNG"
+name = "PYUSD/fxUSD"
+
+[[pools]]
+address = "0x8fFC7b89412eFD0D17EDEa2018F6634eA4C2FCb2"
+variant = "StableSwapNG"
+name = "crvUSD/fxUSD"
+
+[[pools]]
+address = "0x670a72e6D22b0956C0D2573288F82DCc5d6E3a61"
+variant = "StableSwapNG"
+name = "GHO/USDe"
+
+[[pools]]
+address = "0x8C24b3213FD851db80245FCCc42c40B94Ac9a745"
+variant = "StableSwapNG"
+name = "crvUSD/zunUSD"
+
+[[pools]]
+address = "0xC236BAE6e35b3Fb7335e1c35CA0862Ce92bd5DE3"
+variant = "StableSwapNG"
+name = "mkUSD/ULTRA"
+
+[[pools]]
+address = "0xFE3C78D947b329160496E192b4Cf417bB86272Ed"
+variant = "StableSwapNG"
+name = "mwstETH-WPUNKS:20/wstETH"
+
