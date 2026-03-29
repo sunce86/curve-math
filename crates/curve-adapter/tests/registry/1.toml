@@ -5058,3 +5058,148 @@ address = "0x7264cc03a9126Cc063265365fB043dF9c3479b63"
 variant = "StableSwapNG"
 name = "wstETH/ETHx"
 
+[[pools]]
+address = "0x0024271A09284bbF227465a9AF312667BE62346E"
+variant = "StableSwapNG"
+name = "WETH/ETHx"
+
+[[pools]]
+address = "0x525e99f743EE495F3b032baa737BC590dc1C85b5"
+variant = "StableSwapNG"
+name = "stETH/wBETH"
+
+[[pools]]
+address = "0x9EfE1A1Cbd6Ca51Ee8319AFc4573d253C3B732af"
+variant = "StableSwapNG"
+name = "WETH/rETH"
+
+[[pools]]
+address = "0xC55Bcf5370e67fbA281E2aac8937B4Ea71E7785F"
+variant = "StableSwapNG"
+name = "crvUSD/sDAI"
+
+[[pools]]
+address = "0x73a0cba58c19ed5F27C6590BD792eC38dE4815Ea"
+variant = "StableSwapNG"
+name = "crvUSD/sFRAX"
+
+[[pools]]
+address = "0x4ef4c7519023F30A78647EEab321d6cFabC2513c"
+variant = "StableSwapNG"
+name = "FRAX/FXB_20240630"
+
+[[pools]]
+address = "0xe035e27A8eD6842b478933820f90093D205F7098"
+variant = "StableSwapNG"
+name = "FRAX/FXB_20261231"
+
+[[pools]]
+address = "0x6307E6688819951Cf8D6B6066018243D2496952F"
+variant = "StableSwapNG"
+name = "FRAX/FXB_20241231"
+
+[[pools]]
+address = "0x383E6b4437b59fff47B619CBA855CA29342A8559"
+variant = "StableSwapNG"
+name = "PYUSD/USDC"
+
+[[pools]]
+address = "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+variant = "StableSwapNG"
+name = "PYUSD/crvUSD"
+
+[[pools]]
+address = "0x00e6Fd108C4640d21B40d02f18Dd6fE7c7F725CA"
+variant = "StableSwapNG"
+name = "USDV/3Crv"
+
+[[pools]]
+address = "0x8eFD02a0a40545F32DbA5D664CbBC1570D3FedF6"
+variant = "StableSwapNG"
+name = "alETH/WETH"
+
+[[pools]]
+address = "0x5dc1BF6f1e983C0b21EfB003c105133736fA0743"
+variant = "StableSwapNG"
+name = "FRAX/USDe"
+
+[[pools]]
+address = "0xA5588F7cdf560811710A2D82D3C9c99769DB1Dcb"
+variant = "StableSwapNG"
+name = "FRAX/PYUSD"
+
+[[pools]]
+address = "0x2Cf99A343e4ECF49623E82f2Ec6A9b62e16Ff3fe"
+variant = "StableSwapNG"
+name = "FRAX/FPI"
+
+[[pools]]
+address = "0xcE6431D21E3fb1036CE9973a3312368ED96F5CE7"
+variant = "StableSwapNG"
+name = "FRAX/sDAI"
+
+[[pools]]
+address = "0xC8Eb2Cf2f792F77AF0Cd9e203305a585E588179D"
+variant = "StableSwapNG"
+name = "WETH/pxETH"
+
+[[pools]]
+address = "0x6951bDC4734b9f7F3E1B74afeBC670c736A0EDB6"
+variant = "StableSwapNG"
+name = "pxETH/stETH"
+
+[[pools]]
+address = "0xe2Ed1dAc3A9547BC6057e32bf8133b5268D7d987"
+variant = "StableSwapNG"
+name = "pxETH/frxETH"
+
+[[pools]]
+address = "0xC83b79C07ECE44b8b99fFa0E235C00aDd9124f9E"
+variant = "StableSwapNG"
+name = "USDM/3Crv"
+
+[[pools]]
+address = "0xDe6BF97B1cdee8a93Ddd8b45d504f247e6C9f886"
+variant = "StableSwapNG"
+name = "FLIP/stFLIP"
+
+[[pools]]
+address = "0x425BfB93370F14fF525aDb6EaEAcfE1f4e3b5802"
+variant = "StableSwapNG"
+name = "sDAI/USDM"
+
+[[pools]]
+address = "0x13947303F63b363876868D070F14dc865C36463b"
+variant = "StableSwapNG"
+name = "weETH/WETH"
+
+[[pools]]
+address = "0xF980B4A4194694913Af231De69AB4593f5E0fCDc"
+variant = "StableSwapNG"
+name = "mkUSD/USDC"
+
+[[pools]]
+address = "0xe080027Bd47353b5D1639772b4a75E9Ed3658A0d"
+variant = "StableSwapNG"
+name = "osETH/rETH"
+
+[[pools]]
+address = "0xc273fd237F23cb13296D0Cc2897F0B7A61e83387"
+variant = "StableSwapNG"
+name = "USDV/3Crv"
+
+[[pools]]
+address = "0x02950460E2b9529D0E00284A5fA2d7bDF3fA4d72"
+variant = "StableSwapNG"
+name = "USDe/USDC"
+
+[[pools]]
+address = "0xF55B0f6F2Da5ffDDb104b58a60F2862745960442"
+variant = "StableSwapNG"
+name = "USDe/crvUSD"
+
+[[pools]]
+address = "0x76Ae7A7DC125E4163a2137e650b7726231FdB917"
+variant = "StableSwapNG"
+name = "USDV/3Crv"
+
