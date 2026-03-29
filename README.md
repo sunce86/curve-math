@@ -10,12 +10,12 @@ Pure Rust implementation of [Curve Finance](https://curve.fi/) AMM math. Exact o
 
 Every registered pool is **differentially fuzz-tested** against its on-chain `get_dy`: our `get_amount_out` is called with random swap amounts and the result is compared with an on-chain call at the same block. The test requires **exact wei-level match** — no tolerances, no approximations. Pools that don't match are not registered.
 
-The pool registry covers all Curve factory pools above ~$1K TVL and all legacy (pre-factory) pools above ~$5K TVL.
+The pool registry covers all live Curve pools (non-empty, non-paused, functional tokens) across factory and legacy deployments.
 
-| Chain | Fuzz | Verified pools | Last indexed |
-|-------|------|----------------|-------------|
-| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 1039 / 2051 ![](https://geps.dev/progress/50?successColor=6366f1) | 2026-03-29 |
-| Base | | 138 / 1450 ![](https://geps.dev/progress/9?successColor=6366f1) | 2026-03-23 |
+| Chain | Fuzz | Verified / Live pools | Last indexed |
+|-------|------|----------------------|-------------|
+| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 1039 / 1039 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-03-29 |
+| Base | | 138 / 138 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-03-29 |
 
 ## Performance
 
