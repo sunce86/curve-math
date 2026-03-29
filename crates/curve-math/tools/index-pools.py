@@ -407,12 +407,23 @@ def discover_pools(w3, factory_cfg, existing_addrs, max_new, block):
                     abi=FACTORY_ABI,
                 )
                 is_meta = fc.functions.is_meta(Web3.to_checksum_address(addr)).call(block_identifier=block)
-                variant = "StableSwapMeta" if is_meta else "StableSwapV2"
+                if is_meta:
+                    variant = "StableSwapMeta"
+                else:
+                    # Non-meta plain pools may still have stored_rates (oracle pools).
+                    # Use full detection to classify correctly.
+                    variant = detect_variant_onchain(w3, addr, block)
             except Exception:
                 variant = detect_variant_onchain(w3, addr, block)
         # Auto-detect variant by probing on-chain functions
         elif variant == "auto":
             variant = detect_variant_onchain(w3, addr, block)
+
+        # None = unsupported variant (e.g. unsupported coin count)
+        if variant is None:
+            name = "/".join(symbols)
+            print(f"    {addr} {name} ({len(coins)}-coin, SKIP: unsupported variant)")
+            continue
 
         name = "/".join(symbols)
         print(f"    {addr} {name} ({len(coins)}-coin, {variant})")
