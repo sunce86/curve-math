@@ -845,3 +845,26 @@ async fn fuzz_8453_pending() {
     }
     fuzz_pools("chain 8453 pending", &pools).await;
 }
+
+#[tokio::test]
+#[ignore = "requires RPC_URL_42161"]
+async fn fuzz_42161() {
+    let pools = load_registry("tests/registry/42161.toml");
+    fuzz_pools("chain 42161", &pools).await;
+}
+
+#[tokio::test]
+#[ignore = "requires RPC_URL_42161"]
+async fn fuzz_42161_pending() {
+    let path = "tests/registry/42161_pending.toml";
+    if !std::path::Path::new(path).exists() {
+        println!("No pending pools at {path}");
+        return;
+    }
+    let pools = load_registry(path);
+    if pools.is_empty() {
+        println!("No pending pools");
+        return;
+    }
+    fuzz_pools("chain 42161 pending", &pools).await;
+}

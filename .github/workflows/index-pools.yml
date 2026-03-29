@@ -46,6 +46,46 @@ jobs:
           cargo test -p curve-adapter --test fuzz_registry -- fuzz_1_pending --ignored --nocapture
           rm -f crates/curve-adapter/tests/registry/1_pending.toml
 
+      - name: Discover new pools (Base)
+        env:
+          RPC_URL_8453: ${{ secrets.RPC_URL_8453 }}
+        working-directory: crates/curve-adapter
+        run: |
+          if [ -z "$RPC_URL_8453" ]; then
+            echo "::warning::RPC_URL_8453 not set, skipping"
+            exit 0
+          fi
+          python ../curve-math/tools/index-pools.py --chain-id 8453 --max-new 30
+
+      - name: Fuzz new pools only (Base)
+        if: hashFiles('crates/curve-adapter/tests/registry/8453_pending.toml') != ''
+        env:
+          RPC_URL_8453: ${{ secrets.RPC_URL_8453 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          cargo test -p curve-adapter --test fuzz_registry -- fuzz_8453_pending --ignored --nocapture
+          rm -f crates/curve-adapter/tests/registry/8453_pending.toml
+
+      - name: Discover new pools (Arbitrum)
+        env:
+          RPC_URL_42161: ${{ secrets.RPC_URL_42161 }}
+        working-directory: crates/curve-adapter
+        run: |
+          if [ -z "$RPC_URL_42161" ]; then
+            echo "::warning::RPC_URL_42161 not set, skipping"
+            exit 0
+          fi
+          python ../curve-math/tools/index-pools.py --chain-id 42161 --max-new 30
+
+      - name: Fuzz new pools only (Arbitrum)
+        if: hashFiles('crates/curve-adapter/tests/registry/42161_pending.toml') != ''
+        env:
+          RPC_URL_42161: ${{ secrets.RPC_URL_42161 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          cargo test -p curve-adapter --test fuzz_registry -- fuzz_42161_pending --ignored --nocapture
+          rm -f crates/curve-adapter/tests/registry/42161_pending.toml
+
       - name: Read PR summary
         id: summary
         working-directory: crates/curve-adapter

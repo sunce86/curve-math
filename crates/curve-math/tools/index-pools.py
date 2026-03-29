@@ -96,6 +96,23 @@ FACTORIES = {
             "label": "StableSwap Factory (legacy, 725 pools)",
         },
     ],
+    42161: [  # Arbitrum
+        {
+            "address": "0x9AF14D26075f142eb3F292D5065EB3faa646167b",
+            "variant": "StableSwapNG",
+            "label": "StableSwap-NG",
+        },
+        {
+            "address": "0x98EE851a00abeE0d95D08cF4CA2BdCE32aeaAF7F",
+            "variant": "TwoCryptoNG",
+            "label": "TwoCrypto-NG",
+        },
+        {
+            "address": "0xbC0797015fcFc47d9C1856639CaE50D0e69FbEE8",
+            "variant": "TriCryptoNG",
+            "label": "TriCrypto-NG",
+        },
+    ],
 }
 
 # ── Minimal ABIs ─────────────────────────────────────────────────────────────
@@ -598,7 +615,7 @@ def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list
     print(f"PR summary written to .pr-summary.md")
 
 
-CHAIN_NAMES = {1: "Ethereum", 8453: "Base"}
+CHAIN_NAMES = {1: "Ethereum", 8453: "Base", 42161: "Arbitrum"}
 CHAIN_FUZZ_BADGES = {
     1: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)",
 }
