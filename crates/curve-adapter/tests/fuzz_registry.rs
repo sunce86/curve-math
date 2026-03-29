@@ -152,6 +152,7 @@ alloy::sol! {
         function mid_fee() external view returns (uint256);
         function out_fee() external view returns (uint256);
         function fee_gamma() external view returns (uint256);
+        function precisions() external view returns (uint256[2]);
     }
 
     #[sol(rpc)]
@@ -165,6 +166,7 @@ alloy::sol! {
         function mid_fee() external view returns (uint256);
         function out_fee() external view returns (uint256);
         function fee_gamma() external view returns (uint256);
+        function precisions() external view returns (uint256[3]);
     }
 }
 
@@ -584,6 +586,7 @@ async fn read_and_build_pool(
             let mid_fee = c.mid_fee().block(block).call().await.ok()?;
             let out_fee = c.out_fee().block(block).call().await.ok()?;
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
+            let precs = c.precisions().block(block).call().await.ok();
             RawPoolState {
                 variant,
                 balances: vec![b0, b1],
@@ -595,6 +598,7 @@ async fn read_and_build_pool(
                 d: Some(d),
                 gamma: Some(gamma),
                 price_scale: Some(vec![ps]),
+                precisions: precs.map(|p| p.to_vec()),
                 ..Default::default()
             }
         }
@@ -608,6 +612,7 @@ async fn read_and_build_pool(
             let mid_fee = c.mid_fee().block(block).call().await.ok()?;
             let out_fee = c.out_fee().block(block).call().await.ok()?;
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
+            let precs = c.precisions().block(block).call().await.ok();
             RawPoolState {
                 variant,
                 balances: vec![b0, b1],
@@ -618,6 +623,7 @@ async fn read_and_build_pool(
                 fee_gamma: Some(fee_gamma),
                 d: Some(d),
                 price_scale: Some(vec![ps]),
+                precisions: precs.map(|p| p.to_vec()),
                 ..Default::default()
             }
         }
@@ -644,6 +650,7 @@ async fn read_and_build_pool(
             let mid_fee = c.mid_fee().block(block).call().await.ok()?;
             let out_fee = c.out_fee().block(block).call().await.ok()?;
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
+            let precs = c.precisions().block(block).call().await.ok();
             RawPoolState {
                 variant,
                 balances: vec![b0, b1, b2],
@@ -655,6 +662,7 @@ async fn read_and_build_pool(
                 d: Some(d),
                 gamma: Some(gamma),
                 price_scale: Some(vec![ps0, ps1]),
+                precisions: precs.map(|p| p.to_vec()),
                 ..Default::default()
             }
         }

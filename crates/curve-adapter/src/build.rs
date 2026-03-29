@@ -246,6 +246,18 @@ pub struct RawPoolState {
     /// impact is outsized. Every wei of such a token is worth `10^36` in
     /// normalized space.
     pub dynamic_rates: Option<Vec<Option<U256>>>,
+
+    /// On-chain precisions for CryptoSwap variants. **Immutable.**
+    ///
+    /// If `Some`, used directly instead of computing from `token_decimals`.
+    /// Read from the pool contract's `precisions()` getter.
+    ///
+    /// This is important because some tokens report incorrect `decimals()`
+    /// (e.g. Spectra PT tokens), and the factory computes the correct
+    /// precisions at deployment time.
+    ///
+    /// If `None`, precisions are computed as `10^(18 - decimals)`.
+    pub precisions: Option<Vec<U256>>,
 }
 
 impl Default for RawPoolState {
@@ -264,6 +276,7 @@ impl Default for RawPoolState {
             d: None,
             gamma: None,
             dynamic_rates: None,
+            precisions: None,
         }
     }
 }
@@ -562,7 +575,8 @@ fn build_twocrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
     }
     let price_scale = price_scale_vec[0];
 
-    let precisions = compute_crypto_precisions(&state.token_decimals);
+    let default_precs = compute_crypto_precisions(&state.token_decimals);
+    let precisions = state.precisions.as_deref().unwrap_or(&default_precs);
     let balances: [U256; 2] = [state.balances[0], state.balances[1]];
     let prec_arr: [U256; 2] = [precisions[0], precisions[1]];
 
@@ -647,7 +661,8 @@ fn build_tricrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
     }
     let price_scale: [U256; 2] = [price_scale_vec[0], price_scale_vec[1]];
 
-    let precisions = compute_crypto_precisions(&state.token_decimals);
+    let default_precs = compute_crypto_precisions(&state.token_decimals);
+    let precisions = state.precisions.as_deref().unwrap_or(&default_precs);
     let balances: [U256; 3] = [state.balances[0], state.balances[1], state.balances[2]];
     let prec_arr: [U256; 3] = [precisions[0], precisions[1], precisions[2]];
 
