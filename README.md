@@ -14,7 +14,7 @@ The pool registry covers all Curve factory pools above ~$1K TVL and all legacy (
 
 | Chain | Fuzz | Verified pools | Last indexed |
 |-------|------|----------------|-------------|
-| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 938 / 2051 ![](https://geps.dev/progress/45?successColor=6366f1) | 2026-03-29 |
+| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 950 / 2051 ![](https://geps.dev/progress/46?successColor=6366f1) | 2026-03-29 |
 | Base | | 138 / 1450 ![](https://geps.dev/progress/9?successColor=6366f1) | 2026-03-23 |
 
 ## Performance

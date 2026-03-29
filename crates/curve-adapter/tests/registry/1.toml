@@ -4698,3 +4698,63 @@ address = "0xC26b89A667578ec7b3f11b2F98d6Fd15C07C54ba"
 variant = "TwoCryptoV1"
 name = "WETH/YFI"
 
+[[pools]]
+address = "0x42E03280C99579B048Bc001531Bf7015Bc252653"
+variant = "StableSwapNG"
+name = "USDC/USDT/omUSD"
+
+[[pools]]
+address = "0xe1fbaEc91b8A211db901AdF5ACc5b31f9A988279"
+variant = "StableSwapNG"
+name = "rUSDY/USDC"
+
+[[pools]]
+address = "0xDB74dfDD3BB46bE8Ce6C33dC9D82777BCFc3dEd5"
+variant = "StableSwapNG"
+name = "WETH/weETH"
+
+[[pools]]
+address = "0x13120b7599DdF33782c748A847cc1d3c96387Ecd"
+variant = "StableSwapNG"
+name = "YFI/upYFI"
+
+[[pools]]
+address = "0x30cE6E5A75586F0E83bCAc77C9135E980e6bc7A8"
+variant = "StableSwapNG"
+name = "USDM/crvUSD"
+
+[[pools]]
+address = "0x33F2b4b9f6EBDcA98f48548e26149fc44F9e2289"
+variant = "StableSwapNG"
+name = "cvcrvUSD/scrvUSD-CRV/uCRVUSD"
+
+[[pools]]
+address = "0xa3f152837492340dAAf201F4dFeC6cD73A8a9760"
+variant = "StableSwapNG"
+name = "coveYFI/YFI"
+
+[[pools]]
+address = "0x9E641187391B7a5fE9ee193359408CA3894f68a2"
+variant = "StableSwapNG"
+name = "thUSD/crvUSD"
+
+[[pools]]
+address = "0x91553BAD9Fbc8bD69Ff5d5678Cbf7D514d00De0b"
+variant = "StableSwapNG"
+name = "thUSD/3Crv"
+
+[[pools]]
+address = "0x39F5b252dE249790fAEd0C2F05aBead56D2088e1"
+variant = "StableSwapNG"
+name = "WETH/pufETH"
+
+[[pools]]
+address = "0x50f3752289e1456BfA505afd37B241bca23e685d"
+variant = "TwoCryptoV1"
+name = "BADGER/WBTC"
+
+[[pools]]
+address = "0x941Eb6F616114e4Ecaa85377945EA306002612FE"
+variant = "TwoCryptoV1"
+name = "WETH/FXS"
+
