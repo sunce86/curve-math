@@ -97,6 +97,7 @@ FACTORIES = {
         },
     ],
     42161: [  # Arbitrum
+        # ── NG factories ────────────────────────────────────────────────
         {
             "address": "0x9AF14D26075f142eb3F292D5065EB3faa646167b",
             "variant": "StableSwapNG",
@@ -111,6 +112,12 @@ FACTORIES = {
             "address": "0xbC0797015fcFc47d9C1856639CaE50D0e69FbEE8",
             "variant": "TriCryptoNG",
             "label": "TriCrypto-NG",
+        },
+        # ── Legacy factories ────────────────────────────────────────────
+        {
+            "address": "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
+            "variant": "meta_factory",
+            "label": "StableSwap Factory (legacy)",
         },
     ],
 }
