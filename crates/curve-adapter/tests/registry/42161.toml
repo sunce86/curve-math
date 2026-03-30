@@ -7,7 +7,7 @@
 
 last_updated = "2026-03-30"
 total_factory_pools = 554
-live_factory_pools = 112
+live_factory_pools = 139
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -567,4 +567,139 @@ name = "???/ETHMAXY"
 address = "0x48E8DCb9fbE51899Df8960415fB11dfb8745C2DB"
 variant = "StableSwapMeta"
 name = "DL/2CRV"
+
+[[pools]]
+address = "0x49b720F1Aab26260BEAec93A7BeB5BF2925b2A8F"
+variant = "StableSwapNG"
+name = "USDC/USD₮0"
+
+[[pools]]
+address = "0xc5f859F5aA1881CFF4521C513982799895f7D01a"
+variant = "StableSwapNG"
+name = "USDC/yUSD"
+
+[[pools]]
+address = "0x7480CB9b48bA0efEF2C5d65aa4C3Ba2Ef587A28d"
+variant = "StableSwapNG"
+name = "USDT/USDT"
+
+[[pools]]
+address = "0x208cbFaa79ea369ed04343aE2577551fc188fA3d"
+variant = "StableSwapNG"
+name = "USD₮0/USDT"
+
+[[pools]]
+address = "0xd339CD6E694438cD72326c9337EC4f02fc019972"
+variant = "StableSwapNG"
+name = "WETHUSDT/ETH"
+
+[[pools]]
+address = "0x6169a904d73D019189509b1C0a385F716CbD9655"
+variant = "StableSwapNG"
+name = "USD₮0/LMKY"
+
+[[pools]]
+address = "0x4C721F26223a2d30AC6bf7b93111c92BCB61086d"
+variant = "StableSwapNG"
+name = "crvUSDC/USD₮0"
+
+[[pools]]
+address = "0xF3d9af60Daa2F5e48dCC0E318B626faD4C4A7314"
+variant = "StableSwapNG"
+name = "WETH/WETH"
+
+[[pools]]
+address = "0xFE5b777AC52f39A2F61C618f77099933EeEb633b"
+variant = "StableSwapNG"
+name = "USDC/USDC"
+
+[[pools]]
+address = "0x8F26c8041a963c5b0846C68f02d68C8CdFD7afdC"
+variant = "StableSwapNG"
+name = "alXAI/XAI"
+
+[[pools]]
+address = "0x99Ca0FbAA278CD62E26F0E9B6D167b07D1F0D51B"
+variant = "TwoCryptoNG"
+name = "stXAI/XAI"
+
+[[pools]]
+address = "0x19d2B5CE188Ca60790755204691E38102749297b"
+variant = "TwoCryptoNG"
+name = "AUDSC/USDC"
+
+[[pools]]
+address = "0x390C6eB1E824A7CCa2E646e47D8fCba4263E9E38"
+variant = "TwoCryptoNG"
+name = "SETH/WETH"
+
+[[pools]]
+address = "0x86EA1191a219989d2dA3a85c949a12A92f8ED3Db"
+variant = "TwoCryptoNG"
+name = "KNOX/eUSD"
+
+[[pools]]
+address = "0x1Fb84Fa6D252762e8367eA607A6586E09dceBe3D"
+variant = "TwoCryptoNG"
+name = "ETH+/WETH"
+
+[[pools]]
+address = "0x656dc5D968b899476bEe3445584cde5dD123305f"
+variant = "TwoCryptoNG"
+name = "TokenA/TokenB"
+
+[[pools]]
+address = "0x592878b920101946Fb5915aB97961bC546f211CC"
+variant = "TwoCryptoNG"
+name = "BRU/BRUSD"
+
+[[pools]]
+address = "0xbb8a6436e0E9A22bb7F1dC76aFB4421D8195620E"
+variant = "StableSwapMeta"
+name = "DL/2CRV"
+
+[[pools]]
+address = "0xc5536d59D026BE19b4267810f43aC083cD607b64"
+variant = "StableSwapMeta"
+name = "MAI/2CRV"
+
+[[pools]]
+address = "0xfC78eAFf2E8290D3d608B689e93ec6954E21B6C2"
+variant = "StableSwapV2"
+name = "pDF/DF"
+
+[[pools]]
+address = "0x37C9Be6C81990398e9B87494484Afc6a4608C25d"
+variant = "StableSwapV2"
+name = "aArbDAI/aArbUSDC/aArbUSDT"
+
+[[pools]]
+address = "0xE013593CEA239E445d2271106836b00C9E7356ae"
+variant = "StableSwapV2"
+name = "aArbUSDC/aArbUSDT"
+
+[[pools]]
+address = "0x59bF0545FCa0E5Ad48E13DA269faCD2E8C886Ba4"
+variant = "StableSwapV2"
+name = "VST/FRAX"
+
+[[pools]]
+address = "0x76b44e0Cf9bD024dbEd09E1785DF295D59770138"
+variant = "StableSwapMeta"
+name = "deUSDC/2CRV"
+
+[[pools]]
+address = "0x0a824B5d4C96EA0EC46306Efbd34Bf88fE1277e0"
+variant = "StableSwapV2"
+name = "???/deETH"
+
+[[pools]]
+address = "0x2ce5Fd6f6F4a159987eac99FF5158B7B62189Acf"
+variant = "StableSwapMeta"
+name = "USX/2CRV"
+
+[[pools]]
+address = "0xd0DD5D76cF0fC06DaBC48632735566DCa241a35e"
+variant = "StableSwapMeta"
+name = "fxUSD/2CRV"
 
