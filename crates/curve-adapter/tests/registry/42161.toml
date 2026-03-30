@@ -7,7 +7,7 @@
 
 last_updated = "2026-03-30"
 total_factory_pools = 554
-live_factory_pools = 139
+live_factory_pools = 154
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -702,4 +702,79 @@ name = "USX/2CRV"
 address = "0xd0DD5D76cF0fC06DaBC48632735566DCa241a35e"
 variant = "StableSwapMeta"
 name = "fxUSD/2CRV"
+
+[[pools]]
+address = "0x5a784782eBf58810bc0b14d4e3280A59D170f9b0"
+variant = "StableSwapNG"
+name = "wXYZ/USDC"
+
+[[pools]]
+address = "0x096A8865367686290639bc50bF8D85C0110d9Fea"
+variant = "StableSwapNG"
+name = "USDe/USDx"
+
+[[pools]]
+address = "0xad37295881f53Fe6FDAb54493A06CD84f988646B"
+variant = "StableSwapNG"
+name = "uniETH/WETH"
+
+[[pools]]
+address = "0x2b6cc4d44e5ce846F45CE7742E91e628155a4aba"
+variant = "StableSwapNG"
+name = "WETH/ezETH"
+
+[[pools]]
+address = "0x6E8E50f884Ac7e7814A8B0F7d5478Adcf11f50A4"
+variant = "StableSwapNG"
+name = "sUSX/USDC"
+
+[[pools]]
+address = "0x8adeaEFeE3203c2f6E402B8A72582388D5D7f328"
+variant = "StableSwapNG"
+name = "TokenA/TokenB"
+
+[[pools]]
+address = "0x921c3be2435410cD1Cc24EA620ff3Fd5794550D3"
+variant = "StableSwapNG"
+name = "TokenA/TokenB"
+
+[[pools]]
+address = "0x8CE4E9d3246E3d629f8ed811c421054DC6542BD6"
+variant = "StableSwapNG"
+name = "crvUSD/MONEY"
+
+[[pools]]
+address = "0xe699fD2B4EA36Af0CA07cEe042E0833aB831D067"
+variant = "StableSwapNG"
+name = "FRAX/MONEY"
+
+[[pools]]
+address = "0xDF96c0334D628e2FD084111761aE1016f3A1Fb3D"
+variant = "StableSwapNG"
+name = "DAI/MONEY"
+
+[[pools]]
+address = "0xf07d553B195080F84F582e88ecdD54bAa122b279"
+variant = "StableSwapMeta"
+name = "FRAX/2CRV"
+
+[[pools]]
+address = "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE"
+variant = "StableSwapV2"
+name = "fxEUR/EURS"
+
+[[pools]]
+address = "0xF92C2A3C91bf869F77f9cB221C5AB1B1ada8a586"
+variant = "StableSwapMeta"
+name = "DAI/2CRV"
+
+[[pools]]
+address = "0xE9dcF2d2A17eAD11fab8b198578B20535370Be6a"
+variant = "StableSwapMeta"
+name = "MIM/2CRV"
+
+[[pools]]
+address = "0x30dF229cefa463e991e29D42DB0bae2e122B2AC7"
+variant = "StableSwapMeta"
+name = "MIM/2CRV"
 
