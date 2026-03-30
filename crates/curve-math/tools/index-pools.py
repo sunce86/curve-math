@@ -625,6 +625,8 @@ def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list
 CHAIN_NAMES = {1: "Ethereum", 8453: "Base", 42161: "Arbitrum"}
 CHAIN_FUZZ_BADGES = {
     1: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)",
+    8453: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml)",
+    42161: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml)",
 }
 
 
