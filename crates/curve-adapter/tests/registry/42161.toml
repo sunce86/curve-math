@@ -7,7 +7,7 @@
 
 last_updated = "2026-03-30"
 total_factory_pools = 554
-live_factory_pools = 154
+live_factory_pools = 165
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -777,4 +777,59 @@ name = "MIM/2CRV"
 address = "0x30dF229cefa463e991e29D42DB0bae2e122B2AC7"
 variant = "StableSwapMeta"
 name = "MIM/2CRV"
+
+[[pools]]
+address = "0x73F8b9739a557d5822f0E431F5e03F614f3BD8A9"
+variant = "StableSwapNG"
+name = "USDC/MONEY"
+
+[[pools]]
+address = "0x81fdbd700DB44C3e57639c2c4518630945c132A6"
+variant = "StableSwapNG"
+name = "USD₮0/MONEY"
+
+[[pools]]
+address = "0x186cF879186986A20aADFb7eAD50e3C20cb26CeC"
+variant = "StableSwapNG"
+name = "WBTC/tBTC"
+
+[[pools]]
+address = "0xEb74Bfccc819FcE6c8E5D0574C5730415850bbF1"
+variant = "StableSwapNG"
+name = "XUSD/USD₮0"
+
+[[pools]]
+address = "0x6f33daF91d2aCAe10F5CD7BbE3f31716Ed123F1D"
+variant = "StableSwapNG"
+name = "KNOX/eUSD"
+
+[[pools]]
+address = "0x93a416206B4ae3204cFE539edfeE6BC05a62963e"
+variant = "StableSwapNG"
+name = "eUSD/USDC"
+
+[[pools]]
+address = "0x67D11005AF05Bb1e9fDb1CFc261C23DE3E1055a1"
+variant = "StableSwapNG"
+name = "eUSD/crvUSD"
+
+[[pools]]
+address = "0x95F425c7d730Eb7673fca272c2c305f48Ed546c3"
+variant = "StableSwapNG"
+name = "ETH+/WETH"
+
+[[pools]]
+address = "0xbdf44492aC1C81b1Bd9B9A8B075026d3E8A3225a"
+variant = "StableSwapNG"
+name = "eUSD/rgUSD"
+
+[[pools]]
+address = "0xB6F249594cF358139dC50760F974fE4c8316B83a"
+variant = "StableSwapNG"
+name = "USDC/USD₮0"
+
+[[pools]]
+address = "0x2CB445366FbE025569D6883Aa931E79deF202802"
+variant = "StableSwapMeta"
+name = "Cr/2CRV"
 
