@@ -7,7 +7,7 @@
 
 last_updated = "2026-03-30"
 total_factory_pools = 554
-live_factory_pools = 185
+live_factory_pools = 193
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -932,4 +932,44 @@ name = "xUSD/USDT+"
 address = "0xE6a5a74FB1f48C0A36d9a7EF8b8E14077c1a41B9"
 variant = "StableSwapNG"
 name = "stARB/ARB"
+
+[[pools]]
+address = "0x4070C044ABc8d9d22447DFE4B032405970878d06"
+variant = "StableSwapNG"
+name = "crvUSD/MIM"
+
+[[pools]]
+address = "0x68951A51A6218b31e507C4dD8E578fb99Df50d54"
+variant = "StableSwapNG"
+name = "BTC.b/svBTC/gmdBTC"
+
+[[pools]]
+address = "0x2FE7AE43591E534C256A1594D326e5779E302Ff4"
+variant = "StableSwapNG"
+name = "crvUSD/FRAX"
+
+[[pools]]
+address = "0x946adc524BD312D036776798c46ceDD948DD0A0f"
+variant = "StableSwapNG"
+name = "FRAX/FXB_20261231"
+
+[[pools]]
+address = "0xE920eEdAff6c3BEd1Ef61010B64d46986634E908"
+variant = "StableSwapNG"
+name = "FRAX/FXB_20241231"
+
+[[pools]]
+address = "0xec090cf6DD891D2d014beA6edAda6e05E025D93d"
+variant = "StableSwapNG"
+name = "crvUSD/USDC"
+
+[[pools]]
+address = "0x3aDf984c937FA6846E5a24E0A68521Bdaf767cE1"
+variant = "StableSwapNG"
+name = "crvUSD/USDC"
+
+[[pools]]
+address = "0x73aF1150F265419Ef8a5DB41908B700C32D49135"
+variant = "StableSwapNG"
+name = "crvUSD/USD₮0"
 
