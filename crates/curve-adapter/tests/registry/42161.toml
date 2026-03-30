@@ -7,7 +7,7 @@
 
 last_updated = "2026-03-30"
 total_factory_pools = 554
-live_factory_pools = 175
+live_factory_pools = 185
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -882,4 +882,54 @@ name = "USDC/CRV"
 address = "0xeC9C5703B5CBc2d23574EEDE451E941304AC61a5"
 variant = "StableSwapNG"
 name = "USDC/cUSDCv3"
+
+[[pools]]
+address = "0x8f5d46267EB52F3aA6E141004A781469D445888c"
+variant = "StableSwapNG"
+name = "HFXB/FRAX"
+
+[[pools]]
+address = "0x4bD135524897333bec344e50ddD85126554E58B4"
+variant = "StableSwapNG"
+name = "USDC/USDM"
+
+[[pools]]
+address = "0x21E3D31F67D4aa3e09D479bB46BD35420BF7e645"
+variant = "StableSwapNG"
+name = "ODR/USDC"
+
+[[pools]]
+address = "0xfF2A8aA260324a86E50C48E3F2adAf13BC6b5Eb6"
+variant = "StableSwapNG"
+name = "WETH/Ebal"
+
+[[pools]]
+address = "0x7004aE8cd7FfC6DB8b15E4d5B6692FE1D7EADcDA"
+variant = "StableSwapNG"
+name = "GRAI/USDC"
+
+[[pools]]
+address = "0xd885428cCdfB48ae9F751ADf429728DEd19BFcE2"
+variant = "StableSwapNG"
+name = "USX/USDC"
+
+[[pools]]
+address = "0x38Eac795Dc2f30E323F46bE9C710690A16f66563"
+variant = "StableSwapNG"
+name = "senUSD/USDC"
+
+[[pools]]
+address = "0x6267c20a940387A956d3a8075555117ea72D06a0"
+variant = "StableSwapNG"
+name = "GMX/wstETH"
+
+[[pools]]
+address = "0x1446999B0b0E4f7aDA6Ee73f2Ae12a2cfdc5D9E7"
+variant = "StableSwapNG"
+name = "xUSD/USDT+"
+
+[[pools]]
+address = "0xE6a5a74FB1f48C0A36d9a7EF8b8E14077c1a41B9"
+variant = "StableSwapNG"
+name = "stARB/ARB"
 
