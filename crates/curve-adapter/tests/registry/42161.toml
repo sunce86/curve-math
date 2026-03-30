@@ -7,7 +7,7 @@
 
 last_updated = "2026-03-30"
 total_factory_pools = 554
-live_factory_pools = 165
+live_factory_pools = 175
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -832,4 +832,54 @@ name = "USDC/USD₮0"
 address = "0x2CB445366FbE025569D6883Aa931E79deF202802"
 variant = "StableSwapMeta"
 name = "Cr/2CRV"
+
+[[pools]]
+address = "0x3dcb7b53B6177a04a2AECE61d95bF577ECC02241"
+variant = "StableSwapNG"
+name = "rgUSD/USDC"
+
+[[pools]]
+address = "0x1c34204FCFE5314Dcf53BE2671C02c35DB58B4e3"
+variant = "StableSwapNG"
+name = "USDC/USDe"
+
+[[pools]]
+address = "0xEBEEC2EDbbc66eB9055fe772b154f34d3dd686C8"
+variant = "StableSwapNG"
+name = "zunETH/WETH"
+
+[[pools]]
+address = "0xe957cE03cCdd88f02ed8b05C9a3A28ABEf38514A"
+variant = "StableSwapNG"
+name = "WBTC/IBTC"
+
+[[pools]]
+address = "0xC44b7e6Fe6b1c4700f313822F640596c01c2aA0B"
+variant = "StableSwapNG"
+name = "fxUSD/cvcrvUSD"
+
+[[pools]]
+address = "0xcC8D7b18E39b95443f71F0C146f2Ece8AD4aDBf4"
+variant = "StableSwapNG"
+name = "BRUSD/FUSD"
+
+[[pools]]
+address = "0x7D22EA8877256437CC56075B856A714404Fe5343"
+variant = "StableSwapNG"
+name = "USSD/USD₮0"
+
+[[pools]]
+address = "0x8958AE46De6b33293DDdc6cDfbe36900f4631851"
+variant = "StableSwapNG"
+name = "zunUSD/crvUSD"
+
+[[pools]]
+address = "0xDADe5D52e5FCE7bf64243e30Dc1439787e64bA32"
+variant = "StableSwapNG"
+name = "USDC/CRV"
+
+[[pools]]
+address = "0xeC9C5703B5CBc2d23574EEDE451E941304AC61a5"
+variant = "StableSwapNG"
+name = "USDC/cUSDCv3"
 
