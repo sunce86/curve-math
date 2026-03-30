@@ -642,8 +642,8 @@ def update_readme_badge(chain_id: int, count: int, last_updated: str, total: int
     import re
     chain_name = CHAIN_NAMES.get(chain_id, f"Chain {chain_id}")
     badge = CHAIN_FUZZ_BADGES.get(chain_id, "")
-    pct = (count * 100 // total) if total else 0
-    pool_str = f"{count} / {total} ![](https://geps.dev/progress/{pct}?successColor=6366f1)" if total else str(count)
+    pct = min(count * 100 // total, 100) if total else 0
+    pool_str = f"{min(count, total)} / {total} ![](https://geps.dev/progress/{pct}?successColor=6366f1)" if total else str(count)
     new_row = f"| {chain_name} | {badge} | {pool_str} | {last_updated} |"
     content = re.sub(
         rf'\| {re.escape(chain_name)} \|.*\|.*\|.*\|',
