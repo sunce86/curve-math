@@ -1,6 +1,6 @@
 [package]
 name = "curve-adapter"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 edition = "2021"
 rust-version = "1.80"
 description = "Adapts raw on-chain Curve pool data into curve-math Pool instances. Variant detection, rate/precision computation, and pool construction."
@@ -16,7 +16,7 @@ serde = ["dep:serde", "alloy-primitives/serde"]
 
 [dependencies]
 alloy-primitives = "1"
-curve-math = { path = "../curve-math", optional = true }
+curve-math = { path = "../curve-math", version = "0.1.0-alpha.2", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
