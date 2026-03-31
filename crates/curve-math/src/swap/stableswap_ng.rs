@@ -172,7 +172,7 @@ mod tests {
         let out = get_amount_out(
             &[b, b],
             &[U256::from(RATE_18), U256::from(RATE_18)],
-            U256::from(400u64 * A_PRECISION as u64),
+            U256::from(400u64) * A_PRECISION,
             U256::from(4_000_000u64),
             U256::from(20_000_000_000u64),
             0,
@@ -188,7 +188,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let amp = U256::from(400u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let dx = U256::from(1_000_000_000_000_000_000_000u128);
@@ -207,7 +207,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let amp = U256::from(400u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let (num, den) = spot_price(&balances, &rates, amp, fee, offpeg, 0, 1).expect("price");
@@ -220,7 +220,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let amp = U256::from(400u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let (num_ij, den_ij) =
@@ -242,7 +242,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(400u64 * A_PRECISION as u64);
+        let amp = U256::from(400u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let dx = U256::from(1_000_000_000_000_000u128);

@@ -138,7 +138,7 @@ mod tests {
         let out = get_amount_out(
             &[b, b],
             &[U256::from(RATE_18), U256::from(RATE_18)],
-            U256::from(200u64 * A_PRECISION as u64),
+            U256::from(200u64) * A_PRECISION,
             U256::from(4_000_000u64),
             0,
             1,
@@ -156,7 +156,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let amp = U256::from(200u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let dx = U256::from(1_000_000_000_000_000_000_000u128);
         let dy = get_amount_out(&balances, &rates, amp, fee, 0, 1, dx).expect("out");
@@ -175,7 +175,7 @@ mod tests {
             U256::from(1_000_000_000_000u128),
         ];
         let rates = [U256::from(RATE_18), U256::from(RATE_6)];
-        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let amp = U256::from(200u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let dx = U256::from(1_000_000_000u128); // 1k USDC
         let dy = get_amount_out(&balances, &rates, amp, fee, 1, 0, dx).expect("out");
@@ -193,7 +193,7 @@ mod tests {
         assert!(get_amount_out(
             &[b, b],
             &[U256::from(RATE_18), U256::from(RATE_18)],
-            U256::from(200u64 * A_PRECISION as u64),
+            U256::from(200u64) * A_PRECISION,
             U256::from(4_000_000u64),
             0,
             1,
@@ -207,7 +207,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let amp = U256::from(200u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let (num, den) = spot_price(&balances, &rates, amp, fee, 0, 1).expect("price");
         let diff = if num > den { num - den } else { den - num };
@@ -219,7 +219,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let amp = U256::from(200u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let (num_ij, den_ij) = spot_price(&balances, &rates, amp, fee, 0, 1).expect("price_ij");
         let (num_ji, den_ji) = spot_price(&balances, &rates, amp, fee, 1, 0).expect("price_ji");
@@ -238,7 +238,7 @@ mod tests {
         let b = U256::from(1_000_000_000_000_000_000_000_000u128);
         let balances = [b, b];
         let rates = [U256::from(RATE_18), U256::from(RATE_18)];
-        let amp = U256::from(200u64 * A_PRECISION as u64);
+        let amp = U256::from(200u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let dx = U256::from(1_000_000_000_000_000u128);
         let dy = get_amount_out(&balances, &rates, amp, fee, 0, 1, dx).expect("out");

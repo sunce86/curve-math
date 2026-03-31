@@ -8,11 +8,11 @@ use alloy_primitives::U256;
 
 use crate::core::twocrypto_stable::get_y;
 
-pub const WAD: u128 = 1_000_000_000_000_000_000;
-pub const FEE_DENOMINATOR: u64 = 10_000_000_000;
+pub const WAD: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
+pub const FEE_DENOMINATOR: U256 = U256::from_limbs([10_000_000_000, 0, 0, 0]);
 
 fn crypto_fee(xp: &[U256], mid_fee: U256, out_fee: U256, fee_gamma: U256) -> Option<U256> {
-    let wad = U256::from(WAD);
+    let wad = WAD;
     let s: U256 = xp
         .iter()
         .try_fold(U256::ZERO, |acc, v| acc.checked_add(*v))?;
@@ -55,7 +55,7 @@ pub fn get_amount_out(
         return None;
     }
 
-    let wad = U256::from(WAD);
+    let wad = WAD;
     let price_scale_local = price_scale * precisions[1];
 
     // CryptoSwap normalization — compute xp BEFORE and AFTER dx
@@ -90,7 +90,7 @@ pub fn get_amount_out(
 
     // CryptoSwap fee
     let fee = crypto_fee(&xp_after, mid_fee, out_fee, fee_gamma)?;
-    let fee_amount = fee * dy_native / U256::from(FEE_DENOMINATOR);
+    let fee_amount = fee * dy_native / FEE_DENOMINATOR;
     let result = dy_native - fee_amount;
 
     if result.is_zero() {
@@ -117,8 +117,8 @@ pub fn get_amount_in(
         return None;
     }
 
-    let wad = U256::from(WAD);
-    let fee_denom = U256::from(FEE_DENOMINATOR);
+    let wad = WAD;
+    let fee_denom = FEE_DENOMINATOR;
     let price_scale_local = price_scale * precisions[1];
 
     let xp_orig: [U256; 2] = [

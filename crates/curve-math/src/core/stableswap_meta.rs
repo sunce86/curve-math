@@ -5,14 +5,13 @@
 
 use alloy_primitives::U256;
 
-pub const PRECISION: u128 = 1_000_000_000_000_000_000;
-pub const FEE_DENOMINATOR: u64 = 10_000_000_000;
-pub const A_PRECISION: u64 = 100;
+pub const PRECISION: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
+pub const FEE_DENOMINATOR: U256 = U256::from_limbs([10_000_000_000, 0, 0, 0]);
+pub const A_PRECISION: U256 = U256::from_limbs([100, 0, 0, 0]);
 const MAX_ITERATIONS: usize = 255;
 
 pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
-    let a_prec = U256::from(A_PRECISION);
     let sum: U256 = xp
         .iter()
         .try_fold(U256::ZERO, |acc, b| acc.checked_add(*b))?;
@@ -29,13 +28,13 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
         let d_prev = d;
         let num = ann
             .checked_mul(sum)?
-            .checked_div(a_prec)?
+            .checked_div(A_PRECISION)?
             .checked_add(d_p.checked_mul(n)?)?
             .checked_mul(d)?;
         let den = ann
-            .checked_sub(a_prec)?
+            .checked_sub(A_PRECISION)?
             .checked_mul(d)?
-            .checked_div(a_prec)?
+            .checked_div(A_PRECISION)?
             .checked_add(n.checked_add(U256::from(1))?.checked_mul(d_p)?)?;
         if den.is_zero() {
             return None;
@@ -51,7 +50,6 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
 
 pub fn get_y(i: usize, j: usize, x_new: U256, xp: &[U256], d: U256, amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
-    let a_prec = U256::from(A_PRECISION);
     let ann = amp.checked_mul(n)?;
     let mut s_prime = U256::ZERO;
     let mut c = d;
@@ -69,9 +67,9 @@ pub fn get_y(i: usize, j: usize, x_new: U256, xp: &[U256], d: U256, amp: U256) -
     }
     c = c
         .checked_mul(d)?
-        .checked_mul(a_prec)?
+        .checked_mul(A_PRECISION)?
         .checked_div(ann.checked_mul(n)?)?;
-    let b = s_prime.checked_add(d.checked_mul(a_prec)?.checked_div(ann)?)?;
+    let b = s_prime.checked_add(d.checked_mul(A_PRECISION)?.checked_div(ann)?)?;
     let mut y = d;
     for _ in 0..MAX_ITERATIONS {
         let y_prev = y;
@@ -97,13 +95,13 @@ mod tests {
     use super::*;
 
     fn wad() -> U256 {
-        U256::from(PRECISION)
+        PRECISION
     }
 
     #[test]
     fn get_d_balanced_meta_pool() {
         let balance = U256::from(1_000_000u64) * wad();
-        let amp = U256::from(500u64 * A_PRECISION as u64);
+        let amp = U256::from(500u64) * A_PRECISION;
         let d = get_d(&[balance, balance], amp).expect("converge");
         let expected = balance * U256::from(2u64);
         let diff = if d > expected {
@@ -118,7 +116,7 @@ mod tests {
     fn get_y_roundtrip() {
         let balance = U256::from(1_000_000u64) * wad();
         let xp = [balance, balance];
-        let amp = U256::from(500u64 * A_PRECISION as u64);
+        let amp = U256::from(500u64) * A_PRECISION;
         let d = get_d(&xp, amp).expect("d");
         let y = get_y(0, 1, xp[0], &xp, d, amp).expect("y");
         let diff = if y > xp[1] { y - xp[1] } else { xp[1] - y };

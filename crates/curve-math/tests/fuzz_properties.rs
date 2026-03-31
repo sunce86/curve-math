@@ -161,7 +161,7 @@ fn roundtrip_stableswap_v2() {
     let rate18 = wad;
     let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
     let rates = [rate18, rate6];
-    let amp = U256::from(200u64 * A_PRECISION as u64);
+    let amp = U256::from(200u64) * A_PRECISION;
     let fee = U256::from(4_000_000u64);
     let n = prop_iterations();
     let mut passed = 0u64;
@@ -224,7 +224,7 @@ fn roundtrip_twocrypto_v1() {
     let precisions = [U256::from(1u64), U256::from(1u64)];
     let price_scale = wad;
     let d = U256::from(10000u64) * wad;
-    let ann = U256::from(540_000u64) * U256::from(A_MULTIPLIER as u64);
+    let ann = U256::from(540_000u64) * A_MULTIPLIER;
     let gamma = U256::from(28_000_000_000_000u64);
     let mid_fee = U256::from(3_000_000u64);
     let out_fee = U256::from(30_000_000u64);
@@ -302,7 +302,7 @@ fn spot_price_stableswap_v2() {
     let rate18 = wad;
     let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
     let rates = [rate18, rate6];
-    let amp = U256::from(200u64 * A_PRECISION as u64);
+    let amp = U256::from(200u64) * A_PRECISION;
     let fee = U256::from(4_000_000u64);
 
     let (num, den) = spot_price(&balances, &rates, amp, fee, 0, 1).expect("price");
@@ -378,7 +378,7 @@ fn spot_price_stableswap_ng_imbalanced() {
         U256::from(10_000_000u64) * wad,
     ];
     let rates = [wad, wad];
-    let amp = U256::from(400u64 * A_PRECISION as u64);
+    let amp = U256::from(400u64) * A_PRECISION;
     let fee = U256::from(4_000_000u64);
     let offpeg = U256::from(20_000_000_000u64);
 

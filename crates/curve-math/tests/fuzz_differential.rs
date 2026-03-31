@@ -278,7 +278,7 @@ async fn fuzz_stableswap_v2() {
     let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
     let rates = [rate18, rate6];
     let balances = [b0, b1];
-    let amp = raw_a * U256::from(A_PRECISION as u64);
+    let amp = raw_a * A_PRECISION;
 
     let n = fuzz_iterations();
     let half = n / 2;
@@ -373,7 +373,7 @@ async fn fuzz_stableswap_alend() {
         U256::from(1_000_000_000_000u64),
         U256::from(1_000_000_000_000u64),
     ];
-    let amp = raw_a * U256::from(curve_math::core::stableswap_alend::A_PRECISION as u64);
+    let amp = raw_a * curve_math::core::stableswap_alend::A_PRECISION;
 
     let n = fuzz_iterations();
     let n_coins = 3usize;
@@ -464,7 +464,7 @@ async fn fuzz_stableswap_ng() {
     let rate18 = U256::from(1_000_000_000_000_000_000u128);
     let rates = [rate18, rate18];
     let balances = [b0, b1];
-    let amp = raw_a * U256::from(A_PRECISION as u64);
+    let amp = raw_a * A_PRECISION;
 
     let n = fuzz_iterations();
     let half = n / 2;
@@ -586,7 +586,7 @@ async fn fuzz_stableswap_meta() {
     let rate_gusd = U256::from(10u64).pow(U256::from(34u64));
     let rates = [rate_gusd, vp];
     let balances = [b0, b1];
-    let amp = raw_a * U256::from(A_PRECISION as u64);
+    let amp = raw_a * A_PRECISION;
 
     let n = fuzz_iterations();
     let half = n / 2;
@@ -1118,7 +1118,7 @@ async fn fuzz_stableswap_ng_pyusd() {
     let rate18 = U256::from(1_000_000_000_000_000_000u128);
     let rates = [rate6, rate18];
     let balances = [b0, b1];
-    let amp = raw_a * U256::from(A_PRECISION as u64);
+    let amp = raw_a * A_PRECISION;
 
     let n = fuzz_iterations();
     let half = n / 2;

@@ -6,14 +6,14 @@
 
 use alloy_primitives::U256;
 
-pub const A_MULTIPLIER: u64 = 10_000;
+pub const A_MULTIPLIER: U256 = U256::from_limbs([10_000, 0, 0, 0]);
 const MAX_ITERATIONS: usize = 255;
 
 /// Compute StableSwap invariant D using Newton's method.
 /// `amp` is the on-chain A value (already includes A_MULTIPLIER scaling).
 pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
-    let a_mul = U256::from(A_MULTIPLIER);
+    let a_mul = A_MULTIPLIER;
     let sum: U256 = xp
         .iter()
         .try_fold(U256::ZERO, |acc, b| acc.checked_add(*b))?;
@@ -60,7 +60,7 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
 /// `amp` is the on-chain A value, `d` is the invariant.
 pub fn get_y(i: usize, j: usize, x_new: U256, xp: &[U256], d: U256, amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
-    let a_mul = U256::from(A_MULTIPLIER);
+    let a_mul = A_MULTIPLIER;
     let ann = amp.checked_mul(n)?;
     let mut s_prime = U256::ZERO;
     let mut c = d;

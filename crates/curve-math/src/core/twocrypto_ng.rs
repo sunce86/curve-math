@@ -24,9 +24,9 @@ fn fdiv(a: I256, b: I256) -> I256 {
     }
 }
 
-pub const WAD: u128 = 1_000_000_000_000_000_000;
-pub const FEE_DENOMINATOR: u64 = 10_000_000_000;
-pub const A_MULTIPLIER: u64 = 10_000;
+pub const WAD: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
+pub const FEE_DENOMINATOR: U256 = U256::from_limbs([10_000_000_000, 0, 0, 0]);
+pub const A_MULTIPLIER: U256 = U256::from_limbs([10_000, 0, 0, 0]);
 const MAX_ITERATIONS: usize = 255;
 
 pub fn isqrt(x: U256) -> U256 {
@@ -85,10 +85,10 @@ pub fn snekmate_log_2(x: U256) -> u32 {
 pub fn cbrt(x: U256) -> U256 {
     let threshold =
         U256::from_str_radix("115792089237316195423570985008687907853269", 10).expect("cbrt const");
-    let (xx, scale_back) = if x >= threshold * U256::from(WAD) {
+    let (xx, scale_back) = if x >= threshold * WAD {
         (x, 0u8)
     } else if x >= threshold {
-        (x * U256::from(WAD), 1)
+        (x * WAD, 1)
     } else {
         (x * U256::from(10u128.pow(36)), 2)
     };
@@ -127,12 +127,10 @@ pub fn newton_y_2_ng(
     i: usize,
     lim_mul: U256,
 ) -> Option<U256> {
-    let wad = U256::from(WAD);
-    let a_mul = U256::from(A_MULTIPLIER);
     let n = U256::from(2u64);
     let x_j = x[1 - i];
     let mut y = d * d / (x_j * U256::from(4u64));
-    let k0_i = wad * n * x_j / d;
+    let k0_i = WAD * n * x_j / d;
     if k0_i < U256::from(10u128.pow(36)) / lim_mul || k0_i > lim_mul {
         return None;
     }
@@ -144,16 +142,16 @@ pub fn newton_y_2_ng(
         let k0 = k0_i * y * n / d;
         let s = x_j + y;
         let _g1k0 = {
-            let g = gamma + wad;
+            let g = gamma + WAD;
             if g > k0 {
                 g - k0 + U256::from(1)
             } else {
                 k0 - g + U256::from(1)
             }
         };
-        let mul1 = wad * d / gamma * _g1k0 / gamma * _g1k0 * a_mul / ann;
-        let mul2 = wad + U256::from(2u64) * wad * k0 / _g1k0;
-        let yfprime = wad * y + s * mul2 + mul1;
+        let mul1 = WAD * d / gamma * _g1k0 / gamma * _g1k0 * A_MULTIPLIER / ann;
+        let mul2 = WAD + U256::from(2u64) * WAD * k0 / _g1k0;
+        let yfprime = WAD * y + s * mul2 + mul1;
         let _dyfprime = d * mul2;
         if yfprime < _dyfprime {
             y = y_prev / U256::from(2);
@@ -162,8 +160,8 @@ pub fn newton_y_2_ng(
         let yfprime = yfprime - _dyfprime;
         let fprime = yfprime / y;
         let y_minus = mul1 / fprime;
-        let y_plus = (yfprime + wad * d) / fprime + y_minus * wad / k0;
-        let y_minus = y_minus + wad * s / fprime;
+        let y_plus = (yfprime + WAD * d) / fprime + y_minus * WAD / k0;
+        let y_minus = y_minus + WAD * s / fprime;
         if y_plus < y_minus {
             y = y_prev / U256::from(2);
         } else {
@@ -178,13 +176,12 @@ pub fn newton_y_2_ng(
 }
 
 pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Option<(U256, U256)> {
-    let wad = U256::from(WAD);
     let s = |v: u128| -> I256 { I256::try_from(v).expect("i256 const") };
     let p = |exp: u32| -> U256 { U256::from(10u64).pow(U256::from(exp)) };
     let si = |exp: u32| -> I256 { I256::try_from(p(exp)).expect("i256 pow") };
 
     let max_gamma_small = U256::from(2u64) * U256::from(10u128.pow(16));
-    let mut lim_mul = U256::from(100u64) * wad;
+    let mut lim_mul = U256::from(100u64) * WAD;
     if gamma > max_gamma_small {
         lim_mul = lim_mul * max_gamma_small / gamma;
     }
@@ -194,7 +191,7 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
     let d_s = I256::try_from(d).ok()?;
     let x_j_s = I256::try_from(x[1 - i]).ok()?;
     let gamma2 = gamma_s.wrapping_mul(gamma_s);
-    let e18 = s(WAD);
+    let e18 = I256::try_from(WAD).expect("WAD fits I256");
     let n_s = s(2);
 
     let k0_i = fdiv(e18.wrapping_mul(n_s).wrapping_mul(x_j_s), d_s);
@@ -326,7 +323,7 @@ pub fn get_y_2_ng(ann: U256, gamma: U256, x: [U256; 2], d: U256, i: usize) -> Op
     )
     .ok()?;
     let k0_prev = U256::try_from(root).ok()?;
-    let frac = y_out * wad / d;
+    let frac = y_out * WAD / d;
     let n2 = U256::from(2u64);
     if frac < U256::from(10u128.pow(36)) / n2 / lim_mul || frac > lim_mul / n2 {
         return None;
@@ -352,9 +349,9 @@ mod tests {
 
     #[test]
     fn isqrt_large() {
-        let x = U256::from(WAD) * U256::from(WAD);
+        let x = WAD * WAD;
         let s = isqrt(x);
-        assert_eq!(s, U256::from(WAD));
+        assert_eq!(s, WAD);
     }
 
     #[test]
@@ -369,7 +366,7 @@ mod tests {
 
     #[test]
     fn cbrt_basic() {
-        let wad = U256::from(WAD);
+        let wad = WAD;
         // cbrt(1e18) in WAD-scaled space
         let result = cbrt(wad);
         // cbrt(10^18) = 10^6, then scaled by 10^18 = 10^24? No, cbrt is WAD-scaled.
@@ -398,9 +395,9 @@ mod tests {
 
     #[test]
     fn get_y_2_ng_convergence() {
-        let wad = U256::from(WAD);
+        let wad = WAD;
         // Realistic twocrypto-ng params
-        let ann = U256::from(540_000u64) * U256::from(A_MULTIPLIER as u64);
+        let ann = U256::from(540_000u64) * A_MULTIPLIER;
         let gamma = U256::from(11_809_167_828_997u64);
         let x0 = U256::from(5000u64) * wad;
         let x1 = U256::from(5000u64) * wad;

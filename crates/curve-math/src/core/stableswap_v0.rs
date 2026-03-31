@@ -5,14 +5,13 @@
 
 use alloy_primitives::U256;
 
-pub const PRECISION: u128 = 1_000_000_000_000_000_000;
-pub const FEE_DENOMINATOR: u64 = 10_000_000_000;
-pub const A_PRECISION: u64 = 1;
+pub const PRECISION: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
+pub const FEE_DENOMINATOR: U256 = U256::from_limbs([10_000_000_000, 0, 0, 0]);
+pub const A_PRECISION: U256 = U256::from_limbs([1, 0, 0, 0]);
 const MAX_ITERATIONS: usize = 255;
 
 pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
-    let a_prec = U256::from(A_PRECISION);
     let sum: U256 = xp
         .iter()
         .try_fold(U256::ZERO, |acc, b| acc.checked_add(*b))?;
@@ -31,10 +30,10 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
         let d_prev = d;
         let num = ann
             .checked_mul(sum)?
-            .checked_div(a_prec)?
+            .checked_div(A_PRECISION)?
             .checked_add(d_p.checked_mul(n)?)?
             .checked_mul(d)?;
-        let den = (ann.checked_div(a_prec)?.checked_sub(U256::from(1))?)
+        let den = (ann.checked_div(A_PRECISION)?.checked_sub(U256::from(1))?)
             .checked_mul(d)?
             .checked_add(n.checked_add(U256::from(1))?.checked_mul(d_p)?)?;
         if den.is_zero() {
@@ -51,7 +50,6 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
 
 pub fn get_y(i: usize, j: usize, x_new: U256, xp: &[U256], d: U256, amp: U256) -> Option<U256> {
     let n = U256::from(xp.len());
-    let a_prec = U256::from(A_PRECISION);
     let ann = amp.checked_mul(n)?;
     let mut s_prime = U256::ZERO;
     let mut c = d;
@@ -69,9 +67,9 @@ pub fn get_y(i: usize, j: usize, x_new: U256, xp: &[U256], d: U256, amp: U256) -
     }
     c = c
         .checked_mul(d)?
-        .checked_mul(a_prec)?
+        .checked_mul(A_PRECISION)?
         .checked_div(ann.checked_mul(n)?)?;
-    let b = s_prime.checked_add(d.checked_mul(a_prec)?.checked_div(ann)?)?;
+    let b = s_prime.checked_add(d.checked_mul(A_PRECISION)?.checked_div(ann)?)?;
     let mut y = d;
     for _ in 0..MAX_ITERATIONS {
         let y_prev = y;
@@ -97,7 +95,7 @@ mod tests {
     use super::*;
 
     fn wad() -> U256 {
-        U256::from(PRECISION)
+        PRECISION
     }
 
     #[test]

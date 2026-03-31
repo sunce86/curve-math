@@ -159,7 +159,7 @@ mod tests {
             U256::from(10_000_000_000_000_000_000_000_000u128),
         ];
         let prec_mul = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
-        let amp = U256::from(100u64 * A_PRECISION as u64);
+        let amp = U256::from(100u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let dx = U256::from(1_000_000_000_000_000_000_000u128);
@@ -181,7 +181,7 @@ mod tests {
             U256::from(10_000_000_000_000_000_000_000_000u128),
         ];
         let prec_mul = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
-        let amp = U256::from(100u64 * A_PRECISION as u64);
+        let amp = U256::from(100u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let (num, den) = spot_price(&balances, &prec_mul, amp, fee, offpeg, 0, 1).expect("price");
@@ -197,7 +197,7 @@ mod tests {
             U256::from(10_000_000_000_000_000_000_000_000u128),
         ];
         let prec_mul = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
-        let amp = U256::from(100u64 * A_PRECISION as u64);
+        let amp = U256::from(100u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let (num_ij, den_ij) =
@@ -221,7 +221,7 @@ mod tests {
             U256::from(10_000_000_000_000_000_000_000_000u128),
         ];
         let prec_mul = [U256::from(1u64), U256::from(1u64), U256::from(1u64)];
-        let amp = U256::from(100u64 * A_PRECISION as u64);
+        let amp = U256::from(100u64) * A_PRECISION;
         let fee = U256::from(4_000_000u64);
         let offpeg = U256::from(20_000_000_000u64);
         let dx = U256::from(1_000_000_000_000_000u128);
