@@ -14,9 +14,9 @@ The pool registry covers all live Curve pools (non-empty, non-paused, functional
 
 | Chain | Fuzz | Verified / Live pools | Last indexed |
 |-------|------|----------------------|-------------|
-| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 1040 / 1040 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-03-31 |
-| Base | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml) | 135 / 135 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-03-31 |
-| Arbitrum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml) | 193 / 193 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-03-31 |
+| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 1043 / 1043 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-01 |
+| Base | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml) | 137 / 137 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-01 |
+| Arbitrum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml) | 193 / 193 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-01 |
 
 ## Performance
 
