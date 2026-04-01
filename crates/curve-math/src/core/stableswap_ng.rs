@@ -105,7 +105,8 @@ pub fn dynamic_fee(xpi: U256, xpj: U256, fee: U256, fee_multiplier: U256) -> U25
         return fee;
     }
     (fee_multiplier * fee)
-        / ((fee_multiplier - FEE_DENOMINATOR) * U256::from(4u64) * xpi * xpj / xps2 + FEE_DENOMINATOR)
+        / ((fee_multiplier - FEE_DENOMINATOR) * U256::from(4u64) * xpi * xpj / xps2
+            + FEE_DENOMINATOR)
 }
 
 #[cfg(test)]

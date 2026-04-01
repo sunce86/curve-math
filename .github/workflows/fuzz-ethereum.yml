@@ -15,7 +15,7 @@ on:
       - '*.md'
 
 concurrency:
-  group: fuzz-rpc-${{ github.ref }}
+  group: fuzz-ethereum-${{ github.ref }}
   cancel-in-progress: false
 
 env:

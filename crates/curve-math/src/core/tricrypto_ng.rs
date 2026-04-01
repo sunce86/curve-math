@@ -165,9 +165,11 @@ pub fn newton_y_3(ann: U256, gamma: U256, x: [U256; 3], d: U256, j: usize) -> Op
 }
 
 pub fn get_y_3_ng(ann: U256, gamma: U256, x: [U256; 3], d: U256, i: usize) -> Option<(U256, U256)> {
-    let s = |v: u128| -> I256 { I256::from_raw(U256::from(v)) };
+    // These closures convert known small constants from the Vyper Cardano solver into I256.
+    // All values are hardcoded literals (max 10^36 << 2^255), so try_from never fails.
+    let s = |v: u128| -> I256 { I256::try_from(v).expect("i256 const") };
     let p = |exp: u32| -> U256 { U256::from(10u64).pow(U256::from(exp)) };
-    let si = |exp: u32| -> I256 { I256::from_raw(p(exp)) };
+    let si = |exp: u32| -> I256 { I256::try_from(p(exp)).expect("i256 pow") };
     let (j_idx, k_idx) = match i {
         0 => (1usize, 2usize),
         1 => (0, 2),
@@ -180,8 +182,8 @@ pub fn get_y_3_ng(ann: U256, gamma: U256, x: [U256; 3], d: U256, i: usize) -> Op
     let x_j = I256::try_from(x[j_idx]).ok()?;
     let x_k = I256::try_from(x[k_idx]).ok()?;
     let gamma2 = gamma_s.wrapping_mul(gamma_s);
-    let e18 = I256::from_raw(WAD);
-    let a_mul_s = I256::from_raw(A_MULTIPLIER);
+    let e18 = I256::try_from(WAD).expect("WAD fits I256");
+    let a_mul_s = I256::try_from(A_MULTIPLIER).expect("A_MULTIPLIER fits I256");
     let a: I256 = si(36) / s(27);
     let b: I256 = si(36) / s(9) + s(2).wrapping_mul(e18).wrapping_mul(gamma_s) / s(27)
         - d_s.wrapping_mul(d_s) / x_j * gamma2 * ann_s / s(27 * 27) / a_mul_s / x_k;

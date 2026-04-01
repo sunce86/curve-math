@@ -2,3 +2,4 @@
 Cargo.lock
 .pr-summary.md
 __pycache__/
+.claude/settings.local.json
