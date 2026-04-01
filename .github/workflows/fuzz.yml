@@ -1,0 +1,75 @@
+name: Fuzz
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'crates/curve-adapter/tests/registry/**'
+      - 'crates/curve-math/tools/**'
+      - '*.md'
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - 'crates/curve-adapter/tests/registry/**'
+      - 'crates/curve-math/tools/**'
+      - '*.md'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ethereum:
+    name: Fuzz Ethereum
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run registry fuzz
+        env:
+          RPC_URL_1: ${{ secrets.RPC_URL_1 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          if [ -z "$RPC_URL_1" ]; then
+            echo "::warning::RPC_URL_1 not set, skipping fuzz"
+            exit 0
+          fi
+          cargo test -p curve-adapter --test fuzz_registry -- fuzz_1 --ignored --nocapture --test-threads=1
+
+  base:
+    name: Fuzz Base
+    needs: ethereum
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run registry fuzz
+        env:
+          RPC_URL_8453: ${{ secrets.RPC_URL_8453 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          if [ -z "$RPC_URL_8453" ]; then
+            echo "::warning::RPC_URL_8453 not set, skipping fuzz"
+            exit 0
+          fi
+          cargo test -p curve-adapter --test fuzz_registry -- fuzz_8453 --ignored --nocapture --test-threads=1
+
+  arbitrum:
+    name: Fuzz Arbitrum
+    needs: base
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run registry fuzz
+        env:
+          RPC_URL_42161: ${{ secrets.RPC_URL_42161 }}
+          FUZZ_ITERATIONS: "100"
+        run: |
+          if [ -z "$RPC_URL_42161" ]; then
+            echo "::warning::RPC_URL_42161 not set, skipping fuzz"
+            exit 0
+          fi
+          cargo test -p curve-adapter --test fuzz_registry -- fuzz_42161 --ignored --nocapture --test-threads=1

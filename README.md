@@ -12,11 +12,13 @@ Every registered pool is **differentially fuzz-tested** against its on-chain `ge
 
 The pool registry covers all live Curve pools (non-empty, non-paused, functional tokens) across factory and legacy deployments.
 
-| Chain | Fuzz | Verified / Live pools | Last indexed |
-|-------|------|----------------------|-------------|
-| Ethereum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml) | 1047 / 1047 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-02 |
-| Base | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml) | 136 / 136 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-02 |
-| Arbitrum | [![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml) | 194 / 194 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-02 |
+[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz.yml)
+
+| Chain | Verified / Live pools | Last indexed |
+|-------|----------------------|-------------|
+| Ethereum | 1047 / 1047 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-02 |
+| Base | 136 / 136 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-02 |
+| Arbitrum | 194 / 194 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-02 |
 
 ## Performance
 

@@ -623,11 +623,6 @@ def write_pr_summary(verified: int, failed: int, added: list[str], skipped: list
 
 
 CHAIN_NAMES = {1: "Ethereum", 8453: "Base", 42161: "Arbitrum"}
-CHAIN_FUZZ_BADGES = {
-    1: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-ethereum.yml)",
-    8453: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-base.yml)",
-    42161: "[![Fuzz](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml/badge.svg)](https://github.com/sunce86/curve-math/actions/workflows/fuzz-arbitrum.yml)",
-}
 
 
 def update_readme_badge(chain_id: int, count: int, last_updated: str, total: int = 0):
@@ -643,12 +638,11 @@ def update_readme_badge(chain_id: int, count: int, last_updated: str, total: int
 
     import re
     chain_name = CHAIN_NAMES.get(chain_id, f"Chain {chain_id}")
-    badge = CHAIN_FUZZ_BADGES.get(chain_id, "")
     pct = min(count * 100 // total, 100) if total else 0
     pool_str = f"{min(count, total)} / {total} ![](https://geps.dev/progress/{pct}?successColor=6366f1)" if total else str(count)
-    new_row = f"| {chain_name} | {badge} | {pool_str} | {last_updated} |"
+    new_row = f"| {chain_name} | {pool_str} | {last_updated} |"
     content = re.sub(
-        rf'\| {re.escape(chain_name)} \|.*\|.*\|.*\|',
+        rf'\| {re.escape(chain_name)} \|.*\|.*\|',
         new_row,
         content,
     )
