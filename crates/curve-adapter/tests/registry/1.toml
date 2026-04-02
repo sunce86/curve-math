@@ -5249,3 +5249,28 @@ address = "0xB576491F1E6e5E62f1d8F26062Ee822B40B0E0d4"
 variant = "TwoCryptoV1"
 name = "WETH/CVX (legacy CryptoSwap)"
 
+[[pools]]
+address = "0x9838eCcC42659FA8AA7daF2aD134b53984c9427b"
+variant = "TwoCryptoV1"
+name = "EURT/3Crv (legacy CryptoSwap)"
+
+[[pools]]
+address = "0x98a7F18d4E56Cfe84E3D081B40001B3d5bD3eB8B"
+variant = "TwoCryptoV1"
+name = "USDC/EURS (legacy CryptoSwap)"
+
+[[pools]]
+address = "0xAdCFcf9894335dC340f6Cd182aFA45999F45Fc44"
+variant = "TwoCryptoV1"
+name = "XAUt/3Crv (legacy CryptoSwap)"
+
+[[pools]]
+address = "0x98638FAcf9a3865cd033F36548713183f6996122"
+variant = "TwoCryptoV1"
+name = "WETH/SPELL (legacy CryptoSwap)"
+
+[[pools]]
+address = "0x752eBeb79963cf0732E9c0fec72a49FD1DEfAEAC"
+variant = "TwoCryptoV1"
+name = "WETH/T (legacy CryptoSwap)"
+
