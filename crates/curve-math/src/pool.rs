@@ -127,8 +127,12 @@ pub enum Pool {
         fee: U256,
     },
 
-    /// Legacy 2-coin CryptoSwap (CurveCryptoSwap2).
+    /// Legacy 2-coin CryptoSwap (CurveCryptoSwap2 / CurveCryptoSwap2ETH).
     /// Newton iteration for y.
+    ///
+    /// `eth_variant` controls the Newton `mul2` formula:
+    /// - `true`  (CurveCryptoSwap2ETH): pools containing WETH
+    /// - `false` (CurveCryptoSwap2): pools without WETH
     TwoCryptoV1 {
         balances: [U256; 2],
         precisions: [U256; 2],
@@ -139,6 +143,7 @@ pub enum Pool {
         mid_fee: U256,
         out_fee: U256,
         fee_gamma: U256,
+        eth_variant: bool,
     },
 
     /// Next-gen 2-coin CryptoSwap (twocrypto-ng).
@@ -292,6 +297,7 @@ impl Pool {
                 mid_fee,
                 out_fee,
                 fee_gamma,
+                eth_variant,
             } => swap::twocrypto_v1::get_amount_out(
                 balances,
                 precisions,
@@ -302,6 +308,7 @@ impl Pool {
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
+                *eth_variant,
                 i,
                 j,
                 dx,
@@ -507,6 +514,7 @@ impl Pool {
                 mid_fee,
                 out_fee,
                 fee_gamma,
+                eth_variant,
             } => swap::twocrypto_v1::get_amount_in(
                 balances,
                 precisions,
@@ -517,6 +525,7 @@ impl Pool {
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
+                *eth_variant,
                 i,
                 j,
                 desired_output,
@@ -688,6 +697,7 @@ impl Pool {
                 mid_fee,
                 out_fee,
                 fee_gamma,
+                eth_variant,
             } => swap::twocrypto_v1::spot_price(
                 balances,
                 precisions,
@@ -698,6 +708,7 @@ impl Pool {
                 *mid_fee,
                 *out_fee,
                 *fee_gamma,
+                *eth_variant,
                 i,
                 j,
             ),

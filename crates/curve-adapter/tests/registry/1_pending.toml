@@ -1,0 +1,6 @@
+last_updated = "2026-04-03"
+
+[[pools]]
+address = "0xE84f5b1582BA325fDf9cE6B0c1F087ccfC924e54"
+variant = "TwoCryptoV1"
+name = "EURC/3Crv (legacy CryptoSwap, non-ETH)"

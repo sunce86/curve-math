@@ -14,7 +14,21 @@ pub const FEE_DENOMINATOR: U256 = U256::from_limbs([10_000_000_000, 0, 0, 0]);
 pub const A_MULTIPLIER: U256 = U256::from_limbs([10_000, 0, 0, 0]);
 const MAX_ITERATIONS: usize = 255;
 
-pub fn newton_y_2(ann: U256, gamma: U256, x: [U256; 2], d: U256, j: usize) -> Option<U256> {
+/// Newton solver for 2-coin CryptoSwap.
+///
+/// `eth_variant` controls the `mul2` formula:
+/// - `true`  (CurveCryptoSwap2ETH): `mul2 = WAD + 2*WAD*K0 / _g1k0`
+/// - `false` (CurveCryptoSwap2):    `mul2 = (WAD + 2*WAD*K0) / _g1k0`
+///
+/// Deployed pools without WETH use the non-ETH variant (different Vyper source).
+pub fn newton_y_2(
+    ann: U256,
+    gamma: U256,
+    x: [U256; 2],
+    d: U256,
+    j: usize,
+    eth_variant: bool,
+) -> Option<U256> {
     let n = U256::from(2u64);
     let x_j = x[1 - j];
     let mut y = d * d / (x_j * U256::from(4u64));
@@ -35,7 +49,11 @@ pub fn newton_y_2(ann: U256, gamma: U256, x: [U256; 2], d: U256, j: usize) -> Op
             k0 - __g1k0 + U256::from(1)
         };
         let mul1 = WAD * d / gamma * _g1k0 / gamma * _g1k0 * A_MULTIPLIER / ann;
-        let mul2 = WAD + U256::from(2u64) * WAD * k0 / _g1k0;
+        let mul2 = if eth_variant {
+            WAD + U256::from(2u64) * WAD * k0 / _g1k0
+        } else {
+            (WAD + U256::from(2u64) * WAD * k0) / _g1k0
+        };
         let yfprime = WAD * y + s * mul2 + mul1;
         let _dyfprime = d * mul2;
         if yfprime < _dyfprime {
@@ -110,7 +128,7 @@ mod tests {
     #[test]
     fn newton_y_2_convergence() {
         let (ann, gamma, x, d) = realistic_params();
-        let y = newton_y_2(ann, gamma, x, d, 1).expect("converge");
+        let y = newton_y_2(ann, gamma, x, d, 1, true).expect("converge");
         assert!(y > U256::ZERO);
         assert!(y < d);
     }
@@ -120,8 +138,8 @@ mod tests {
         let wad = WAD;
         let (ann, gamma, x, d) = realistic_params();
         let dx = U256::from(10u64) * wad;
-        let y_before = newton_y_2(ann, gamma, x, d, 1).expect("before");
-        let y_after = newton_y_2(ann, gamma, [x[0] + dx, x[1]], d, 1).expect("after");
+        let y_before = newton_y_2(ann, gamma, x, d, 1, true).expect("before");
+        let y_after = newton_y_2(ann, gamma, [x[0] + dx, x[1]], d, 1, true).expect("after");
         assert!(y_after < y_before);
     }
 

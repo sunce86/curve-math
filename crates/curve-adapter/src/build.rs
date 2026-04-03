@@ -263,6 +263,14 @@ pub struct RawPoolState {
     ///
     /// If `None`, precisions are computed as `10^(18 - decimals)`.
     pub precisions: Option<Vec<U256>>,
+
+    /// Whether this TwoCryptoV1 pool uses the ETH variant Newton solver.
+    ///
+    /// - `true`  (CurveCryptoSwap2ETH): pools containing WETH — `mul2 = WAD + 2*WAD*K0 / _g1k0`
+    /// - `false` (CurveCryptoSwap2): pools without WETH — `mul2 = (WAD + 2*WAD*K0) / _g1k0`
+    ///
+    /// Only relevant for `TwoCryptoV1`. Defaults to `true` (ETH variant).
+    pub eth_variant: bool,
 }
 
 impl Default for RawPoolState {
@@ -282,6 +290,7 @@ impl Default for RawPoolState {
             gamma: None,
             dynamic_rates: None,
             precisions: None,
+            eth_variant: true,
         }
     }
 }
@@ -600,6 +609,7 @@ fn build_twocrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
                 mid_fee,
                 out_fee,
                 fee_gamma,
+                eth_variant: state.eth_variant,
             })
         }
         CurveVariant::TwoCryptoNG => {

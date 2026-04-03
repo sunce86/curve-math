@@ -16,7 +16,7 @@
 //!     cargo test -p curve-adapter --test fuzz_registry -- fuzz_1 --ignored --nocapture
 
 use alloy::providers::{Provider, ProviderBuilder};
-use alloy_primitives::{Address, U256};
+use alloy_primitives::{address, Address, U256};
 use curve_adapter::{build_pool, CurveVariant, RawPoolState};
 use curve_math::Pool;
 use serde::Deserialize;
@@ -145,6 +145,7 @@ alloy::sol! {
     interface ICrypto2 {
         function get_dy(uint256 i, uint256 j, uint256 dx) external view returns (uint256);
         function balances(uint256 i) external view returns (uint256);
+        function coins(uint256 i) external view returns (address);
         function A() external view returns (uint256);
         function gamma() external view returns (uint256);
         function D() external view returns (uint256);
@@ -598,6 +599,19 @@ async fn read_and_build_pool(
             let out_fee = c.out_fee().block(block).call().await.ok()?;
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
             let precs = c.precisions().block(block).call().await.ok();
+
+            // Detect ETH vs non-ETH variant for TwoCryptoV1 by checking if pool contains WETH.
+            // CurveCryptoSwap2ETH (WETH pools) uses a different mul2 formula in Newton solver.
+            let eth_variant = if variant == CurveVariant::TwoCryptoV1 {
+                // Known WETH addresses per chain
+                const WETH_MAINNET: Address = address!("C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+                let coin0 = c.coins(U256::from(0)).block(block).call().await.ok();
+                let coin1 = c.coins(U256::from(1)).block(block).call().await.ok();
+                coin0 == Some(WETH_MAINNET) || coin1 == Some(WETH_MAINNET)
+            } else {
+                true // TwoCryptoNG always uses its own solver, eth_variant is ignored
+            };
+
             RawPoolState {
                 variant,
                 balances: vec![b0, b1],
@@ -610,6 +624,7 @@ async fn read_and_build_pool(
                 gamma: Some(gamma),
                 price_scale: Some(vec![ps]),
                 precisions: precs.map(|p| p.to_vec()),
+                eth_variant,
                 ..Default::default()
             }
         }
