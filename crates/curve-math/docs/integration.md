@@ -63,6 +63,16 @@ The registry is maintained by the [pool indexer](../tools/index-pools.py) and co
 
 Each variant requires different on-chain state. Some fields change every block, others rarely.
 
+### Balance validation
+
+A pool's internal `balances(i)` can diverge from the actual token balance held by the contract (`ERC20(coins(i)).balanceOf(pool)`). This happens on drained, exploited, or abandoned pools — the internal accounting remains stale while the tokens are gone.
+
+On such pools, `get_dy()` returns a mathematically "correct" result based on stale `balances(i)`, but `exchange()` reverts because the contract cannot transfer tokens it doesn't hold.
+
+**Always verify**: for each coin `i`, check that `ERC20(coins(i)).balanceOf(pool) >= balances(i)`. If any coin fails this check, the pool is in an inconsistent state and swap simulations will produce unreliable results.
+
+This applies to all variants, but is most common on legacy CryptoSwap pools (TwoCryptoV1) and old StableSwap deployments.
+
 ### Per-block state (update on every swap/liquidity event)
 
 | Variant | Fields |
