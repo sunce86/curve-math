@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-04-02"
-total_factory_pools = 2061
-live_factory_pools = 1047
+last_updated = "2026-04-03"
+total_factory_pools = 2066
+live_factory_pools = 1052
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5243,4 +5243,29 @@ name = "OUSD/USDC"
 address = "0x516076cFa1DACA43974EA2f8bA2976d7a234fD93"
 variant = "TwoCryptoStable"
 name = "A7A5/BRZ"
+
+[[pools]]
+address = "0x659B7B5Dd7936BF2f2d198A87C1583049D1D91d3"
+variant = "StableSwapNG"
+name = "crvUSD/sVUSD"
+
+[[pools]]
+address = "0x534D48048525445386979F53907B3eeF47E5A10D"
+variant = "StableSwapNG"
+name = "EURe/EURC/EURCV"
+
+[[pools]]
+address = "0x9D8AFD5Ce19A3b948049468188f1De13951A4383"
+variant = "StableSwapNG"
+name = "frxUSD/sDOLA"
+
+[[pools]]
+address = "0xf41Df3C4f7A3C6663df602241505f21586a41C72"
+variant = "StableSwapNG"
+name = "frxUSD/DOLA"
+
+[[pools]]
+address = "0xb14Fea74B5a3849c0311aeAe6aAea6AB4194C345"
+variant = "StableSwapNG"
+name = "USPC/sUSDC"
 
