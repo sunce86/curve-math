@@ -161,6 +161,67 @@ Different variants scale A differently:
 | TwoCryptoV1, TwoCryptoNG, TwoCryptoStable | A * A_MULTIPLIER (10000) | `ann = A()` (already scaled) |
 | TriCryptoV1, TriCryptoNG | A * A_MULTIPLIER (10000) | `ann = A()` (already scaled) |
 
+## Meta Pool Underlying Swaps (LP Unwrap)
+
+Meta pools (e.g., GUSD/3CRV) trade a meta token against a base pool LP token. On-chain, `exchange_underlying` allows direct swaps between the meta token and base pool underlying coins (e.g., GUSD → USDC).
+
+`curve-math` provides the building blocks for this as two standalone functions in `swap::stableswap_v1`:
+
+| Function | Direction | Description |
+|----------|-----------|-------------|
+| `calc_withdraw_one_coin` | LP → coin | Amount of coin `i` received when burning LP tokens |
+| `calc_add_liquidity` | coin → LP | LP tokens minted when depositing into base pool |
+
+### Additional state required
+
+These functions require **`total_supply`** of the base pool LP token, which is not part of the standard pool state:
+
+| Field | How to fetch | When to update |
+|-------|-------------|----------------|
+| `total_supply` | `ERC20(lp_token).totalSupply()` | Per-block (changes on every add/remove liquidity) |
+
+The LP token address can be discovered via `pool.token()` (for legacy pools) or from factory deployment events.
+
+### Usage pattern
+
+To simulate `exchange_underlying(0, 2, dx)` on a GUSD/3CRV meta pool:
+
+```rust
+// Step 1: Meta pool swap GUSD → 3CRV LP
+let lp_amount = meta_pool.get_amount_out(0, 1, dx)?;
+
+// Step 2: Base pool withdrawal 3CRV LP → USDC
+let usdc_out = stableswap_v1::calc_withdraw_one_coin(
+    &base_balances, &base_rates, base_amp, base_fee,
+    lp_amount, 1, // coin index 1 = USDC in 3pool
+    base_total_supply,
+)?;
+```
+
+For the reverse direction (USDC → GUSD):
+```rust
+// Step 1: Base pool deposit USDC → 3CRV LP
+let amounts = [U256::ZERO, usdc_amount, U256::ZERO];
+let lp_minted = stableswap_v1::calc_add_liquidity(
+    &base_balances, &base_rates, base_amp, base_fee,
+    &amounts, base_total_supply,
+)?;
+
+// Step 2: Meta pool swap 3CRV LP → GUSD
+let gusd_out = meta_pool.get_amount_out(1, 0, lp_minted)?;
+```
+
+This matches on-chain `exchange_underlying` at wei-level precision because the on-chain implementation literally performs these same two steps as separate contract calls.
+
+### Base pools
+
+Most meta pools use 3pool as base. The base pool address is available via `meta_pool.base_pool()`.
+
+| Base pool | LP token | Coins | Variant |
+|-----------|----------|-------|---------|
+| 3pool (`0xbEbc...FF1C7`) | 3CRV (`0x6c3F...E490`) | DAI, USDC, USDT | StableSwapV1 |
+| sBTC (`0x7fC7...8D85`) | sbtcCrv (`0x075b...B997`) | renBTC, WBTC, sBTC | StableSwapV1 |
+
 ## Substreams / Streaming Integration
 
 For streaming architectures that cannot make `eth_call`:
