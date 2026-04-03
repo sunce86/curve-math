@@ -266,9 +266,24 @@ async fn fuzz_calc_withdraw_one_coin_v1() {
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
-    let b2 = curve.balances(U256::from(2)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let amp = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
     let total_supply = lp_token.totalSupply().block(block).call().await.unwrap();
@@ -284,7 +299,8 @@ async fn fuzz_calc_withdraw_one_coin_v1() {
     let mut passed = 0u64;
     let mut skipped = 0u64;
     for i in 0..3 {
-        for lp_amount in generate_amounts(per_coin, total_supply / U256::from(10u64), bn + i as u64) {
+        for lp_amount in generate_amounts(per_coin, total_supply / U256::from(10u64), bn + i as u64)
+        {
             if lp_amount.is_zero() || lp_amount >= total_supply {
                 skipped += 1;
                 continue;
@@ -295,9 +311,20 @@ async fn fuzz_calc_withdraw_one_coin_v1() {
                 .call()
                 .await;
             match on_chain {
-                Ok(expected) => match calc_withdraw_one_coin(&balances, &rates, amp, fee, lp_amount, i, total_supply) {
+                Ok(expected) => match calc_withdraw_one_coin(
+                    &balances,
+                    &rates,
+                    amp,
+                    fee,
+                    lp_amount,
+                    i,
+                    total_supply,
+                ) {
                     Some(result) => {
-                        assert_eq!(result, expected, "withdraw coin {i} mismatch at lp={lp_amount}");
+                        assert_eq!(
+                            result, expected,
+                            "withdraw coin {i} mismatch at lp={lp_amount}"
+                        );
                         passed += 1;
                     }
                     None => skipped += 1,
@@ -337,9 +364,24 @@ async fn fuzz_calc_add_liquidity_v1() {
     let bn = provider.get_block_number().await.unwrap() - 5;
     let block = alloy::eips::BlockId::number(bn);
 
-    let b0 = curve.balances(U256::from(0)).block(block).call().await.unwrap();
-    let b1 = curve.balances(U256::from(1)).block(block).call().await.unwrap();
-    let b2 = curve.balances(U256::from(2)).block(block).call().await.unwrap();
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
     let amp = curve.A().block(block).call().await.unwrap();
     let fee = curve.fee().block(block).call().await.unwrap();
     let total_supply = lp_token.totalSupply().block(block).call().await.unwrap();
@@ -357,7 +399,11 @@ async fn fuzz_calc_add_liquidity_v1() {
 
     // Test single-coin deposits for each coin
     for coin in 0..3 {
-        for deposit_amount in generate_amounts(per_coin, balances[coin] / U256::from(10u64), bn + coin as u64) {
+        for deposit_amount in generate_amounts(
+            per_coin,
+            balances[coin] / U256::from(10u64),
+            bn + coin as u64,
+        ) {
             if deposit_amount.is_zero() {
                 skipped += 1;
                 continue;
@@ -375,7 +421,10 @@ async fn fuzz_calc_add_liquidity_v1() {
             match calc_add_liquidity(&balances, &rates, amp, fee, &amounts, total_supply) {
                 Some(mint) => {
                     // Basic sanity: mint > 0 for non-zero deposit
-                    assert!(mint > U256::ZERO, "mint should be positive for coin {coin} deposit {deposit_amount}");
+                    assert!(
+                        mint > U256::ZERO,
+                        "mint should be positive for coin {coin} deposit {deposit_amount}"
+                    );
                     // mint should be less than total_supply (can't double supply with small deposit)
                     if deposit_amount < balances[coin] {
                         assert!(mint < total_supply, "mint too large for coin {coin}");

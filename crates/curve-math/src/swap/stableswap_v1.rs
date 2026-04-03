@@ -174,8 +174,11 @@ pub fn calc_withdraw_one_coin(
             xp[j].checked_sub(xp[j].checked_mul(d1)?.checked_div(d0)?)?
         };
         // Vyper: xp_reduced[j] -= _fee * dx_expected / FEE_DENOMINATOR
-        xp_reduced[j] = xp_reduced[j]
-            .checked_sub(reduced_fee.checked_mul(dx_expected)?.checked_div(fee_denom)?)?;
+        xp_reduced[j] = xp_reduced[j].checked_sub(
+            reduced_fee
+                .checked_mul(dx_expected)?
+                .checked_div(fee_denom)?,
+        )?;
     }
 
     // Vyper: dy = xp_reduced[i] - self.get_y_D(amp, i, xp_reduced, D1)
@@ -271,7 +274,9 @@ pub fn calc_add_liquidity(
             new_balances[idx] - ideal
         };
         // Vyper: fees[i] = _fee * difference / FEE_DENOMINATOR
-        let fee_i = reduced_fee.checked_mul(difference)?.checked_div(fee_denom)?;
+        let fee_i = reduced_fee
+            .checked_mul(difference)?
+            .checked_div(fee_denom)?;
         // Vyper: new_balances[i] -= fees[i]
         new_balances_after_fee[idx] = new_balances_after_fee[idx].checked_sub(fee_i)?;
     }
@@ -384,11 +389,11 @@ mod tests {
         // 3pool state at block 24669924
         let balances = [
             U256::from(63975337809806329031583135u128), // DAI (18 dec)
-            U256::from(61219263170093u128),              // USDC (6 dec)
-            U256::from(37832425459809u128),              // USDT (6 dec)
+            U256::from(61219263170093u128),             // USDC (6 dec)
+            U256::from(37832425459809u128),             // USDT (6 dec)
         ];
         let rates = [
-            U256::from(1_000_000_000_000_000_000u128),  // 1e18 (DAI 18 dec)
+            U256::from(1_000_000_000_000_000_000u128), // 1e18 (DAI 18 dec)
             U256::from(1_000_000_000_000_000_000_000_000_000_000u128), // 1e30 (USDC 6 dec)
             U256::from(1_000_000_000_000_000_000_000_000_000_000u128), // 1e30 (USDT 6 dec)
         ];
@@ -397,11 +402,16 @@ mod tests {
         let total_supply = U256::from(156782246573983669718736356u128);
 
         let token_amount = U256::from(1_000_000_000_000_000_000u128); // 1 LP token
-        let result = calc_withdraw_one_coin(&balances, &rates, amp, fee, token_amount, 1, total_supply)
-            .expect("should succeed");
+        let result =
+            calc_withdraw_one_coin(&balances, &rates, amp, fee, token_amount, 1, total_supply)
+                .expect("should succeed");
 
         // On-chain result: 1039789 (1.039789 USDC)
-        assert_eq!(result, U256::from(1039789u64), "must match on-chain exactly");
+        assert_eq!(
+            result,
+            U256::from(1039789u64),
+            "must match on-chain exactly"
+        );
     }
 
     #[test]
@@ -421,7 +431,7 @@ mod tests {
         let total_supply = U256::from(156782246573983669718736356u128);
 
         // Deposit 1000 USDC
-        let deposit = U256::from(1000_000_000u64); // 1000 USDC (6 dec)
+        let deposit = U256::from(1_000_000_000u64); // 1000 USDC (6 dec)
         let amounts = [U256::ZERO, deposit, U256::ZERO];
         let lp_minted = calc_add_liquidity(&balances, &rates, amp, fee, &amounts, total_supply)
             .expect("add should succeed");
