@@ -600,30 +600,42 @@ async fn read_and_build_pool(
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
             let precs = c.precisions().block(block).call().await.ok();
 
-            // Detect ETH vs non-ETH variant for TwoCryptoV1.
-            // Factory-deployed pools (EIP-1167 proxies) always use the ETH implementation
-            // regardless of coin composition. Only legacy non-proxy pools without WETH
-            // use the non-ETH formula. See docs/integration.md for details.
+            // Detect ETH vs non-ETH variant for TwoCryptoV1 by probing on-chain.
+            // Try a small swap with both variants and pick the one that matches.
+            // This is the only reliable method — WETH presence doesn't determine
+            // the implementation (factory pools use ETH variant regardless of coins).
             let eth_variant = if variant == CurveVariant::TwoCryptoV1 {
-                let code: alloy::primitives::Bytes = provider
-                    .get_code_at(addr)
-                    .block_id(block)
-                    .await
-                    .unwrap_or_default();
-                let is_proxy = code.len() < 100
-                    && code
-                        .as_ref()
-                        .windows(10)
-                        .any(|w| w == b"\x36\x3d\x3d\x37\x3d\x3d\x3d\x36\x3d\x73");
-                if is_proxy {
-                    true // Factory pools always use ETH implementation
-                } else {
-                    // Legacy pools: check for WETH
-                    const WETH_MAINNET: Address =
-                        address!("C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
-                    let coin0 = c.coins(U256::from(0)).block(block).call().await.ok();
-                    let coin1 = c.coins(U256::from(1)).block(block).call().await.ok();
-                    coin0 == Some(WETH_MAINNET) || coin1 == Some(WETH_MAINNET)
+                let probe_dx = U256::from(1_000_000_000_000_000u128); // 0.001 token
+                let on_chain = c
+                    .get_dy(U256::from(0), U256::from(1), probe_dx)
+                    .block(block)
+                    .call()
+                    .await;
+                match on_chain {
+                    Ok(expected) => {
+                        use curve_math::swap::twocrypto_v1::get_amount_out;
+                        let state_eth = RawPoolState {
+                            eth_variant: true,
+                            ..RawPoolState {
+                                variant,
+                                balances: vec![b0, b1],
+                                token_decimals: decimals.clone(),
+                                amp: ann,
+                                mid_fee: Some(mid_fee),
+                                out_fee: Some(out_fee),
+                                fee_gamma: Some(fee_gamma),
+                                d: Some(d),
+                                gamma: Some(gamma),
+                                price_scale: Some(vec![ps]),
+                                precisions: precs.clone().map(|p| p.to_vec()),
+                                ..Default::default()
+                            }
+                        };
+                        let pool_eth = build_pool(&state_eth).ok();
+                        let result_eth = pool_eth.and_then(|p| p.get_amount_out(0, 1, probe_dx));
+                        result_eth == Some(expected)
+                    }
+                    Err(_) => true, // default to ETH if probe fails
                 }
             } else {
                 true // TwoCryptoNG always uses its own solver, eth_variant is ignored
