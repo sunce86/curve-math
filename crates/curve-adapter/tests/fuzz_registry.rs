@@ -600,14 +600,31 @@ async fn read_and_build_pool(
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
             let precs = c.precisions().block(block).call().await.ok();
 
-            // Detect ETH vs non-ETH variant for TwoCryptoV1 by checking if pool contains WETH.
-            // CurveCryptoSwap2ETH (WETH pools) uses a different mul2 formula in Newton solver.
+            // Detect ETH vs non-ETH variant for TwoCryptoV1.
+            // Factory-deployed pools (EIP-1167 proxies) always use the ETH implementation
+            // regardless of coin composition. Only legacy non-proxy pools without WETH
+            // use the non-ETH formula. See docs/integration.md for details.
             let eth_variant = if variant == CurveVariant::TwoCryptoV1 {
-                // Known WETH addresses per chain
-                const WETH_MAINNET: Address = address!("C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
-                let coin0 = c.coins(U256::from(0)).block(block).call().await.ok();
-                let coin1 = c.coins(U256::from(1)).block(block).call().await.ok();
-                coin0 == Some(WETH_MAINNET) || coin1 == Some(WETH_MAINNET)
+                let code: alloy::primitives::Bytes = provider
+                    .get_code_at(addr)
+                    .block_id(block)
+                    .await
+                    .unwrap_or_default();
+                let is_proxy = code.len() < 100
+                    && code
+                        .as_ref()
+                        .windows(10)
+                        .any(|w| w == b"\x36\x3d\x3d\x37\x3d\x3d\x3d\x36\x3d\x73");
+                if is_proxy {
+                    true // Factory pools always use ETH implementation
+                } else {
+                    // Legacy pools: check for WETH
+                    const WETH_MAINNET: Address =
+                        address!("C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+                    let coin0 = c.coins(U256::from(0)).block(block).call().await.ok();
+                    let coin1 = c.coins(U256::from(1)).block(block).call().await.ok();
+                    coin0 == Some(WETH_MAINNET) || coin1 == Some(WETH_MAINNET)
+                }
             } else {
                 true // TwoCryptoNG always uses its own solver, eth_variant is ignored
             };
