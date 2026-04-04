@@ -26,8 +26,20 @@ pub fn get_d(xp: &[U256], amp: U256) -> Option<U256> {
 
     for _ in 0..MAX_ITERATIONS {
         let mut d_p = d;
-        for balance in xp {
-            d_p = d_p.checked_mul(d)?.checked_div(balance.checked_mul(n)?)?;
+        if n_coins == 2 {
+            // Plain-2 factory Vyper uses unrolled D_P with different truncation:
+            //   D_P = D * D / xp[0] * D / xp[1] / N_COINS²
+            // Divides by each xp separately, then by N² at the end.
+            for balance in xp {
+                d_p = d_p.checked_mul(d)?.checked_div(*balance)?;
+            }
+            d_p = d_p.checked_div(n.checked_mul(n)?)?;
+        } else {
+            // Plain-3/4 factory Vyper uses per-element loop (same as V0/V1):
+            //   D_P = D_P * D / (x * N_COINS)
+            for balance in xp {
+                d_p = d_p.checked_mul(d)?.checked_div(balance.checked_mul(n)?)?;
+            }
         }
 
         let d_prev = d;

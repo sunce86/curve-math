@@ -251,4 +251,22 @@ mod tests {
             "spot price inconsistent with swap"
         );
     }
+
+    /// Regression test: crvUSD/USDM pool at highly imbalanced state (8:1 ratio).
+    /// Previously failed with 1 wei mismatch due to D_P truncation order in get_d.
+    #[test]
+    fn crvusd_usdm_imbalanced() {
+        let balances = [
+            U256::from_str_radix("7997642844895266633", 10).unwrap(),
+            U256::from_str_radix("1200263404327533497", 10).unwrap(),
+        ];
+        let rates = [U256::from(RATE_18), U256::from(RATE_18)];
+        let amp = U256::from(500u64) * A_PRECISION;
+        let fee = U256::from(1_000_000u64);
+        let dx = U256::from_str_radix("7997642844895266", 10).unwrap();
+
+        let result = get_amount_out(&balances, &rates, amp, fee, 0, 1, dx).unwrap();
+        // On-chain value at block ~24800000
+        assert_eq!(result, U256::from(7883635526307528u128));
+    }
 }
