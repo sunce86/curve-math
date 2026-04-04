@@ -244,6 +244,7 @@ fn roundtrip_twocrypto_v1() {
             mid_fee,
             out_fee,
             fee_gamma,
+            true, // CRV/ETH is ETH variant
             0,
             1,
             desired_dy,
@@ -264,6 +265,7 @@ fn roundtrip_twocrypto_v1() {
             mid_fee,
             out_fee,
             fee_gamma,
+            true, // CRV/ETH is ETH variant
             0,
             1,
             dx,

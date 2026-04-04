@@ -701,6 +701,7 @@ async fn fuzz_twocrypto_v1() {
                 mid_fee,
                 out_fee,
                 fee_gamma,
+                true, // CRV/ETH is ETH variant
                 0,
                 1,
                 dx,
@@ -731,6 +732,7 @@ async fn fuzz_twocrypto_v1() {
                 mid_fee,
                 out_fee,
                 fee_gamma,
+                true, // CRV/ETH is ETH variant
                 1,
                 0,
                 dx,
