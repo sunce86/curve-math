@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-04-09"
-total_factory_pools = 1456
-live_factory_pools = 137
+last_updated = "2026-04-10"
+total_factory_pools = 1458
+live_factory_pools = 139
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
@@ -717,4 +717,14 @@ name = "USDC/crvUSD"
 address = "0x3df1658e3E76d14eF3C4d410829EA7575bB83B9B"
 variant = "StableSwapNG"
 name = "USDC/crvUSD"
+
+[[pools]]
+address = "0x8B1eb9240dAE949680468E9f174adFb4fb247744"
+variant = "TriCryptoNG"
+name = "EVRGROW/cbETH/DAI"
+
+[[pools]]
+address = "0x8B1eb9240dAE949680468E9f174adFb4fb247744"
+variant = "TriCryptoNG"
+name = "EVRGROW/cbETH/DAI"
 
