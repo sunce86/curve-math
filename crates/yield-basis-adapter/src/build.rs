@@ -10,6 +10,7 @@ use yield_basis_math::pool::{PoolError, YieldBasisPool};
 /// Immutable fields (`leverage`, `lev_ratio`, `collateral_precision`) are
 /// set at deploy time. Mutable fields change per block.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RawYieldBasisState {
     // -- Immutables (from constructor, never change) --
     /// `L * 1e18` (e.g. 2e18 for 2x leverage). Must be > 1e18.

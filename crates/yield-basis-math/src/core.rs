@@ -4,7 +4,7 @@
 
 use alloy_primitives::U256;
 
-const WAD: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
+use crate::constants::WAD;
 
 /// Integer square root (floor). Babylonian method.
 /// Matches Vyper's `isqrt()`.
@@ -69,6 +69,7 @@ pub fn get_x0(
     }
 
     // D = coll_value^2 - 4 * coll_value * LEV_RATIO / 1e18 * debt
+    // Safe: WAD = 1e18 ≠ 0, lev_ratio > 0 (checked by YieldBasisPool::new)
     let four_lr_debt = U256::from(4u64) * coll_value * lev_ratio / WAD * debt;
     let cv_sq = coll_value * coll_value;
     if cv_sq < four_lr_debt {
@@ -77,6 +78,7 @@ pub fn get_x0(
     let d = cv_sq - four_lr_debt;
 
     // x0 = (coll_value + sqrt(D)) * 1e18 / (2 * LEV_RATIO)
+    // Safe: lev_ratio > 0 (constructor invariant)
     Some((coll_value + sqrt(d)) * WAD / (U256::from(2u64) * lev_ratio))
 }
 
@@ -89,6 +91,7 @@ pub fn compute_rate_mul(rate_mul_stored: U256, rate: U256, rate_time: U256, now:
     if now <= rate_time {
         return rate_mul_stored;
     }
+    // Safe: WAD = 1e18 ≠ 0
     rate_mul_stored * (WAD + rate * (now - rate_time)) / WAD
 }
 
@@ -101,6 +104,7 @@ pub fn compute_rate_mul(rate_mul_stored: U256, rate: U256, rate_time: U256, now:
 /// so this is just `stored_debt * current_rate_mul / 1e18` when debt is
 /// stored as `debt / rate_mul * 1e18`.
 pub fn compute_debt(stored_debt: U256, rate_mul: U256) -> U256 {
+    // Safe: WAD = 1e18 ≠ 0
     stored_debt * rate_mul / WAD
 }
 

@@ -15,5 +15,5 @@ swap = []
 serde = ["dep:serde", "alloy-primitives/serde"]
 
 [dependencies]
-alloy-primitives = "1"
+alloy-primitives = "1.5"
 serde = { version = "1", features = ["derive"], optional = true }

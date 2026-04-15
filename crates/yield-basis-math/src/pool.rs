@@ -94,8 +94,7 @@ impl YieldBasisPool {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    const WAD: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
+    use crate::constants::WAD;
 
     fn test_pool() -> YieldBasisPool {
         let leverage = U256::from(2u64) * WAD;

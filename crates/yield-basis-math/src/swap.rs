@@ -6,10 +6,9 @@
 
 use alloy_primitives::U256;
 
+use crate::constants::WAD;
 use crate::core::{ceil_div, get_x0};
 use crate::pool::PoolError;
-
-const WAD: U256 = U256::from_limbs([1_000_000_000_000_000_000, 0, 0, 0]);
 
 /// Compute swap output for the LEVAMM.
 ///
@@ -80,10 +79,6 @@ pub fn calc_swap_out(
         // (x_initial - x) * (1e18 - fee) / 1e18
         (x_initial - x) * (WAD - fee) / WAD
     };
-
-    if out.is_zero() {
-        return Err(PoolError::MathError);
-    }
 
     Ok(out)
 }

@@ -23,6 +23,7 @@
 //!
 //! Ported from [`AMM.vy`](https://github.com/yield-basis/yb-core/blob/main/contracts/AMM.vy).
 
+pub mod constants;
 pub mod core;
 
 #[cfg(feature = "swap")]
