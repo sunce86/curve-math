@@ -1,0 +1,19 @@
+[package]
+name = "yield-basis-math"
+version = "0.1.0-alpha.1"
+edition = "2021"
+rust-version = "1.80"
+description = "Pure Rust port of Yield Basis (LEVAMM) math. Wei-level precision, fuzz-verified against on-chain contracts."
+license = "MIT"
+repository = "https://github.com/sunce86/curve-math"
+keywords = ["curve", "yield-basis", "levamm", "amm", "defi"]
+categories = ["cryptography::cryptocurrencies"]
+
+[features]
+default = []
+swap = []
+serde = ["dep:serde", "alloy-primitives/serde"]
+
+[dependencies]
+alloy-primitives = "1"
+serde = { version = "1", features = ["derive"], optional = true }
