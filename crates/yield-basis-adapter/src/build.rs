@@ -6,23 +6,16 @@ use yield_basis_math::pool::{PoolError, YieldBasisPool};
 
 /// Raw LEVAMM pool state, data-source agnostic.
 /// Populate from RPC, substream, database, or registry.
-///
-/// Immutable fields (`leverage`, `lev_ratio`, `collateral_precision`) are
-/// set at deploy time. Mutable fields change per block.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RawYieldBasisState {
-    // -- Immutables (from constructor, never change) --
-    /// `L * 1e18` (e.g. 2e18 for 2x leverage). Must be > 1e18.
+    /// `L * 1e18`. Must be > 1e18. Immutable (deploy-time).
     pub leverage: U256,
-    /// `L^2 * 1e18 / (2L - 1)^2`, precomputed at deploy.
+    /// `L^2 * 1e18 / (2L - 1)^2`. Immutable (deploy-time).
     pub lev_ratio: U256,
-    /// `10^(18 - collateral_decimals)`
+    /// `10^(18 - collateral_decimals)`. Immutable (deploy-time).
     pub collateral_precision: U256,
-
-    // -- Mutable storage --
     pub fee: U256,
-    /// Collateral in AMM (native decimals).
     pub collateral_amount: U256,
     /// Stored debt (before rate_mul adjustment).
     pub stored_debt: U256,
@@ -32,8 +25,6 @@ pub struct RawYieldBasisState {
     pub rate: U256,
     /// Timestamp of last rate update.
     pub rate_time: U256,
-
-    // -- External --
     /// Oracle price in WAD.
     pub p_oracle: U256,
 }

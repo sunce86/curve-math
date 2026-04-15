@@ -27,22 +27,8 @@ pub fn ceil_div(a: U256, b: U256) -> U256 {
     (a + b - U256::from(1u64)) / b
 }
 
-/// Compute `x0` — the virtual reserve invariant of the LEVAMM.
-///
-/// `AMM.vy` L142-158: `get_x0(p_oracle, collateral, debt, safe_limits)`
-///
-/// Returns `None` if the discriminant is negative (debt too large) or
-/// `safe_limits` check fails.
-///
-/// # Arguments
-/// * `p_oracle` — oracle price in WAD
-/// * `collateral` — collateral amount in native decimals
-/// * `debt` — current debt in stablecoin (18 decimals)
-/// * `collateral_precision` — `10^(18 - collateral_decimals)`
-/// * `lev_ratio` — `L^2 * 1e18 / (2L - 1)^2`, precomputed
-/// * `safe_limits` — enforce min/max debt bounds
-/// * `min_safe_debt` — `1e54 / (4 * L^2)`
-/// * `max_safe_debt` — `(2L-1)^2 * 1e18 / (4*L^2) - 1e54 / (8*L^2)`
+/// `AMM.vy` L142-158: `get_x0(p_oracle, collateral, debt, safe_limits)`.
+/// Returns `None` if discriminant is negative or safe_limits check fails.
 #[allow(clippy::too_many_arguments)]
 pub fn get_x0(
     p_oracle: U256,

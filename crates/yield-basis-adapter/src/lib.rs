@@ -8,11 +8,10 @@
 //!
 //! let state = RawYieldBasisState {
 //!     leverage, lev_ratio, collateral_precision,
-//!     fee, collateral_amount, debt, rate_mul,
-//!     stored_debt, rate, rate_time,
-//!     p_oracle,
+//!     fee, collateral_amount, stored_debt,
+//!     rate_mul, rate, rate_time, p_oracle,
 //! };
-//! let pool = build_pool(&state, now)?;
+//! let pool = build_pool(&state, block_timestamp)?;
 //! let dy = pool.get_amount_out(0, 1, dx)?;
 //! ```
 
