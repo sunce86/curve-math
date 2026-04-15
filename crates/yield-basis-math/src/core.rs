@@ -95,17 +95,17 @@ pub fn compute_rate_mul(rate_mul_stored: U256, rate: U256, rate_time: U256, now:
     rate_mul_stored * (WAD + rate * (now - rate_time)) / WAD
 }
 
-/// Compute current debt from stored debt and rate multiplier.
+/// Compute current debt from stored debt and rate multipliers.
 ///
-/// `AMM.vy` L202-204: `_debt()`
+/// `AMM.vy` L202-203: `self.debt * self._rate_mul() // self.rate_mul`
 ///
-/// `stored_debt * current_rate_mul / stored_rate_mul`
-/// In practice, `stored_rate_mul` is baked into `stored_debt` at write time,
-/// so this is just `stored_debt * current_rate_mul / 1e18` when debt is
-/// stored as `debt / rate_mul * 1e18`.
-pub fn compute_debt(stored_debt: U256, rate_mul: U256) -> U256 {
-    // Safe: WAD = 1e18 ≠ 0
-    stored_debt * rate_mul / WAD
+/// Stored debt is in raw units (not WAD-normalized). Division is by
+/// `stored_rate_mul`, not WAD.
+pub fn compute_debt(stored_debt: U256, current_rate_mul: U256, stored_rate_mul: U256) -> U256 {
+    if stored_rate_mul.is_zero() {
+        return stored_debt;
+    }
+    stored_debt * current_rate_mul / stored_rate_mul
 }
 
 #[cfg(test)]

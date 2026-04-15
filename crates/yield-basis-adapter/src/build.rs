@@ -49,8 +49,8 @@ pub fn build_pool(
     let current_rate_mul =
         compute_rate_mul(state.rate_mul, state.rate, state.rate_time, block_timestamp);
 
-    // Current debt = stored_debt * current_rate_mul / 1e18
-    let debt = compute_debt(state.stored_debt, current_rate_mul);
+    // Current debt = stored_debt * current_rate_mul / stored_rate_mul
+    let debt = compute_debt(state.stored_debt, current_rate_mul, state.rate_mul);
 
     YieldBasisPool::new(
         state.leverage,

@@ -4,6 +4,7 @@
 
 use alloy_primitives::U256;
 
+use crate::constants::WAD;
 use crate::swap;
 
 /// Error returned by pool methods.
@@ -58,8 +59,7 @@ impl YieldBasisPool {
         debt: U256,
         p_oracle: U256,
     ) -> Result<Self, PoolError> {
-        let wad = U256::from(1_000_000_000_000_000_000u128);
-        if leverage <= wad || collateral_precision.is_zero() || lev_ratio.is_zero() {
+        if leverage <= WAD || collateral_precision.is_zero() || lev_ratio.is_zero() {
             return Err(PoolError::InvalidParams);
         }
         Ok(Self {
