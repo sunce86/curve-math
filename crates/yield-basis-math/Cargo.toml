@@ -7,7 +7,7 @@ description = "Pure Rust port of Yield Basis (LEVAMM) math. Wei-level precision,
 license = "MIT"
 repository = "https://github.com/sunce86/curve-math"
 keywords = ["curve", "yield-basis", "levamm", "amm", "defi"]
-categories = ["cryptography::cryptocurrencies"]
+categories = ["cryptography::cryptocurrencies", "mathematics"]
 
 [features]
 default = []

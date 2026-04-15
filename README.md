@@ -68,6 +68,8 @@ All 11 Curve pool variants:
 |-------|-------------|
 | [`curve-math`](crates/curve-math) | Pure math — Newton solvers, Cardano cubic, fee formulas, `Pool` enum. Only depends on `alloy-primitives`. |
 | [`curve-adapter`](crates/curve-adapter) | Pool discovery, variant detection, and `build_pool()` — adapts raw on-chain data into `curve-math::Pool`. |
+| [`yield-basis-math`](crates/yield-basis-math) | Pure Rust port of [Yield Basis](https://github.com/yield-basis/yb-core) LEVAMM math. Quadratic solver, constant-product swap with leverage. |
+| [`yield-basis-adapter`](crates/yield-basis-adapter) | Pool construction with interest accrual — `RawYieldBasisState` → `YieldBasisPool`. |
 
 ## Usage
 
