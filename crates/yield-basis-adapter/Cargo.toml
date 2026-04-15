@@ -1,0 +1,26 @@
+[package]
+name = "yield-basis-adapter"
+version = "0.1.0-alpha.1"
+edition = "2021"
+rust-version = "1.80"
+description = "Data-source agnostic pool construction for Yield Basis LEVAMM. Converts RawYieldBasisState into yield-basis-math pools."
+license = "MIT"
+repository = "https://github.com/sunce86/curve-math"
+keywords = ["curve", "yield-basis", "levamm", "amm", "defi"]
+categories = ["cryptography::cryptocurrencies"]
+
+[features]
+default = ["build"]
+build = ["yield-basis-math/swap"]
+serde = ["dep:serde", "alloy-primitives/serde"]
+
+[dependencies]
+alloy-primitives = "1"
+yield-basis-math = { path = "../yield-basis-math", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros"] }
+alloy = { version = "1.7", features = ["provider-http", "contract", "sol-types", "eips"] }
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }

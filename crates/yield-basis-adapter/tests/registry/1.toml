@@ -1,0 +1,18 @@
+# Yield Basis LEVAMM pool registry — Chain ID: 1 (Ethereum)
+#
+# Each pool will be differentially fuzz-tested against on-chain get_dy.
+
+last_updated = "2026-04-15"
+
+# TODO: Add deployed pool addresses. Need to find:
+# 1. Factory address or direct pool deployments
+# 2. For each pool: AMM address, leverage, lev_ratio, collateral_precision
+# 3. PRICE_ORACLE_CONTRACT address per pool
+
+# Example format:
+# [[pools]]
+# amm = "0x..."
+# name = "ETH/crvUSD (L=2)"
+# leverage = 2000000000000000000
+# lev_ratio = 444444444444444444
+# collateral_precision = 1
