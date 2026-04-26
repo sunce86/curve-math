@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-04-23"
-total_factory_pools = 2100
-live_factory_pools = 1078
+last_updated = "2026-04-26"
+total_factory_pools = 2106
+live_factory_pools = 1083
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5398,4 +5398,29 @@ name = "USDC/UCBI"
 address = "0x16a973F8e466F44e9eA67e7e2d3166bD460ea852"
 variant = "StableSwapNG"
 name = "frxUSD/AZND"
+
+[[pools]]
+address = "0x516C3eCfe45F0820653E08DD7c93633d71B93Cb5"
+variant = "StableSwapNG"
+name = "crvUSD/cvcrvUSD"
+
+[[pools]]
+address = "0x35364a18efDe0169D214E7c72f4Ee0e4C522bA63"
+variant = "StableSwapNG"
+name = "frxUSD/DUSD"
+
+[[pools]]
+address = "0x01646F6fe0d75CEd6E514faB0Ea2F4ed5e1A5C9F"
+variant = "StableSwapNG"
+name = "frxUSD/muBOND"
+
+[[pools]]
+address = "0xe430e64081a3E7a39D24c5f507D9d4b492b2ED52"
+variant = "StableSwapNG"
+name = "sDOLA/invUSD"
+
+[[pools]]
+address = "0x179Fe269e738B63ac2964305fc2e4C800c95a458"
+variant = "TriCryptoNG"
+name = "SNX/FLIP/SESH"
 
