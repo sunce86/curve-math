@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-04-26"
-total_factory_pools = 2106
-live_factory_pools = 1083
+last_updated = "2026-04-29"
+total_factory_pools = 2110
+live_factory_pools = 1088
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5423,4 +5423,29 @@ name = "sDOLA/invUSD"
 address = "0x179Fe269e738B63ac2964305fc2e4C800c95a458"
 variant = "TriCryptoNG"
 name = "SNX/FLIP/SESH"
+
+[[pools]]
+address = "0x90343fc2e9449e9Cd001Be955fad9727c815ec6D"
+variant = "StableSwapNG"
+name = "WBTC/svetBTC"
+
+[[pools]]
+address = "0xF2e47b9bcb26463A12b1409be06fDAa1C308aa65"
+variant = "StableSwapNG"
+name = "vetBTC/WBTC"
+
+[[pools]]
+address = "0xEeA33Df43ACC023fE9A454Fe87bB380B21Eb6d46"
+variant = "StableSwapNG"
+name = "USDC/thUSD"
+
+[[pools]]
+address = "0x6865Be0D0da507EA57684cEe935cF22ea1d5A106"
+variant = "StableSwapNG"
+name = "OBUSD/USDC"
+
+[[pools]]
+address = "0x51a57b0a36ef63828929683609fa1fc12C72A776"
+variant = "TwoCryptoStable"
+name = "tGBP/frxUSD"
 
