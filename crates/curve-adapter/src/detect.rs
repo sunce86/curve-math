@@ -22,7 +22,7 @@
 //!    `stored_rates()` and `offpeg_fee_multiplier()`)
 //! 4. `base_pool()` → **StableSwapMeta**
 //! 5. `balances(int128)` → **StableSwapV0**
-//! 6. Known address → **StableSwapV0** / **StableSwapV1**
+//! 6. Known address → **StableSwapV0** / **StableSwapV1** / **StableSwapSTETH**
 //! 7. Fallback → **StableSwapV2**
 //!
 //! # Limitations
@@ -185,12 +185,14 @@ fn detect_stableswap(probing: &ProbingResults) -> CurveVariant {
         return CurveVariant::StableSwapV0;
     }
 
-    // Fallback: known addresses for V0/V1, else V2
+    // Fallback: known addresses for V0/V1/STETH, else V2
     let addr = probing.pool_address;
     if KNOWN_V0.contains(&addr) {
         CurveVariant::StableSwapV0
     } else if KNOWN_V1.contains(&addr) {
         CurveVariant::StableSwapV1
+    } else if KNOWN_STETH.contains(&addr) {
+        CurveVariant::StableSwapSTETH
     } else {
         CurveVariant::StableSwapV2
     }
@@ -221,6 +223,10 @@ const KNOWN_V0: [Address; 8] = [
 const KNOWN_V1: [Address; 2] = [
     address!("bEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"), // 3pool
     address!("4CA9b3063Ec5866A4B82E437059D2C43d1be596F"), // hbtc
+];
+
+const KNOWN_STETH: [Address; 1] = [
+    address!("DC24316b9AE028F1497c275EB9192a3Ea0f67022"), // Lido stETH/ETH
 ];
 
 #[cfg(test)]
@@ -531,6 +537,26 @@ mod tests {
         assert_eq!(
             detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapV1
+        );
+    }
+
+    #[test]
+    fn detect_stableswap_steth_by_known_address() {
+        let probing = ProbingResults {
+            has_gamma: false,
+            n_coins: 2,
+            has_math: false,
+            math_version: None,
+            has_offpeg_fee_multiplier: false,
+            has_stored_rates: false,
+            has_version: false,
+            has_base_pool: false,
+            has_int128_balances: false,
+            pool_address: addr("0xDC24316b9AE028F1497c275EB9192a3Ea0f67022"),
+        };
+        assert_eq!(
+            detect_variant(&probing).unwrap(),
+            CurveVariant::StableSwapSTETH
         );
     }
 
