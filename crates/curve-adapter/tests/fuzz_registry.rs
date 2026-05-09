@@ -16,7 +16,7 @@
 //!     cargo test -p curve-adapter --test fuzz_registry -- fuzz_1 --ignored --nocapture
 
 use alloy::providers::{Provider, ProviderBuilder};
-use alloy_primitives::{address, Address, U256};
+use alloy_primitives::{Address, U256};
 use curve_adapter::{build_pool, CurveVariant, RawPoolState};
 use curve_math::Pool;
 use serde::Deserialize;
@@ -332,6 +332,7 @@ async fn read_and_build_pool(
     entry: &PoolEntry,
     provider: &BoxProvider,
     block: alloy::eips::BlockId,
+    chain: curve_adapter::SupportedChain,
 ) -> Option<(Pool, usize)> {
     let addr = Address::from_str(&entry.address).ok()?;
     let variant: CurveVariant = entry.variant.parse().ok()?;
@@ -600,45 +601,25 @@ async fn read_and_build_pool(
             let fee_gamma = c.fee_gamma().block(block).call().await.ok()?;
             let precs = c.precisions().block(block).call().await.ok();
 
-            // Detect ETH vs non-ETH variant for TwoCryptoV1 by probing on-chain.
-            // Try a small swap with both variants and pick the one that matches.
-            // This is the only reliable method — WETH presence doesn't determine
-            // the implementation (factory pools use ETH variant regardless of coins).
-            let eth_variant = if variant == CurveVariant::TwoCryptoV1 {
-                let probe_dx = U256::from(1_000_000_000_000_000u128); // 0.001 token
-                let on_chain = c
-                    .get_dy(U256::from(0), U256::from(1), probe_dx)
-                    .block(block)
-                    .call()
-                    .await;
-                match on_chain {
-                    Ok(expected) => {
-                        use curve_math::swap::twocrypto_v1::get_amount_out;
-                        let state_eth = RawPoolState {
-                            eth_variant: true,
-                            ..RawPoolState {
-                                variant,
-                                balances: vec![b0, b1],
-                                token_decimals: decimals.clone(),
-                                amp: ann,
-                                mid_fee: Some(mid_fee),
-                                out_fee: Some(out_fee),
-                                fee_gamma: Some(fee_gamma),
-                                d: Some(d),
-                                gamma: Some(gamma),
-                                price_scale: Some(vec![ps]),
-                                precisions: precs.clone().map(|p| p.to_vec()),
-                                ..Default::default()
-                            }
-                        };
-                        let pool_eth = build_pool(&state_eth).ok();
-                        let result_eth = pool_eth.and_then(|p| p.get_amount_out(0, 1, probe_dx));
-                        result_eth == Some(expected)
-                    }
-                    Err(_) => true, // default to ETH if probe fails
-                }
+            // Detect ETH vs non-ETH variant for TwoCryptoV1 via WETH-in-coins
+            // and EIP-1167 proxy bytecode signature. See `curve_adapter::detect`
+            // for the full rationale; in short, factory pools (proxies) always
+            // use the ETH variant, plus any direct deploy with WETH as a coin.
+            let eth_variant: Option<bool> = if variant == CurveVariant::TwoCryptoV1 {
+                let coin0 = c.coins(U256::from(0)).block(block).call().await.ok()?;
+                let coin1 = c.coins(U256::from(1)).block(block).call().await.ok()?;
+                let bytecode = provider
+                    .get_code_at(addr)
+                    .block_id(block)
+                    .await
+                    .unwrap_or_default();
+                Some(curve_adapter::detect_eth_variant(
+                    &[coin0, coin1],
+                    &bytecode,
+                    chain,
+                ))
             } else {
-                true // TwoCryptoNG always uses its own solver, eth_variant is ignored
+                None // TwoCryptoNG/TwoCryptoStable variants ignore this field
             };
 
             RawPoolState {
@@ -734,6 +715,8 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
         .split_whitespace()
         .find_map(|w| w.parse().ok())
         .unwrap_or(1);
+    let chain = curve_adapter::SupportedChain::from_u64(chain_id)
+        .expect("test running on chain not registered in SupportedChain — update detect.rs");
     let env_key = format!("RPC_URL_{chain_id}");
     let rpc_url = std::env::var(&env_key)
         .or_else(|_| std::env::var("RPC_URL"))
@@ -754,7 +737,7 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
     let mut pools_ok = 0u64;
 
     for entry in pools {
-        let (pool, n_coins) = match read_and_build_pool(entry, &provider, block).await {
+        let (pool, n_coins) = match read_and_build_pool(entry, &provider, block, chain).await {
             Some(p) => p,
             None => {
                 println!("  SKIP {}: could not read on-chain state", entry.name);

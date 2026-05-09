@@ -269,8 +269,11 @@ pub struct RawPoolState {
     /// - `true`  (CurveCryptoSwap2ETH): pools containing WETH — `mul2 = WAD + 2*WAD*K0 / _g1k0`
     /// - `false` (CurveCryptoSwap2): pools without WETH — `mul2 = (WAD + 2*WAD*K0) / _g1k0`
     ///
-    /// Only relevant for `TwoCryptoV1`. Defaults to `true` (ETH variant).
-    pub eth_variant: bool,
+    /// **Required for `TwoCryptoV1`.** `build_pool` returns
+    /// [`BuildError::EthVariantRequired`] if this is `None` and the variant
+    /// is `TwoCryptoV1`. Use [`detect_eth_variant`](crate::detect_eth_variant)
+    /// from `curve_adapter` to determine the value structurally.
+    pub eth_variant: Option<bool>,
 }
 
 impl Default for RawPoolState {
@@ -290,7 +293,7 @@ impl Default for RawPoolState {
             gamma: None,
             dynamic_rates: None,
             precisions: None,
-            eth_variant: true,
+            eth_variant: None,
         }
     }
 }
@@ -606,6 +609,7 @@ fn build_twocrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
     match state.variant {
         CurveVariant::TwoCryptoV1 => {
             let gamma = require!(state, gamma);
+            let eth_variant = require!(state, eth_variant);
             Ok(Pool::TwoCryptoV1 {
                 balances,
                 precisions: prec_arr,
@@ -616,7 +620,7 @@ fn build_twocrypto(state: &RawPoolState) -> Result<Pool, BuildError> {
                 mid_fee,
                 out_fee,
                 fee_gamma,
-                eth_variant: state.eth_variant,
+                eth_variant,
             })
         }
         CurveVariant::TwoCryptoNG => {
@@ -1348,10 +1352,16 @@ mod tests {
             }
         };
 
-        // TwoCryptoV1, TwoCryptoNG
-        for v in [CurveVariant::TwoCryptoV1, CurveVariant::TwoCryptoNG] {
-            assert!(build_pool(&crypto_base(v, 2)).is_ok(), "failed for {v}");
-        }
+        // TwoCryptoV1 (requires explicit eth_variant)
+        let mut tcv1 = crypto_base(CurveVariant::TwoCryptoV1, 2);
+        tcv1.eth_variant = Some(true);
+        assert!(build_pool(&tcv1).is_ok(), "failed for TwoCryptoV1");
+
+        // TwoCryptoNG
+        assert!(
+            build_pool(&crypto_base(CurveVariant::TwoCryptoNG, 2)).is_ok(),
+            "failed for TwoCryptoNG"
+        );
 
         // TwoCryptoStable (no gamma needed)
         let mut tcs = crypto_base(CurveVariant::TwoCryptoStable, 2);
@@ -1521,6 +1531,7 @@ mod tests {
             mid_fee: Some(U256::from(26_000_000u64)),
             out_fee: Some(U256::from(45_000_000u64)),
             fee_gamma: Some(u("230000000000000")),
+            eth_variant: Some(true), // CRV/ETH legacy direct deploy with WETH
             ..Default::default()
         };
         let pool = build_pool(&state).unwrap();
