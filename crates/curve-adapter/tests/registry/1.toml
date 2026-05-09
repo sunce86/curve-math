@@ -20,7 +20,7 @@ name = "3pool (DAI/USDC/USDT)"
 
 [[pools]]
 address = "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022"
-variant = "StableSwapV1"
+variant = "StableSwapSTETH"
 name = "stETH/ETH"
 
 [[pools]]
@@ -256,7 +256,7 @@ name = "CJPY/TXJP/PND"
 
 [[pools]]
 address = "0x8461A004b50d321CB22B7d034969cE6803911899"
-variant = "StableSwapV1"
+variant = "StableSwapV2"
 name = "ibKRW/sKRW"
 
 [[pools]]
@@ -266,7 +266,7 @@ name = "USDN/3Crv"
 
 [[pools]]
 address = "0x8818a9bb44Fbf33502bE7c15c500d0C783B73067"
-variant = "StableSwapV1"
+variant = "StableSwapV2"
 name = "ibJPY/sJPY"
 
 [[pools]]
@@ -316,12 +316,12 @@ name = "alUSD/crvFRAX"
 
 [[pools]]
 address = "0xB37D6c07482Bc11cd28a1f11f1a6ad7b66Dec933"
-variant = "StableSwapV1"
+variant = "StableSwapV2"
 name = "ibEUR/EURA"
 
 [[pools]]
 address = "0x19b080FE1ffA0553469D20Ca36219F17Fcf03859"
-variant = "StableSwapV1"
+variant = "StableSwapV2"
 name = "ibEUR/sEUR"
 
 [[pools]]

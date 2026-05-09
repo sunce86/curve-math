@@ -46,13 +46,14 @@ Compared against [revm](https://github.com/bluealloy/revm) executing the same po
 
 ## Coverage
 
-All 11 Curve pool variants:
+All 12 Curve pool variants:
 
 | Variant | Type | Solver | Example pools | Vyper source |
 |---------|------|--------|---------------|--------------|
 | `StableSwapV0` | StableSwap | Newton | sUSD, Compound, USDT, y, BUSD | [StableSwapSUSD.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/susd/StableSwapSUSD.vy) |
 | `StableSwapV1` | StableSwap | Newton | 3pool, ren, sbtc, hbtc | [StableSwap3Pool.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy) |
-| `StableSwapV2` | StableSwap | Newton | FRAX/USDC, stETH, factory plain | [SwapTemplateBase.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/base/SwapTemplateBase.vy) |
+| `StableSwapV2` | StableSwap | Newton | FRAX/USDC, factory plain | [SwapTemplateBase.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/base/SwapTemplateBase.vy) |
+| `StableSwapSTETH` | StableSwap | Newton | Lido stETH/ETH | [StableSwapSTETH.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/steth/StableSwapSTETH.vy) |
 | `StableSwapALend` | StableSwap | Newton | Aave, sAAVE, IB, aETH | [SwapTemplateA.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/a/SwapTemplateA.vy) |
 | `StableSwapNG` | StableSwap | Newton | StableSwap-NG (plain + meta) | [CurveStableSwapNG.vy](https://github.com/curvefi/stableswap-ng/blob/main/contracts/main/CurveStableSwapNG.vy) |
 | `StableSwapMeta` | StableSwap | Newton | GUSD, HUSD, factory meta | [SwapTemplateMeta.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/meta/SwapTemplateMeta.vy) |
@@ -117,7 +118,7 @@ crates/
   curve-adapter/       # Variant detection + pool construction
     src/build.rs       # RawPoolState → Pool, interpolate_a()
     src/detect.rs      # detect_variant() from on-chain probing
-    src/variant.rs     # CurveVariant enum (11 variants)
+    src/variant.rs     # CurveVariant enum (12 variants)
 ```
 
 ## License
