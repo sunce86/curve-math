@@ -16,9 +16,9 @@ The pool registry covers all live Curve pools (non-empty, non-paused, functional
 
 | Chain | Verified / Live pools | Last indexed |
 |-------|----------------------|-------------|
-| Ethereum | 1052 / 1052 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-03 |
-| Base | 136 / 136 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-03 |
-| Arbitrum | 194 / 194 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-04-03 |
+| Ethereum | 1106 / 1106 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-05-09 |
+| Base | 143 / 143 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-05-09 |
+| Arbitrum | 199 / 199 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-05-09 |
 
 ## Performance
 
@@ -46,13 +46,14 @@ Compared against [revm](https://github.com/bluealloy/revm) executing the same po
 
 ## Coverage
 
-All 11 Curve pool variants:
+All 12 Curve pool variants:
 
 | Variant | Type | Solver | Example pools | Vyper source |
 |---------|------|--------|---------------|--------------|
 | `StableSwapV0` | StableSwap | Newton | sUSD, Compound, USDT, y, BUSD | [StableSwapSUSD.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/susd/StableSwapSUSD.vy) |
 | `StableSwapV1` | StableSwap | Newton | 3pool, ren, sbtc, hbtc | [StableSwap3Pool.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/3pool/StableSwap3Pool.vy) |
-| `StableSwapV2` | StableSwap | Newton | FRAX/USDC, stETH, factory plain | [SwapTemplateBase.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/base/SwapTemplateBase.vy) |
+| `StableSwapV2` | StableSwap | Newton | FRAX/USDC, factory plain | [SwapTemplateBase.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/base/SwapTemplateBase.vy) |
+| `StableSwapSTETH` | StableSwap | Newton | Lido stETH/ETH | [StableSwapSTETH.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pools/steth/StableSwapSTETH.vy) |
 | `StableSwapALend` | StableSwap | Newton | Aave, sAAVE, IB, aETH | [SwapTemplateA.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/a/SwapTemplateA.vy) |
 | `StableSwapNG` | StableSwap | Newton | StableSwap-NG (plain + meta) | [CurveStableSwapNG.vy](https://github.com/curvefi/stableswap-ng/blob/main/contracts/main/CurveStableSwapNG.vy) |
 | `StableSwapMeta` | StableSwap | Newton | GUSD, HUSD, factory meta | [SwapTemplateMeta.vy](https://github.com/curvefi/curve-contract/blob/master/contracts/pool-templates/meta/SwapTemplateMeta.vy) |
@@ -117,9 +118,14 @@ crates/
   curve-adapter/       # Variant detection + pool construction
     src/build.rs       # RawPoolState → Pool, interpolate_a()
     src/detect.rs      # detect_variant() from on-chain probing
-    src/variant.rs     # CurveVariant enum (11 variants)
+    src/variant.rs     # CurveVariant enum (12 variants)
 ```
 
 ## License
 
-MIT
+Licensed under the Business Source License 1.1 (see [LICENSE](LICENSE)).
+
+Free for non-production use: research, testing, auditing, and education.
+Production use generating revenue requires a commercial license.
+
+For commercial licensing, contact: dusan.stanivukovic@gmail.com

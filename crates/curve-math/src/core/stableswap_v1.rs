@@ -88,6 +88,50 @@ pub fn get_y(i: usize, j: usize, x_new: U256, xp: &[U256], d: U256, amp: U256) -
     None
 }
 
+/// Solve for xp[i] when D is reduced (used by `calc_withdraw_one_coin`).
+///
+/// Like [`get_y`] but without substituting any balance — uses all `xp[k]`
+/// except `xp[i]`, and `d` is provided directly (not computed from `xp`).
+///
+/// Vyper: `get_y_D(A_, i, xp, D)` in StableSwap3Pool.vy
+pub fn get_y_d(i: usize, xp: &[U256], d: U256, amp: U256) -> Option<U256> {
+    let n = U256::from(xp.len());
+    let ann = amp.checked_mul(n)?;
+    let mut s_prime = U256::ZERO;
+    let mut c = d;
+    #[allow(clippy::needless_range_loop)]
+    for k in 0..xp.len() {
+        if k == i {
+            continue;
+        }
+        s_prime = s_prime.checked_add(xp[k])?;
+        c = c.checked_mul(d)?.checked_div(xp[k].checked_mul(n)?)?;
+    }
+    c = c
+        .checked_mul(d)?
+        .checked_mul(A_PRECISION)?
+        .checked_div(ann.checked_mul(n)?)?;
+    let b = s_prime.checked_add(d.checked_mul(A_PRECISION)?.checked_div(ann)?)?;
+    let mut y = d;
+    for _ in 0..MAX_ITERATIONS {
+        let y_prev = y;
+        let num = y.checked_mul(y)?.checked_add(c)?;
+        let den = y
+            .checked_mul(U256::from(2))?
+            .checked_add(b)?
+            .checked_sub(d)?;
+        if den.is_zero() {
+            return None;
+        }
+        y = num.checked_div(den)?;
+        let diff = if y > y_prev { y - y_prev } else { y_prev - y };
+        if diff <= U256::from(1) {
+            return Some(y);
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

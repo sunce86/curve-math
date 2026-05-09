@@ -234,6 +234,211 @@ async fn fuzz_stableswap_v1() {
     assert!(passed > 0, "no tests passed");
 }
 
+// ── StableSwap V1 liquidity: calc_withdraw_one_coin (3pool) ─────────────────
+
+alloy::sol! {
+    #[sol(rpc)]
+    interface ICurvePool3Liq {
+        function calc_withdraw_one_coin(uint256 _token_amount, int128 i) external view returns (uint256);
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function fee() external view returns (uint256);
+    }
+
+    #[sol(rpc)]
+    interface IERC20Supply {
+        function totalSupply() external view returns (uint256);
+    }
+}
+
+#[tokio::test]
+#[ignore = "requires RPC_URL"]
+async fn fuzz_calc_withdraw_one_coin_v1() {
+    use curve_math::swap::stableswap_v1::calc_withdraw_one_coin;
+
+    let provider = make_provider!();
+    let pool_addr =
+        alloy_primitives::Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
+    let lp_addr =
+        alloy_primitives::Address::from_str("0x6c3F90f043a72FA612cbac8115EE7e52BDE6E490").unwrap();
+    let curve = ICurvePool3Liq::new(pool_addr, &provider);
+    let lp_token = IERC20Supply::new(lp_addr, &provider);
+    let bn = provider.get_block_number().await.unwrap() - 5;
+    let block = alloy::eips::BlockId::number(bn);
+
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let amp = curve.A().block(block).call().await.unwrap();
+    let fee = curve.fee().block(block).call().await.unwrap();
+    let total_supply = lp_token.totalSupply().block(block).call().await.unwrap();
+
+    let rate18 = U256::from(1_000_000_000_000_000_000u128);
+    let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
+    let rates = [rate18, rate6, rate6];
+    let balances = [b0, b1, b2];
+
+    let n = fuzz_iterations();
+    let per_coin = (n / 3).max(1);
+
+    let mut passed = 0u64;
+    let mut skipped = 0u64;
+    for i in 0..3 {
+        for lp_amount in generate_amounts(per_coin, total_supply / U256::from(10u64), bn + i as u64)
+        {
+            if lp_amount.is_zero() || lp_amount >= total_supply {
+                skipped += 1;
+                continue;
+            }
+            let on_chain = curve
+                .calc_withdraw_one_coin(lp_amount, i as i128)
+                .block(block)
+                .call()
+                .await;
+            match on_chain {
+                Ok(expected) => match calc_withdraw_one_coin(
+                    &balances,
+                    &rates,
+                    amp,
+                    fee,
+                    lp_amount,
+                    i,
+                    total_supply,
+                ) {
+                    Some(result) => {
+                        assert_eq!(
+                            result, expected,
+                            "withdraw coin {i} mismatch at lp={lp_amount}"
+                        );
+                        passed += 1;
+                    }
+                    None => skipped += 1,
+                },
+                Err(_) => skipped += 1,
+            }
+        }
+    }
+    println!("fuzz_calc_withdraw_one_coin_v1: {passed} passed, {skipped} skipped (block {bn})");
+    assert!(passed > 0, "no tests passed");
+}
+
+// ── StableSwap V1 liquidity: calc_add_liquidity (3pool) ─────────────────────
+
+alloy::sol! {
+    #[sol(rpc)]
+    interface ICurvePool3AddLiq {
+        function balances(uint256 i) external view returns (uint256);
+        function A() external view returns (uint256);
+        function fee() external view returns (uint256);
+        function add_liquidity(uint256[3] amounts, uint256 min_mint_amount) external;
+    }
+}
+
+#[tokio::test]
+#[ignore = "requires RPC_URL"]
+async fn fuzz_calc_add_liquidity_v1() {
+    use curve_math::swap::stableswap_v1::calc_add_liquidity;
+
+    let provider = make_provider!();
+    let pool_addr =
+        alloy_primitives::Address::from_str("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7").unwrap();
+    let lp_addr =
+        alloy_primitives::Address::from_str("0x6c3F90f043a72FA612cbac8115EE7e52BDE6E490").unwrap();
+    let curve = ICurvePool3AddLiq::new(pool_addr, &provider);
+    let lp_token = IERC20Supply::new(lp_addr, &provider);
+    let bn = provider.get_block_number().await.unwrap() - 5;
+    let block = alloy::eips::BlockId::number(bn);
+
+    let b0 = curve
+        .balances(U256::from(0))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b1 = curve
+        .balances(U256::from(1))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let b2 = curve
+        .balances(U256::from(2))
+        .block(block)
+        .call()
+        .await
+        .unwrap();
+    let amp = curve.A().block(block).call().await.unwrap();
+    let fee = curve.fee().block(block).call().await.unwrap();
+    let total_supply = lp_token.totalSupply().block(block).call().await.unwrap();
+
+    let rate18 = U256::from(1_000_000_000_000_000_000u128);
+    let rate6 = U256::from(1_000_000_000_000_000_000_000_000_000_000u128);
+    let rates = [rate18, rate6, rate6];
+    let balances = [b0, b1, b2];
+
+    let n = fuzz_iterations();
+    let per_coin = (n / 3).max(1);
+
+    let mut passed = 0u64;
+    let mut skipped = 0u64;
+
+    // Test single-coin deposits for each coin
+    for coin in 0..3 {
+        for deposit_amount in generate_amounts(
+            per_coin,
+            balances[coin] / U256::from(10u64),
+            bn + coin as u64,
+        ) {
+            if deposit_amount.is_zero() {
+                skipped += 1;
+                continue;
+            }
+
+            let mut amounts = [U256::ZERO; 3];
+            amounts[coin] = deposit_amount;
+
+            // Note: add_liquidity is state-changing so we can't call it via eth_call
+            // without state overrides. We verify indirectly:
+            // 1. Sanity checks here (mint > 0, mint < supply)
+            // 2. Roundtrip with calc_withdraw_one_coin in unit tests
+            // 3. calc_withdraw_one_coin is already wei-exact fuzz verified
+
+            match calc_add_liquidity(&balances, &rates, amp, fee, &amounts, total_supply) {
+                Some(mint) => {
+                    // Basic sanity: mint > 0 for non-zero deposit
+                    assert!(
+                        mint > U256::ZERO,
+                        "mint should be positive for coin {coin} deposit {deposit_amount}"
+                    );
+                    // mint should be less than total_supply (can't double supply with small deposit)
+                    if deposit_amount < balances[coin] {
+                        assert!(mint < total_supply, "mint too large for coin {coin}");
+                    }
+                    passed += 1;
+                }
+                None => skipped += 1,
+            }
+        }
+    }
+    println!("fuzz_calc_add_liquidity_v1: {passed} passed, {skipped} skipped (block {bn})");
+    assert!(passed > 0, "no tests passed");
+}
+
 // ── StableSwap V2 (FRAX/USDC) ──────────────────────────────────────────────
 
 alloy::sol! {

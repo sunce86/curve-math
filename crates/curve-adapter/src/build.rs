@@ -425,6 +425,7 @@ pub fn build_pool(state: &RawPoolState) -> Result<Pool, BuildError> {
         CurveVariant::StableSwapV0
         | CurveVariant::StableSwapV1
         | CurveVariant::StableSwapV2
+        | CurveVariant::StableSwapSTETH
         | CurveVariant::StableSwapMeta => build_stableswap_plain(state),
         CurveVariant::StableSwapNG => build_stableswap_ng(state),
         CurveVariant::StableSwapALend => build_stableswap_alend(state),
@@ -483,6 +484,12 @@ fn build_stableswap_plain(state: &RawPoolState) -> Result<Pool, BuildError> {
             fee,
         },
         CurveVariant::StableSwapV2 => Pool::StableSwapV2 {
+            balances,
+            rates,
+            amp,
+            fee,
+        },
+        CurveVariant::StableSwapSTETH => Pool::StableSwapSTETH {
             balances,
             rates,
             amp,

@@ -141,7 +141,7 @@ mod tests {
         let rate_gusd = U256::from(10u64).pow(U256::from(34u64));
         let vp = U256::from(1_020_000_000_000_000_000u128); // ~1.02
         let balances = [
-            U256::from(100_000_00u64),
+            U256::from(10_000_000u64),
             U256::from(500_000u64) * precision,
         ];
         let rates = [rate_gusd, vp];
@@ -180,7 +180,7 @@ mod tests {
         let rate_gusd = U256::from(10u64).pow(U256::from(34u64));
         let vp = U256::from(1_020_000_000_000_000_000u128);
         let balances = [
-            U256::from(100_000_00u64),
+            U256::from(10_000_000u64),
             U256::from(500_000u64) * precision,
         ];
         let rates = [rate_gusd, vp];
