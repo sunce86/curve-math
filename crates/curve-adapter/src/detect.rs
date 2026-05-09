@@ -229,6 +229,80 @@ const KNOWN_STETH: [Address; 1] = [
     address!("DC24316b9AE028F1497c275EB9192a3Ea0f67022"), // Lido stETH/ETH
 ];
 
+/// Standard EIP-1167 minimal proxy bytecode prefix (10 bytes).
+/// Followed by 20 bytes of implementation address, then [`EIP1167_SUFFIX`].
+const EIP1167_PREFIX: &[u8] = b"\x36\x3d\x3d\x37\x3d\x3d\x3d\x36\x3d\x73";
+
+/// Standard EIP-1167 minimal proxy bytecode suffix (15 bytes).
+const EIP1167_SUFFIX: &[u8] = b"\x5a\xf4\x3d\x82\x80\x3e\x90\x3d\x91\x60\x2b\x57\xfd\x5b\xf3";
+
+/// Total length of a standard EIP-1167 minimal proxy.
+const EIP1167_LEN: usize = 45;
+
+/// Returns `true` if `bytecode` is a standard EIP-1167 minimal proxy.
+///
+/// All three checks must pass: exact length, prefix, and suffix. This makes
+/// the false positive rate effectively zero — a non-proxy contract would
+/// have to coincidentally match all 25 fixed bytes at exact positions.
+pub fn is_eip1167_proxy(bytecode: &[u8]) -> bool {
+    bytecode.len() == EIP1167_LEN
+        && bytecode.starts_with(EIP1167_PREFIX)
+        && bytecode.ends_with(EIP1167_SUFFIX)
+}
+
+/// Chains supported by `curve_adapter` detection logic.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SupportedChain {
+    /// Ethereum Mainnet (chain ID 1).
+    Mainnet = 1,
+    /// Base (chain ID 8453).
+    Base = 8453,
+    /// Arbitrum One (chain ID 42161).
+    Arbitrum = 42161,
+}
+
+impl SupportedChain {
+    /// Convert a numeric chain ID to a `SupportedChain`. Returns `None` for
+    /// chains the adapter does not yet support.
+    pub fn from_u64(id: u64) -> Option<Self> {
+        match id {
+            1 => Some(Self::Mainnet),
+            8453 => Some(Self::Base),
+            42161 => Some(Self::Arbitrum),
+            _ => None,
+        }
+    }
+
+    /// Wrapped native token address (WETH on EVM chains).
+    pub fn wrapped_native(self) -> Address {
+        match self {
+            Self::Mainnet => address!("C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
+            Self::Base => address!("4200000000000000000000000000000000000006"),
+            Self::Arbitrum => address!("82aF49447D8a07e3bd95BD0d56f35241523fBab1"),
+        }
+    }
+}
+
+/// Detect whether a `TwoCryptoV1` pool uses the ETH variant Newton solver.
+///
+/// `CurveCryptoSwap2ETH.vy` and `CurveCryptoSwap2.vy` differ in one Newton
+/// step (`mul2` formula). Detection rule:
+/// - Factory-deployed pools (EIP-1167 proxies pointing at the CryptoSwap
+///   factory implementation) **always** use the ETH variant, regardless of
+///   coin composition (e.g. CVG/crvFRAX has no WETH but uses ETH math).
+/// - Legacy direct deploys: `CurveCryptoSwap2ETH.vy` was used for
+///   WETH-paired pools (e.g. CRV/ETH); `CurveCryptoSwap2.vy` for the rest.
+///
+/// Combined check: `coins.contains(WETH) || is_eip1167_proxy(bytecode)`.
+///
+/// # Arguments
+/// * `coins` — pool's coin addresses (read from on-chain `coins(i)` getters)
+/// * `pool_bytecode` — runtime bytecode at the pool address (`eth_getCode`)
+/// * `chain` — chain on which the pool is deployed
+pub fn detect_eth_variant(coins: &[Address], pool_bytecode: &[u8], chain: SupportedChain) -> bool {
+    coins.contains(&chain.wrapped_native()) || is_eip1167_proxy(pool_bytecode)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -578,5 +652,115 @@ mod tests {
             detect_variant(&probing).unwrap(),
             CurveVariant::StableSwapV2
         );
+    }
+
+    // ── eth_variant detection ──────────────────────────────────────────────
+
+    fn weth_mainnet() -> Address {
+        addr("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
+    }
+
+    /// Build a synthetic 45-byte EIP-1167 proxy with the given implementation address.
+    fn synthetic_proxy(impl_addr: Address) -> Vec<u8> {
+        let mut out = Vec::with_capacity(EIP1167_LEN);
+        out.extend_from_slice(EIP1167_PREFIX);
+        out.extend_from_slice(impl_addr.as_slice());
+        out.extend_from_slice(EIP1167_SUFFIX);
+        out
+    }
+
+    #[test]
+    fn is_eip1167_recognizes_standard_proxy() {
+        let bytecode = synthetic_proxy(addr("0xa854b3df11afe1e54ddd2d62ce03a40bd0bba100"));
+        assert!(is_eip1167_proxy(&bytecode));
+    }
+
+    #[test]
+    fn is_eip1167_rejects_wrong_length() {
+        let mut bytecode = synthetic_proxy(addr("0xa854b3df11afe1e54ddd2d62ce03a40bd0bba100"));
+        bytecode.push(0x00);
+        assert!(!is_eip1167_proxy(&bytecode));
+    }
+
+    #[test]
+    fn is_eip1167_rejects_corrupted_prefix() {
+        let mut bytecode = synthetic_proxy(addr("0xa854b3df11afe1e54ddd2d62ce03a40bd0bba100"));
+        bytecode[0] = 0xff;
+        assert!(!is_eip1167_proxy(&bytecode));
+    }
+
+    #[test]
+    fn is_eip1167_rejects_corrupted_suffix() {
+        let mut bytecode = synthetic_proxy(addr("0xa854b3df11afe1e54ddd2d62ce03a40bd0bba100"));
+        bytecode[EIP1167_LEN - 1] = 0x00;
+        assert!(!is_eip1167_proxy(&bytecode));
+    }
+
+    #[test]
+    fn is_eip1167_rejects_full_contract_bytecode() {
+        // Realistic Vyper-compiled runtime starts with 0x60 (PUSH1) typically.
+        let bytecode = vec![0x60u8; 5000];
+        assert!(!is_eip1167_proxy(&bytecode));
+    }
+
+    #[test]
+    fn supported_chain_from_u64_known() {
+        assert_eq!(SupportedChain::from_u64(1), Some(SupportedChain::Mainnet));
+        assert_eq!(SupportedChain::from_u64(8453), Some(SupportedChain::Base));
+        assert_eq!(
+            SupportedChain::from_u64(42161),
+            Some(SupportedChain::Arbitrum)
+        );
+    }
+
+    #[test]
+    fn supported_chain_from_u64_unknown() {
+        assert_eq!(SupportedChain::from_u64(0), None);
+        assert_eq!(SupportedChain::from_u64(137), None); // Polygon: not yet supported
+    }
+
+    #[test]
+    fn detect_eth_variant_weth_paired_legacy() {
+        // CRV/ETH-style: direct deploy with WETH coin → ETH variant
+        let coins = [
+            addr("0xD533a949740bb3306d119CC777fa900bA034cd52"),
+            weth_mainnet(),
+        ];
+        let bytecode = vec![0x60u8; 5000]; // full deploy, not proxy
+        assert!(detect_eth_variant(
+            &coins,
+            &bytecode,
+            SupportedChain::Mainnet
+        ));
+    }
+
+    #[test]
+    fn detect_eth_variant_factory_no_weth() {
+        // CVG/crvFRAX-style: factory pool, no WETH → still ETH variant
+        let coins = [
+            addr("0x97efFB790f2fbB701D88f89DB4521348A2B77be8"),
+            addr("0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC"),
+        ];
+        let bytecode = synthetic_proxy(addr("0xa854b3df11afe1e54ddd2d62ce03a40bd0bba100"));
+        assert!(detect_eth_variant(
+            &coins,
+            &bytecode,
+            SupportedChain::Mainnet
+        ));
+    }
+
+    #[test]
+    fn detect_eth_variant_legacy_direct_no_weth() {
+        // EURC/3Crv-style: legacy direct deploy, no WETH → non-ETH variant
+        let coins = [
+            addr("0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c"),
+            addr("0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"),
+        ];
+        let bytecode = vec![0x60u8; 5000]; // full deploy, not proxy
+        assert!(!detect_eth_variant(
+            &coins,
+            &bytecode,
+            SupportedChain::Mainnet
+        ));
     }
 }
