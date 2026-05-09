@@ -222,6 +222,25 @@ Most meta pools use 3pool as base. The base pool address is available via `meta_
 | 3pool (`0xbEbc...FF1C7`) | 3CRV (`0x6c3F...E490`) | DAI, USDC, USDT | StableSwapV1 |
 | sBTC (`0x7fC7...8D85`) | sbtcCrv (`0x075b...B997`) | renBTC, WBTC, sBTC | StableSwapV1 |
 
+### TwoCryptoV1 `eth_variant` detection
+
+`TwoCryptoV1` pools exist in two on-chain implementations with a subtle difference in the Newton solver's `mul2` formula:
+
+| Implementation | `eth_variant` | Deployed as |
+|---|---|---|
+| `CurveCryptoSwap2ETH` | `true` | Factory pools + legacy pools with WETH |
+| `CurveCryptoSwap2` | `false` | Legacy non-factory pools without WETH |
+
+**Detection rule:**
+
+1. **Factory-deployed pools** (from CryptoSwap factory `0xF180...ac99`): always `eth_variant = true`. The factory has a single implementation (`0xa854...ba10`) which uses the ETH formula, regardless of whether the pool contains WETH.
+
+2. **Legacy non-factory pools**: `eth_variant = coins.contains(WETH)`. Only ~3 legacy pools on Ethereum mainnet use the non-ETH implementation (e.g., BADGER/WBTC).
+
+**How to identify factory vs legacy:** Factory pools are EIP-1167 minimal proxies (45-byte bytecode starting with `363d3d373d3d3d363d73`). Legacy pools have full bytecode (>20KB). Alternatively, check if the pool address appears in factory `pool_list()`.
+
+For substreams/streaming: factory pools are discovered via `TwocryptoPoolDeployed` events — these are always `eth_variant = true`. Legacy pools are in the static registry with the flag pre-set.
+
 ## Substreams / Streaming Integration
 
 For streaming architectures that cannot make `eth_call`:
