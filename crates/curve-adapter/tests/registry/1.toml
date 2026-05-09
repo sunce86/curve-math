@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-05-05"
-total_factory_pools = 2128
-live_factory_pools = 1096
+last_updated = "2026-05-09"
+total_factory_pools = 2136
+live_factory_pools = 1106
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5488,4 +5488,54 @@ name = "₿Gold/PAXG/XAUt"
 address = "0xF3e4E737D7F60EE44B62782e1F6DF0dFFf8b7333"
 variant = "TwoCryptoNG"
 name = "₿Gold/FLY"
+
+[[pools]]
+address = "0x501C6c506123c1B96fb27e14eD4538526b8F2555"
+variant = "StableSwapNG"
+name = "₿Gold/PAXG/XAUM/XAUt/FLY"
+
+[[pools]]
+address = "0xc23837CCBecaB20102dDb87D41675c8a2F858056"
+variant = "StableSwapNG"
+name = "₿Gold/PAXG/XAUt/XAUM"
+
+[[pools]]
+address = "0x104d6a1b97A6CEf88D905d7b865A378d90be932A"
+variant = "StableSwapNG"
+name = "frxUSD/DUSD"
+
+[[pools]]
+address = "0xDE293e87DDCF51F944214388d21612E3059f1C45"
+variant = "StableSwapNG"
+name = "USDC/lrUSD"
+
+[[pools]]
+address = "0xEfc056790bb19702b2164ec6Ea6bA3AE01d81195"
+variant = "StableSwapNG"
+name = "frxUSD/USG"
+
+[[pools]]
+address = "0x97BA10115da528c113462EDE9C20D7adc806D93f"
+variant = "StableSwapNG"
+name = "USDC/USG"
+
+[[pools]]
+address = "0x517637aA4E83Fc797B3b0087469d933384EcF9B9"
+variant = "TriCryptoNG"
+name = "FLY/SKY/DAI"
+
+[[pools]]
+address = "0x8299E673008948Eb78539Bd4b0eA7Cf707Cf196C"
+variant = "TriCryptoNG"
+name = "FLY/???/DAI"
+
+[[pools]]
+address = "0x7784306EbdEFD3465c6fBf5d5Df489BE7211906B"
+variant = "TriCryptoNG"
+name = "CRV/crvUSD/FLY"
+
+[[pools]]
+address = "0xc412129C0449CBd60B82759a4bd3F59Cd9A286fb"
+variant = "TriCryptoNG"
+name = "DAI/₿Gold/FLY"
 
