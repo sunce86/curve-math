@@ -124,7 +124,7 @@ crates/
 
 Licensed under the Business Source License 1.1 (see [LICENSE](LICENSE)).
 
-Free for non-production use: research, testing, auditing, education, and open-source projects.
+Free for non-production use: research, testing, auditing, and education.
 Production use generating revenue requires a commercial license.
 
 For commercial licensing, contact: dusan.stanivukovic@gmail.com
