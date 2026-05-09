@@ -332,7 +332,6 @@ async fn read_and_build_pool(
     entry: &PoolEntry,
     provider: &BoxProvider,
     block: alloy::eips::BlockId,
-    chain: curve_adapter::SupportedChain,
 ) -> Option<(Pool, usize)> {
     let addr = Address::from_str(&entry.address).ok()?;
     let variant: CurveVariant = entry.variant.parse().ok()?;
@@ -602,22 +601,11 @@ async fn read_and_build_pool(
             let precs = c.precisions().block(block).call().await.ok();
 
             // Detect ETH vs non-ETH variant for TwoCryptoV1 via WETH-in-coins
-            // and EIP-1167 proxy bytecode signature. See `curve_adapter::detect`
-            // for the full rationale; in short, factory pools (proxies) always
-            // use the ETH variant, plus any direct deploy with WETH as a coin.
+            // See `curve_adapter::detect_eth_variant` for the rationale: every
+            // TwoCryptoV1 pool uses the ETH variant unless explicitly listed
+            // in `KNOWN_NON_ETH_TWOCRYPTO_V1`.
             let eth_variant: Option<bool> = if variant == CurveVariant::TwoCryptoV1 {
-                let coin0 = c.coins(U256::from(0)).block(block).call().await.ok()?;
-                let coin1 = c.coins(U256::from(1)).block(block).call().await.ok()?;
-                let bytecode = provider
-                    .get_code_at(addr)
-                    .block_id(block)
-                    .await
-                    .unwrap_or_default();
-                Some(curve_adapter::detect_eth_variant(
-                    &[coin0, coin1],
-                    &bytecode,
-                    chain,
-                ))
+                Some(curve_adapter::detect_eth_variant(addr))
             } else {
                 None // TwoCryptoNG/TwoCryptoStable variants ignore this field
             };
@@ -715,8 +703,6 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
         .split_whitespace()
         .find_map(|w| w.parse().ok())
         .unwrap_or(1);
-    let chain = curve_adapter::SupportedChain::from_u64(chain_id)
-        .expect("test running on chain not registered in SupportedChain — update detect.rs");
     let env_key = format!("RPC_URL_{chain_id}");
     let rpc_url = std::env::var(&env_key)
         .or_else(|_| std::env::var("RPC_URL"))
@@ -737,7 +723,7 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
     let mut pools_ok = 0u64;
 
     for entry in pools {
-        let (pool, n_coins) = match read_and_build_pool(entry, &provider, block, chain).await {
+        let (pool, n_coins) = match read_and_build_pool(entry, &provider, block).await {
             Some(p) => p,
             None => {
                 println!("  SKIP {}: could not read on-chain state", entry.name);
