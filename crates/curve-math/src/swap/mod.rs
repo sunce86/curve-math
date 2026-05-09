@@ -1,6 +1,7 @@
 pub mod stableswap_alend;
 pub mod stableswap_meta;
 pub mod stableswap_ng;
+pub mod stableswap_steth;
 pub mod stableswap_v0;
 pub mod stableswap_v1;
 pub mod stableswap_v2;

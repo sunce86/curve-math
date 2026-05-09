@@ -1,4 +1,4 @@
-/// All 11 Curve pool math variants.
+/// All 12 Curve pool math variants.
 ///
 /// Each variant uses a different on-chain smart contract implementation with
 /// different invariant math, fee formulas, and state layouts.
@@ -11,9 +11,13 @@ pub enum CurveVariant {
     /// 3pool era (2021): 3pool, hBTC.
     /// A_PRECISION=1, `-1` offset on dy.
     StableSwapV1,
-    /// Base/plain template: factory plain pools, stETH, FRAX/USDC.
+    /// Base/plain template: factory plain pools, FRAX/USDC.
     /// A_PRECISION=100, `-1` offset, fee before denormalize.
     StableSwapV2,
+    /// Lido stETH/ETH pool (`contracts/pools/steth/StableSwapSTETH.vy`).
+    /// V2 math plus `D_P = D_P * D / (_x * N_COINS + 1)` quirk in `get_D`,
+    /// `_balances()` reads native ETH via `self.balance`, payable exchange flow.
+    StableSwapSTETH,
     /// Aave lending template: aave, sAAVE, IB pools.
     /// A_PRECISION=100, dynamic fee via `offpeg_fee_multiplier`.
     StableSwapALend,
@@ -47,6 +51,7 @@ impl CurveVariant {
             Self::StableSwapV0 => "StableSwapV0",
             Self::StableSwapV1 => "StableSwapV1",
             Self::StableSwapV2 => "StableSwapV2",
+            Self::StableSwapSTETH => "StableSwapSTETH",
             Self::StableSwapALend => "StableSwapALend",
             Self::StableSwapNG => "StableSwapNG",
             Self::StableSwapMeta => "StableSwapMeta",
@@ -73,6 +78,7 @@ impl std::str::FromStr for CurveVariant {
             "StableSwapV0" => Ok(Self::StableSwapV0),
             "StableSwapV1" => Ok(Self::StableSwapV1),
             "StableSwapV2" => Ok(Self::StableSwapV2),
+            "StableSwapSTETH" => Ok(Self::StableSwapSTETH),
             "StableSwapALend" => Ok(Self::StableSwapALend),
             "StableSwapNG" => Ok(Self::StableSwapNG),
             "StableSwapMeta" => Ok(Self::StableSwapMeta),
@@ -96,6 +102,7 @@ mod tests {
             CurveVariant::StableSwapV0,
             CurveVariant::StableSwapV1,
             CurveVariant::StableSwapV2,
+            CurveVariant::StableSwapSTETH,
             CurveVariant::StableSwapALend,
             CurveVariant::StableSwapNG,
             CurveVariant::StableSwapMeta,

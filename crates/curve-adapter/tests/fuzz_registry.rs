@@ -372,7 +372,7 @@ async fn read_and_build_pool(
                 ..Default::default()
             }
         }
-        CurveVariant::StableSwapV2 => {
+        CurveVariant::StableSwapV2 | CurveVariant::StableSwapSTETH => {
             let c = IStable::new(addr, provider);
             let mut balances = Vec::new();
             for i in 0..n_coins {
@@ -739,6 +739,7 @@ async fn fuzz_pools(label: &str, pools: &[PoolEntry]) {
             Pool::StableSwapV0 { balances, .. }
             | Pool::StableSwapV1 { balances, .. }
             | Pool::StableSwapV2 { balances, .. }
+            | Pool::StableSwapSTETH { balances, .. }
             | Pool::StableSwapALend { balances, .. }
             | Pool::StableSwapNG { balances, .. }
             | Pool::StableSwapMeta { balances, .. } => balances.clone(),
