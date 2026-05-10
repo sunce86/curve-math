@@ -39,10 +39,7 @@ mod variant;
 #[cfg(feature = "build")]
 mod build;
 
-pub use detect::{
-    detect_eth_variant, detect_variant, is_eip1167_proxy, DetectError, ProbingResults,
-    SupportedChain,
-};
+pub use detect::{detect_eth_variant, detect_variant, DetectError, ProbingResults};
 pub use variant::CurveVariant;
 
 #[cfg(feature = "build")]
