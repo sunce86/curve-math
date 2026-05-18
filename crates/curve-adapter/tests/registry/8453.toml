@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-05-16"
-total_factory_pools = 1488
-live_factory_pools = 142
+last_updated = "2026-05-18"
+total_factory_pools = 1524
+live_factory_pools = 156
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
@@ -767,4 +767,74 @@ name = "rETH/wstETH"
 address = "0x2565BdA9851d42c27b8f9eE34Dd4C98E661C11AF"
 variant = "StableSwapNG"
 name = "rETH/wstETH"
+
+[[pools]]
+address = "0x11d7621860CB8F75e54dA41c2091605ed5f9b430"
+variant = "StableSwapNG"
+name = "WETH/cbBTC"
+
+[[pools]]
+address = "0x259f0cdf92a82D3135EBCB76601C0bCbaD654f73"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x71B4f01b5D253C6Ae911cD87414A29D80D741A1D"
+variant = "StableSwapNG"
+name = "WETH/cbBTC"
+
+[[pools]]
+address = "0xec4DB1b2e468644394645E9b41615D50A72BbEFC"
+variant = "StableSwapNG"
+name = "cbBTC/USDC"
+
+[[pools]]
+address = "0x0C8d20baeB2a9965F085e2372aAF252F69cE98a2"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x83dE924f2E3e01b52Ac5E3f2694E25759fC9Cce0"
+variant = "StableSwapNG"
+name = "cbBTC/USDC"
+
+[[pools]]
+address = "0xae07db17dEbde8391c6ea3a6990eBdD9E4939494"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x11d7621860CB8F75e54dA41c2091605ed5f9b430"
+variant = "StableSwapNG"
+name = "WETH/cbBTC"
+
+[[pools]]
+address = "0x259f0cdf92a82D3135EBCB76601C0bCbaD654f73"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x71B4f01b5D253C6Ae911cD87414A29D80D741A1D"
+variant = "StableSwapNG"
+name = "WETH/cbBTC"
+
+[[pools]]
+address = "0xec4DB1b2e468644394645E9b41615D50A72BbEFC"
+variant = "StableSwapNG"
+name = "cbBTC/USDC"
+
+[[pools]]
+address = "0x0C8d20baeB2a9965F085e2372aAF252F69cE98a2"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x83dE924f2E3e01b52Ac5E3f2694E25759fC9Cce0"
+variant = "StableSwapNG"
+name = "cbBTC/USDC"
+
+[[pools]]
+address = "0xae07db17dEbde8391c6ea3a6990eBdD9E4939494"
+variant = "StableSwapNG"
+name = "WETH/USDC"
 
