@@ -34,7 +34,7 @@ pub enum CurveVariant {
     /// Cardano cubic solver. MATH contract version v2.0.0 or v2.1.0.
     TwoCryptoNG,
     /// TwoCrypto-NG factory pools with StableSwap math.
-    /// Newton solver, gamma parameter ignored. MATH contract version v0.1.0.
+    /// Newton solver, gamma parameter ignored. MATH contract version v0.1.0 or v0.1.1.
     TwoCryptoStable,
     /// Legacy 3-coin CryptoSwap (tricrypto2: USDT/WBTC/WETH).
     /// Newton solver for y.

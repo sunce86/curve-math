@@ -1,4 +1,4 @@
-//! TwoCryptoStable — StableSwap math used by some TwoCryptoNG pools (MATH v0.1.0).
+//! TwoCryptoStable — StableSwap math used by some TwoCryptoNG pools (MATH v0.1.0/v0.1.1).
 //!
 //! These pools are deployed from the TwoCryptoNG factory but use StableSwap invariant
 //! instead of CryptoSwap. The gamma parameter is accepted but ignored.
