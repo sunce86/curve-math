@@ -133,6 +133,10 @@ TOKEN_ABI = json.loads('[{"name":"decimals","outputs":[{"type":"uint8"}],"inputs
 MATH_GETTER_ABI = json.loads('[{"name":"MATH","outputs":[{"type":"address"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 VERSION_ABI = json.loads('[{"name":"version","outputs":[{"type":"string"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 
+# MATH versions that are StableSwap math (TwoCryptoStable). v0.1.1 only adds a
+# balance-ratio assert to newton_D, same math as v0.1.0.
+STABLESWAP_MATH_VERSIONS = ("v0.1.0", "v0.1.1")
+
 # ABIs for on-chain variant probing (used by detect_variant_onchain)
 GAMMA_ABI = json.loads('[{"name":"gamma","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
 OFFPEG_ABI = json.loads('[{"name":"offpeg_fee_multiplier","outputs":[{"type":"uint256"}],"inputs":[],"stateMutability":"view","type":"function"}]')
@@ -240,7 +244,7 @@ def detect_variant_onchain(w3, addr, block):
             has_math, math_addr = _probe(w3, addr, MATH_GETTER_ABI, "MATH", block=block)
             if has_math and math_addr:
                 _, version = _probe(w3, math_addr, VERSION_ABI, "version", block=block)
-                if version == "v0.1.0":
+                if version in STABLESWAP_MATH_VERSIONS:
                     return "TwoCryptoStable"
                 return "TwoCryptoNG"
             return "TwoCryptoV1"
@@ -423,10 +427,10 @@ def discover_pools(w3, factory_cfg, existing_addrs, max_new, block):
         symbols = [s for _, s in info]
 
         variant = factory_cfg["variant"]
-        # Detect TwoCryptoStable: MATH v0.1.0 = StableSwap math
+        # Detect TwoCryptoStable: StableSwap MATH versions
         if variant == "TwoCryptoNG":
             math_ver = math_versions.get(addr, "v2.0.0")
-            if math_ver == "v0.1.0":
+            if math_ver in STABLESWAP_MATH_VERSIONS:
                 variant = "TwoCryptoStable"
         # MetaPool Factory: ask factory is_meta() to distinguish meta vs plain
         elif variant == "meta_factory":

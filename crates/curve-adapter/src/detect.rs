@@ -68,7 +68,7 @@ pub struct ProbingResults {
     /// Pool has `MATH()` getter → TwoCrypto-NG with external math contract.
     pub has_math: bool,
 
-    /// Version string from `MATH().version()`. E.g. `"v2.0.0"`, `"v2.1.0"`, `"v0.1.0"`.
+    /// Version string from `MATH().version()`. E.g. `"v2.0.0"`, `"v2.1.0"`, `"v0.1.0"`, `"v0.1.1"`.
     pub math_version: Option<String>,
 
     /// Pool has `offpeg_fee_multiplier()` → StableSwapNG or StableSwapALend.
@@ -142,7 +142,8 @@ fn detect_cryptoswap(probing: &ProbingResults) -> Result<CurveVariant, DetectErr
             if probing.has_math {
                 match probing.math_version.as_deref() {
                     Some("v2.0.0" | "v2.1.0") => Ok(CurveVariant::TwoCryptoNG),
-                    Some("v0.1.0") => Ok(CurveVariant::TwoCryptoStable),
+                    // v0.1.1 only adds a balance-ratio assert to newton_D, same math as v0.1.0
+                    Some("v0.1.0" | "v0.1.1") => Ok(CurveVariant::TwoCryptoStable),
                     // Unknown MATH version — default to TwoCryptoNG
                     _ => Ok(CurveVariant::TwoCryptoNG),
                 }
@@ -344,6 +345,27 @@ mod tests {
             has_base_pool: false,
             has_int128_balances: false,
             pool_address: addr("0x6e5492F8ea2370844EE098A56DD88e1717e4A9C2"),
+        };
+        assert_eq!(
+            detect_variant(&probing).unwrap(),
+            CurveVariant::TwoCryptoStable
+        );
+    }
+
+    #[test]
+    fn detect_twocrypto_stable_v011() {
+        // CADD/frxUSD, deployed from the 2026 Twocrypto factory with StableswapMath v0.1.1
+        let probing = ProbingResults {
+            has_gamma: true,
+            n_coins: 2,
+            has_math: true,
+            math_version: Some("v0.1.1".to_string()),
+            has_offpeg_fee_multiplier: false,
+            has_stored_rates: false,
+            has_version: false,
+            has_base_pool: false,
+            has_int128_balances: false,
+            pool_address: addr("0x384CA8992F955009Bdd94849488E580559590157"),
         };
         assert_eq!(
             detect_variant(&probing).unwrap(),

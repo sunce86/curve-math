@@ -169,9 +169,9 @@ pub enum Pool {
         fee_gamma: U256,
     },
 
-    /// TwoCryptoNG pools using StableSwap MATH (v0.1.0).
+    /// TwoCryptoNG pools using StableSwap MATH (v0.1.0 or v0.1.1).
     /// CryptoSwap interface but StableSwap invariant (gamma ignored).
-    /// Detect via: pool.MATH().version() == "v0.1.0"
+    /// Detect via: pool.MATH().version() in {"v0.1.0", "v0.1.1"}
     TwoCryptoStable {
         balances: [U256; 2],
         precisions: [U256; 2],
