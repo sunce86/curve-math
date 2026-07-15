@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-05-25"
-total_factory_pools = 2192
-live_factory_pools = 1128
+last_updated = "2026-07-15"
+total_factory_pools = 2326
+live_factory_pools = 1149
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5648,4 +5648,109 @@ name = "STRCx/apxUSD"
 address = "0x3e6751c4Be3850bA5b4231339B3F3D3DB6D2FD74"
 variant = "StableSwapNG"
 name = "CRV/yscvxCRV"
+
+[[pools]]
+address = "0x230429F1065201F85BE8a6f858F48BC6e2f1e2A9"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x790089ffb58Fd8322474414a819A36c7c54A158f"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x18042f2FaB99af6E374e4f5F3c2218102993cc23"
+variant = "StableSwapNG"
+name = "USDC/DAI"
+
+[[pools]]
+address = "0x509C6c89Fbf48b968B52C8069607C729464C78b6"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x706dDBd9F2aaD43F50162a89A1cFF30a7942Ca97"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0xC1e02725E3baBa18D3c7CA22Be5338a3714Aa006"
+variant = "StableSwapNG"
+name = "sfrxUSD/waCorefrxUSD"
+
+[[pools]]
+address = "0x6f94465959d33ccf9580Cf177b7cE09767711B27"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0xB5555Ab6CB4F37F833f8Fbd483b70ccDd4601057"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0x21C32256B62C06684e62C9c04Ec21100A8919d02"
+variant = "StableSwapNG"
+name = "USG/msUSD"
+
+[[pools]]
+address = "0xeC19D5f427c56e5A2Df1c620539ECd20a4D0a419"
+variant = "StableSwapNG"
+name = "apxUSD/USDC"
+
+[[pools]]
+address = "0x57C881adA3fa218F8C720E10123A8b46CcC75B81"
+variant = "TwoCryptoStable"
+name = "ZARP/frxUSD"
+
+[[pools]]
+address = "0x384CA8992F955009Bdd94849488E580559590157"
+variant = "TwoCryptoStable"
+name = "CADD/frxUSD"
+
+[[pools]]
+address = "0x7D476d419BbC9F0115Cd59ac35E8a71AE88192c2"
+variant = "TwoCryptoNG"
+name = "USDC/STRCx"
+
+[[pools]]
+address = "0x4FdcCB810f22578ad6700fC10a8C9B6c1DF61852"
+variant = "TwoCryptoStable"
+name = "CADD/USDC"
+
+[[pools]]
+address = "0xE79fB88C7937B39B3E1cAbd44FAefA5258578b2d"
+variant = "TwoCryptoStable"
+name = "AUDF/frxUSD"
+
+[[pools]]
+address = "0x6f10941a6b9009D8a1B4e0bB6776bf4f1da5508b"
+variant = "TwoCryptoNG"
+name = "USDC/UCBI"
+
+[[pools]]
+address = "0xc4ff0e84Ec219581092e5660c74A2Da8dE6Aee4F"
+variant = "TwoCryptoNG"
+name = "VUSD/hemiBTC"
+
+[[pools]]
+address = "0x83777e0467E9fe8B997B868b7B66Cc7d85b56DD9"
+variant = "TwoCryptoNG"
+name = "uDEAD/USDC"
+
+[[pools]]
+address = "0x656341Ef90b622c6634e0573772FfB7f3669b9f3"
+variant = "TwoCryptoStable"
+name = "crvUSD/WETH"
+
+[[pools]]
+address = "0x4F52C3a81E33521e5a9A47FD9D3BE475D2279c2e"
+variant = "TwoCryptoStable"
+name = "crvUSD/tBTC"
+
+[[pools]]
+address = "0x265BB1ACd6e9a46B08018398A5B47Fb2a586C153"
+variant = "TriCryptoNG"
+name = "scrvUSD/FLIP/SESH"
 
