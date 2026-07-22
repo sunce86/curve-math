@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-07-15"
-total_factory_pools = 2326
-live_factory_pools = 1149
+last_updated = "2026-07-22"
+total_factory_pools = 2335
+live_factory_pools = 1163
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5753,4 +5753,74 @@ name = "crvUSD/tBTC"
 address = "0x265BB1ACd6e9a46B08018398A5B47Fb2a586C153"
 variant = "TriCryptoNG"
 name = "scrvUSD/FLIP/SESH"
+
+[[pools]]
+address = "0xB532334c944f12644F321D8Df87cBdc15C9AC72A"
+variant = "StableSwapNG"
+name = "AMPL/apyUSD/sUSDat/SPOT/STRCx/MSTRx/SNX/WAMPL"
+
+[[pools]]
+address = "0x60436FfEed9A5fb131892B2ef985F48f2fd5d679"
+variant = "StableSwapNG"
+name = "USDT/USAD"
+
+[[pools]]
+address = "0x113932Bf958dda1cD050b73e460bfb8950B061EC"
+variant = "StableSwapNG"
+name = "USAD/USDC"
+
+[[pools]]
+address = "0x72c2974b9De3C4DC5A70d2103E2f3ee27b25011F"
+variant = "StableSwapNG"
+name = "AMPL/crvUSD/scrvUSD/CRV"
+
+[[pools]]
+address = "0x47C7E2b83aa7DEEA209D16BF7D49C2149A67dc6c"
+variant = "StableSwapNG"
+name = "frxUSD/FIDD"
+
+[[pools]]
+address = "0x579a9A9d43f9C112dEe359e09a87a44F2718a483"
+variant = "StableSwapNG"
+name = "MIM/crv2pool"
+
+[[pools]]
+address = "0xaFEc61e7A604F8F81F7cab64eC75BFa07c542630"
+variant = "StableSwapNG"
+name = "ftUSD/USDC"
+
+[[pools]]
+address = "0xc3b723b0dAE2Df9668F876236a1922f72Bcb438d"
+variant = "StableSwapNG"
+name = "BOLD/avUSD"
+
+[[pools]]
+address = "0xC6ac08424eE6D1373F03611b96f5Da849594B6D8"
+variant = "StableSwapNG"
+name = "sUSG/reUSD"
+
+[[pools]]
+address = "0xf05F1b7bC5D9f966193201e9f4F320A98aAF260C"
+variant = "StableSwapNG"
+name = "NaraUSD/USDC"
+
+[[pools]]
+address = "0x68102ff5406475881462880a8dA3C9Bc9181aD6c"
+variant = "TwoCryptoNG"
+name = "FT/ftUSD"
+
+[[pools]]
+address = "0x862CB4E988FB66E72f128d1183829f8c05B6c6A0"
+variant = "TwoCryptoStable"
+name = "crvUSD/cbBTC"
+
+[[pools]]
+address = "0x313698667d7FDD6789a9BC70821309ff891E729A"
+variant = "TwoCryptoStable"
+name = "crvUSD/WBTC"
+
+[[pools]]
+address = "0x7a4AdfbC173E2D4f224f11496b0d0ef86F336091"
+variant = "TwoCryptoNG"
+name = "BOBO/WETH"
 
