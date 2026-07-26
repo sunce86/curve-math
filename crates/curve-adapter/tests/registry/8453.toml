@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-07-22"
-total_factory_pools = 1988
-live_factory_pools = 196
+last_updated = "2026-07-26"
+total_factory_pools = 2048
+live_factory_pools = 202
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
@@ -1167,4 +1167,84 @@ name = "USDC/USDT"
 address = "0xb88d67EBC6Ee54968c08e4D7E3f4A288C49A2FCe"
 variant = "StableSwapNG"
 name = "cyUSD/scyUSD/lscyUSD/scrvUSD"
+
+[[pools]]
+address = "0x3863944D9E19483b637124A4c4ce1BeBC800A767"
+variant = "StableSwapNG"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0xC54f5b170DD1BC35436E97F375F4Be076dEa17fE"
+variant = "StableSwapNG"
+name = "WETH/USDT"
+
+[[pools]]
+address = "0xb42a745C8B3Af214000c31b8EeFCf4F682c8B31e"
+variant = "StableSwapNG"
+name = "cbBTC/USDC"
+
+[[pools]]
+address = "0x0132E16CDB4C12baA3B387A4C58b2986E847BcF4"
+variant = "StableSwapNG"
+name = "WETH/USDT"
+
+[[pools]]
+address = "0x4aC0d61413DdF98c39147Ac28e1D25318a0234f5"
+variant = "StableSwapNG"
+name = "cbBTC/WETH"
+
+[[pools]]
+address = "0xdb430853e7F4fe6Eb6ed942f927e9fF9D78a8B5d"
+variant = "StableSwapNG"
+name = "WETH/cbBTC"
+
+[[pools]]
+address = "0x12380121477335b9F91CE413850DBedb7CDB9fdD"
+variant = "StableSwapNG"
+name = "DIEM/wstDIEM"
+
+[[pools]]
+address = "0x35d062Fea93FE43c00f9a00C4C60e3109257eA76"
+variant = "StableSwapNG"
+name = "cyUSD/crvUSD"
+
+[[pools]]
+address = "0x3863944D9E19483b637124A4c4ce1BeBC800A767"
+variant = "StableSwapNG"
+name = "USDC/WETH"
+
+[[pools]]
+address = "0xC54f5b170DD1BC35436E97F375F4Be076dEa17fE"
+variant = "StableSwapNG"
+name = "WETH/USDT"
+
+[[pools]]
+address = "0xb42a745C8B3Af214000c31b8EeFCf4F682c8B31e"
+variant = "StableSwapNG"
+name = "cbBTC/USDC"
+
+[[pools]]
+address = "0x0132E16CDB4C12baA3B387A4C58b2986E847BcF4"
+variant = "StableSwapNG"
+name = "WETH/USDT"
+
+[[pools]]
+address = "0x4aC0d61413DdF98c39147Ac28e1D25318a0234f5"
+variant = "StableSwapNG"
+name = "cbBTC/WETH"
+
+[[pools]]
+address = "0xdb430853e7F4fe6Eb6ed942f927e9fF9D78a8B5d"
+variant = "StableSwapNG"
+name = "WETH/cbBTC"
+
+[[pools]]
+address = "0x12380121477335b9F91CE413850DBedb7CDB9fdD"
+variant = "StableSwapNG"
+name = "DIEM/wstDIEM"
+
+[[pools]]
+address = "0x35d062Fea93FE43c00f9a00C4C60e3109257eA76"
+variant = "StableSwapNG"
+name = "cyUSD/crvUSD"
 
