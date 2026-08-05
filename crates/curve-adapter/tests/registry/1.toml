@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-07-26"
-total_factory_pools = 2338
-live_factory_pools = 1174
+last_updated = "2026-08-05"
+total_factory_pools = 2351
+live_factory_pools = 1182
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5878,4 +5878,44 @@ name = "sUSG/reUSDe"
 address = "0x279B5da45cB6fc61dDDeae5327A47F20d7849361"
 variant = "TwoCryptoNG"
 name = "HLX/USDC"
+
+[[pools]]
+address = "0x6F63deEDc9870D6c16FC644C6654748352cdc87c"
+variant = "StableSwapNG"
+name = "apxUSD/USDC"
+
+[[pools]]
+address = "0x8C51384dF596F38FBf5B8382998D9Fa0AF832638"
+variant = "StableSwapNG"
+name = "evaUSDT/USDT"
+
+[[pools]]
+address = "0x83F14C06740d28F03a670B2E0f8A134D9cCB8efe"
+variant = "StableSwapNG"
+name = "evaUSDC/USDC"
+
+[[pools]]
+address = "0xE4674fF8a59deEEA4fCBe80D878005848FD01B84"
+variant = "StableSwapNG"
+name = "dfxCAD/CADC"
+
+[[pools]]
+address = "0x317837AED98bea887074d1f97Fd3C83eBCA6905b"
+variant = "StableSwapNG"
+name = "USG/sDOLA"
+
+[[pools]]
+address = "0x8273a8578eBf1818541C49F034d896616657b8ce"
+variant = "StableSwapNG"
+name = "USDeAD/USDT/USDC"
+
+[[pools]]
+address = "0x04710a7B238386Da58EfAd8b65E150e5E17AA522"
+variant = "TwoCryptoStable"
+name = "USDC/sUSDat"
+
+[[pools]]
+address = "0x95f07DCD938148Ef3035134fc8ABA146Faa0961D"
+variant = "TwoCryptoNG"
+name = "USDC/WBTC"
 
