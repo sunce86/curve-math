@@ -16,9 +16,9 @@ The pool registry covers all live Curve pools (non-empty, non-paused, functional
 
 | Chain | Verified / Live pools | Last indexed |
 |-------|----------------------|-------------|
-| Ethereum | 1183 / 1183 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-08-08 |
-| Base | 201 / 201 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-08-08 |
-| Arbitrum | 209 / 209 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-08-08 |
+| Ethereum | 1187 / 1187 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-08-13 |
+| Base | 209 / 209 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-08-13 |
+| Arbitrum | 209 / 209 ![](https://geps.dev/progress/100?successColor=6366f1) | 2026-08-13 |
 
 ## Performance
 
