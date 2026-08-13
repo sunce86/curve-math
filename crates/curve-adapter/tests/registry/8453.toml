@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-08-08"
-total_factory_pools = 2146
-live_factory_pools = 201
+last_updated = "2026-08-13"
+total_factory_pools = 2176
+live_factory_pools = 209
 [[pools]]
 address = "0x09bF787B9AB2D52D7836272A41e9809481795AB0"
 variant = "StableSwapNG"
@@ -1297,4 +1297,54 @@ name = "USDC/WETH"
 address = "0xF29B361a41d380472AcC6F0e36a455384803143F"
 variant = "StableSwapNG"
 name = "USDC/WETH"
+
+[[pools]]
+address = "0x3f5D21EDa95AE6b556f90B3c8a101ed32F5bD8fA"
+variant = "StableSwapNG"
+name = "d$U/USDC"
+
+[[pools]]
+address = "0x1F2CE80f43A661A70507153D592034578c5B09E5"
+variant = "StableSwapNG"
+name = "d$H/USDC"
+
+[[pools]]
+address = "0xB8746aB3b21672310cED3a74d3438D6928e63A7C"
+variant = "StableSwapNG"
+name = "d$P/USDC"
+
+[[pools]]
+address = "0x63987bF3400Eb03df36a5aDac2ea7efb7f5eb49c"
+variant = "StableSwapNG"
+name = "WETH/USDC"
+
+[[pools]]
+address = "0x6D4cEff9b439817e28745830A601926846F9c4f2"
+variant = "TwoCryptoNG"
+name = "CTR/4poolUSD-f"
+
+[[pools]]
+address = "0x6D4cEff9b439817e28745830A601926846F9c4f2"
+variant = "TwoCryptoNG"
+name = "CTR/4poolUSD-f"
+
+[[pools]]
+address = "0x3f5D21EDa95AE6b556f90B3c8a101ed32F5bD8fA"
+variant = "StableSwapNG"
+name = "d$U/USDC"
+
+[[pools]]
+address = "0x1F2CE80f43A661A70507153D592034578c5B09E5"
+variant = "StableSwapNG"
+name = "d$H/USDC"
+
+[[pools]]
+address = "0xB8746aB3b21672310cED3a74d3438D6928e63A7C"
+variant = "StableSwapNG"
+name = "d$P/USDC"
+
+[[pools]]
+address = "0x63987bF3400Eb03df36a5aDac2ea7efb7f5eb49c"
+variant = "StableSwapNG"
+name = "WETH/USDC"
 
