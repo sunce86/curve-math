@@ -1,6 +1,7 @@
 //! Pool-level get_amount_out for StableSwapV1 (3pool, ren, sbtc, hbtc).
 //!
-//! -1 offset. Denorm FIRST, then fee.
+//! -1 offset. Fee FIRST (in normalized units), then denorm — models the
+//! on-chain `exchange` (delivered) output, which can be `get_dy` or `get_dy - 1`.
 
 use alloy_primitives::U256;
 
@@ -30,10 +31,16 @@ pub fn get_amount_out(
     if xp[j] <= y_new {
         return None;
     }
-    // -1 offset. Denorm FIRST, then fee.
-    let dy = (xp[j] - y_new - U256::from(1)) * precision / rates[j];
+    // -1 offset. Subtract the fee in normalized units BEFORE the single
+    // `* PRECISION / rates[j]` denorm, matching the on-chain `exchange` (which
+    // does `dy -= dy*fee/FEE_DENOM` then `dy = dy * PRECISION / rates[j]`).
+    // `get_dy` instead denorms first and subtracts the fee after; because both
+    // are floor divisions, the two orders can differ by 1 wei, so `exchange`
+    // returns `get_dy` or `get_dy - 1`. Modeling the delivered `exchange` output
+    // (as StableSwapV2 already does) makes this wei-exact vs an actual swap.
+    let dy = xp[j] - y_new - U256::from(1);
     let fee_amount = fee * dy / U256::from(FEE_DENOMINATOR);
-    let result = dy - fee_amount;
+    let result = (dy - fee_amount) * precision / rates[j];
     if result.is_zero() {
         return None;
     }
