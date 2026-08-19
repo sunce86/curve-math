@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-08-13"
-total_factory_pools = 2356
-live_factory_pools = 1187
+last_updated = "2026-08-19"
+total_factory_pools = 2369
+live_factory_pools = 1192
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5943,4 +5943,29 @@ name = "ESP/stESP"
 address = "0xe60B5E323D72a914b089f137eC9b3aB91ae24A65"
 variant = "StableSwapNG"
 name = "USDC/USDT"
+
+[[pools]]
+address = "0x825040929059c43b0014AB9a53545Bc02A6E091F"
+variant = "StableSwapNG"
+name = "EURC/EURdt"
+
+[[pools]]
+address = "0x09c28ba72D7C50bCE16688bb7CC551569F87675e"
+variant = "StableSwapNG"
+name = "USDT/USDC"
+
+[[pools]]
+address = "0xBE739fE57B9862E9cF17835687e8C008cF8e121c"
+variant = "StableSwapNG"
+name = "AID/USDC"
+
+[[pools]]
+address = "0x063F670A0D672d52302d4b2053c94EB36c145071"
+variant = "StableSwapNG"
+name = "sUSDe/weUSDSr"
+
+[[pools]]
+address = "0x5BC1343a7400C2DEf9C2D1f0a9CD96f36fecb904"
+variant = "TwoCryptoNG"
+name = "PLNdt/EURdt"
 
