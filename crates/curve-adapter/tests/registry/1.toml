@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-08-19"
-total_factory_pools = 2369
-live_factory_pools = 1192
+last_updated = "2026-09-06"
+total_factory_pools = 2396
+live_factory_pools = 1203
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5968,4 +5968,59 @@ name = "sUSDe/weUSDSr"
 address = "0x5BC1343a7400C2DEf9C2D1f0a9CD96f36fecb904"
 variant = "TwoCryptoNG"
 name = "PLNdt/EURdt"
+
+[[pools]]
+address = "0xC4C5e8edB69100108C428E88329039b715E3AAd1"
+variant = "StableSwapNG"
+name = "sVUSD/VUSD"
+
+[[pools]]
+address = "0x00a23A5257CDc7F4b79B2d49A4689A1abd6dd415"
+variant = "StableSwapNG"
+name = "lrUSD/USDC"
+
+[[pools]]
+address = "0x1C9A0b9bFF066756c4586CB6711483Cfa9f281eE"
+variant = "StableSwapNG"
+name = "sUSDx/USDx"
+
+[[pools]]
+address = "0xE521BA88837B2726E5343ccA91adA6f19F356C45"
+variant = "StableSwapNG"
+name = "USDx/USDT"
+
+[[pools]]
+address = "0x5fC00b07a8F21DE2Cd312CDAc73e13b5E9a14b1C"
+variant = "StableSwapNG"
+name = "USDT/USDx"
+
+[[pools]]
+address = "0x6819068dC6D1AFE3120454A3519Ec1Fa1A32FBD1"
+variant = "StableSwapNG"
+name = "USDC/aptUSD"
+
+[[pools]]
+address = "0xd932bf031d44279eC6400c1c9635b7687109Eb9b"
+variant = "StableSwapNG"
+name = "USDC/alqUSD"
+
+[[pools]]
+address = "0x8E18eE046B5E071EA2859740776E297DADbf1fd9"
+variant = "StableSwapNG"
+name = "aptUSD/alqUSD"
+
+[[pools]]
+address = "0x8633aB59f7225eDE4F4F28f6e3cF08851bE9Aac4"
+variant = "StableSwapNG"
+name = "USDT/USDU"
+
+[[pools]]
+address = "0xFf090079baa783ad1cc60175120a4dDDCD6234d4"
+variant = "StableSwapNG"
+name = "USD2/AQUAT"
+
+[[pools]]
+address = "0x7a9BD110d2A8b2BEfF74D5d146aCF8A7888E8d5a"
+variant = "TwoCryptoNG"
+name = "VLT/WETH"
 
