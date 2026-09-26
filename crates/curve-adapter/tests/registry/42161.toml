@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-08-19"
-total_factory_pools = 658
-live_factory_pools = 209
+last_updated = "2026-09-26"
+total_factory_pools = 679
+live_factory_pools = 216
 [[pools]]
 address = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 variant = "StableSwapV2"
@@ -1052,4 +1052,39 @@ name = "WETH/USDC"
 address = "0xF84BA2f9940973eD1E8ec579Be7856076E365cB5"
 variant = "StableSwapNG"
 name = "USDC/USD₮0"
+
+[[pools]]
+address = "0xA087f05ecD245476d7844f6eab28D98724696ac2"
+variant = "TwoCryptoStable"
+name = "CHLt/USD₮0"
+
+[[pools]]
+address = "0x6EdBF3adA7B6D9524c3248955538D573AAE449CF"
+variant = "TwoCryptoStable"
+name = "MEXt/USD₮0"
+
+[[pools]]
+address = "0x7D2dFfa9e903b8377c96196dA424C7965b06BCc3"
+variant = "TwoCryptoStable"
+name = "COLt/USD₮0"
+
+[[pools]]
+address = "0x41af8cC0811DD07F167752B821CF5B11DBa7Ca85"
+variant = "TwoCryptoStable"
+name = "PERt/USD₮0"
+
+[[pools]]
+address = "0x9c7809c813BcC67e288c56d5Ce5e0225996bFcD2"
+variant = "TwoCryptoStable"
+name = "BOLt/USD₮0"
+
+[[pools]]
+address = "0xEef48Df5F1c509cD9730774b4e8A4464626ef8D5"
+variant = "TwoCryptoStable"
+name = "BRAt/USD₮0"
+
+[[pools]]
+address = "0x356D349dA9ADd7Efb56a35fAB939A2c6D852f853"
+variant = "TwoCryptoStable"
+name = "ARGt/USD₮0"
 
