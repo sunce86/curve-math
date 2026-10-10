@@ -5,9 +5,9 @@
 # Every pool with fuzz_verified = true has passed differential fuzz testing
 # against on-chain get_dy with random swap amounts.
 
-last_updated = "2026-08-19"
-total_factory_pools = 2369
-live_factory_pools = 1192
+last_updated = "2026-10-10"
+total_factory_pools = 2430
+live_factory_pools = 1210
 [[pools]]
 address = "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
 variant = "StableSwapV0"
@@ -5968,4 +5968,94 @@ name = "sUSDe/weUSDSr"
 address = "0x5BC1343a7400C2DEf9C2D1f0a9CD96f36fecb904"
 variant = "TwoCryptoNG"
 name = "PLNdt/EURdt"
+
+[[pools]]
+address = "0xf3EF7C2F7bff49EB6a7b4c7BF613a1c2Cb2a48e2"
+variant = "StableSwapNG"
+name = "frxUSD/sVUSD"
+
+[[pools]]
+address = "0x3157266c693324bC0177fA5d2a18dDC019BC6eE0"
+variant = "StableSwapNG"
+name = "alUSD/avUSD"
+
+[[pools]]
+address = "0x8c69E2C5Cc6D8490593Db3635FDC657b0Db45C14"
+variant = "StableSwapNG"
+name = "USDC/USDT"
+
+[[pools]]
+address = "0xfD9F287d1FB94c750601fAbd89739BaB9260f6E4"
+variant = "StableSwapNG"
+name = "SWDC/USDT"
+
+[[pools]]
+address = "0xB8EA881c8c0D330F72Edc27F8DE49d5cAE9550BC"
+variant = "StableSwapNG"
+name = "wstGBP/tGBP"
+
+[[pools]]
+address = "0xD6937eA8D33B0C21348F36F7895FdE3054bA4927"
+variant = "StableSwapNG"
+name = "frxUSD/USDT"
+
+[[pools]]
+address = "0x07830699FE73Eb90f1b3b466Ce88C38d4EEdd83B"
+variant = "StableSwapNG"
+name = "c-uWatt/USDC"
+
+[[pools]]
+address = "0xC4C5e8edB69100108C428E88329039b715E3AAd1"
+variant = "StableSwapNG"
+name = "sVUSD/VUSD"
+
+[[pools]]
+address = "0x00a23A5257CDc7F4b79B2d49A4689A1abd6dd415"
+variant = "StableSwapNG"
+name = "lrUSD/USDC"
+
+[[pools]]
+address = "0x1C9A0b9bFF066756c4586CB6711483Cfa9f281eE"
+variant = "StableSwapNG"
+name = "sUSDx/USDx"
+
+[[pools]]
+address = "0x1Ea81dc7381f32914E0D648d0C73924db262b5Ab"
+variant = "TwoCryptoNG"
+name = "CRV/DHN"
+
+[[pools]]
+address = "0x7488BBc23d7A26340180ec7741575DDF8eFc7A7f"
+variant = "TwoCryptoNG"
+name = "DHN/crvUSD"
+
+[[pools]]
+address = "0x6E2076fBad47264E911CF8A63bC0451760B88a86"
+variant = "TwoCryptoNG"
+name = "WETH/███"
+
+[[pools]]
+address = "0x846254836ab71E53fa66FAdB95129036C837C030"
+variant = "TwoCryptoStable"
+name = "crvUSD/WETH"
+
+[[pools]]
+address = "0x40bd9fE1F6399f7550a88CA24139f80E939E6eaD"
+variant = "TwoCryptoStable"
+name = "crvUSD/WETH"
+
+[[pools]]
+address = "0x08F288C19cC8123280987ACc85e2cc55c08B1E65"
+variant = "TwoCryptoNG"
+name = "USDU/CHFU"
+
+[[pools]]
+address = "0x114acEbbE474fA0c0DcDe6617D867d1A14d20ADA"
+variant = "TwoCryptoNG"
+name = "USDU/EURU"
+
+[[pools]]
+address = "0x7a9BD110d2A8b2BEfF74D5d146aCF8A7888E8d5a"
+variant = "TwoCryptoNG"
+name = "VLT/WETH"
 
